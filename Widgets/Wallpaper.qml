@@ -22,9 +22,8 @@ PanelWindow {
     }
     
     color: "transparent"
-
     property string wallpaperFolder: "../Wallpapers"
-
+    
     FolderListModel {
         id: wpModel
         folder: Qt.resolvedUrl(root.wallpaperFolder)
@@ -32,9 +31,10 @@ PanelWindow {
         showDirs: false
         sortField: FolderListModel.Name
     }
-
+    
     Image {
         anchors.fill: parent
+        anchors.topMargin: 40
         fillMode: Image.PreserveAspectCrop
         source: wpModel.count > 0 ? wpModel.get(0, "fileUrl") : ""
     }
