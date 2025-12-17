@@ -7,13 +7,8 @@ ShellRoot {
     id: root
     property color systemColor: "#1E1E2E"
 
-    Variants {
-        model: Quickshell.screens
-
-        delegate: Wallpaper {
-            bgColor: root.systemColor
-        }
-    }
+		WG.Wallpaper {}
+		WG.Overlay {}
 
     // Widgets
     WG.Bar {
