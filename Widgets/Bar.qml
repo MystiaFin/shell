@@ -7,7 +7,7 @@ import "../Components"
 PanelWindow {
     id: panel
     
-    property color bgColor: "#1E1E2E"
+    property color bgColor: "#11111b"
     property color surfaceColor: "#313244"
     property color textColor: "#cdd6f4"
     
