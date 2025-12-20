@@ -15,5 +15,5 @@ ShellRoot {
         bgColor: root.systemColor
     }
     WG.NotificationPopups {}
-		WG.FloatingBottom {}
+		// WG.FloatingBottom {}
 }
