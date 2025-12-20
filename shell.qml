@@ -5,7 +5,7 @@ import "Widgets" as WG
 
 ShellRoot {
     id: root
-    property color systemColor: "#1E1E2E"
+    property color systemColor: "#11111b"
 
 		WG.Wallpaper {}
 		WG.Overlay {}
