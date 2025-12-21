@@ -18,7 +18,7 @@ Rectangle {
     radius: 12
 
     // --- NEW: Blue Border ---
-    border.width: 1
+    border.width: 2
     border.color: blueColor
 
     // Shadow Effect

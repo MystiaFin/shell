@@ -5,6 +5,7 @@ import QtQuick.Effects
 
 PanelWindow {
     id: root
+    property color bgColor
     
     color: "transparent"
     visible: true
@@ -29,7 +30,7 @@ PanelWindow {
         
         Rectangle {
             anchors.fill: parent
-            color: "#1e1e2e"
+            color: root.bgColor
             
             layer.enabled: true
             layer.effect: MultiEffect {

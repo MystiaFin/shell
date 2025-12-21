@@ -5,15 +5,16 @@ import "Widgets" as WG
 
 ShellRoot {
     id: root
-    property color systemColor: "#11111b"
+    property color systemColor: "#181825"
+    property color systemBlue: "#89b4fa"
+    property bool launcherVisible: false
 
-		WG.Wallpaper {}
-		WG.Overlay {}
-
-    // Widgets
+    WG.Wallpaper {}
+		WG.Overlay {
+						bgColor: root.systemColor
+		}
     WG.Bar {
         bgColor: root.systemColor
     }
     WG.NotificationPopups {}
-		// WG.FloatingBottom {}
 }
