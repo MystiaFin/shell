@@ -7,13 +7,26 @@ Row {
     id: root
     spacing: 15
 
-    WorkspaceService {
-        id: wsService
+    property int lastActiveIndex: 0
+    property int spinDirection: 1
+
+    WorkspaceService { 
+        id: wsService 
+        
+        onActiveIndexChanged: {
+            if (wsService.activeIndex > root.lastActiveIndex) {
+                root.spinDirection = 1
+            } else {
+                root.spinDirection = -1
+            }
+            root.lastActiveIndex = wsService.activeIndex
+        }
     }
 
+    // Generic Niri Command Processor
     Process {
         id: niriCommand
-        command: []
+        command: [] 
     }
 
     Rectangle {
@@ -24,10 +37,7 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
 
         Behavior on width {
-            NumberAnimation {
-                duration: 200
-                easing.type: Easing.OutCubic
-            }
+            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
         }
 
         WorkspaceAnim {
@@ -58,14 +68,12 @@ Row {
                         font.pixelSize: 18
                         text: active ? "󰫢" : ""
                         color: active ? "#1e1e2e" : "#585b70"
-                        scale: active ? 1.0 : 0.6
-                        Behavior on scale {
-                            NumberAnimation {
-                                duration: 150
-                            }
-                        }
-                        rotation: active ? 180 : 0
 
+                        scale: active ? 1.0 : 0.6
+                        Behavior on scale { NumberAnimation { duration: 150 } }
+
+                        rotation: active ? (root.spinDirection * 180) : 0
+                        
                         Behavior on rotation {
                             NumberAnimation {
                                 duration: 700
@@ -79,12 +87,10 @@ Row {
                         anchors.margins: -4
                         cursorShape: Qt.PointingHandCursor
                         hoverEnabled: true
-
                         onClicked: {
-                            niriCommand.running = false;
-                            niriCommand.command = ["niri", "msg", "action", "focus-workspace", model.idx];
-                            niriCommand.running = true;
-                            console.log("Exec: niri msg action focus-workspace " + model.idx);
+                            niriCommand.running = false
+                            niriCommand.command = ["niri", "msg", "action", "focus-workspace", model.idx]
+                            niriCommand.running = true
                         }
                     }
                 }
