@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Io
 import "../Services"
 import "../Anim"
 
@@ -6,12 +7,15 @@ Row {
     id: root
     spacing: 15
 
-    // Initialize Service
     WorkspaceService {
         id: wsService
     }
 
-    // The Pill Container
+    Process {
+        id: niriCommand
+        command: []
+    }
+
     Rectangle {
         width: (wsService.model.count * 30) + 4
         height: 32
@@ -19,12 +23,13 @@ Row {
         color: "#292c3c"
         anchors.verticalCenter: parent.verticalCenter
 
-        // Smooth width adjustment when adding/removing workspaces
-        Behavior on width { 
-            NumberAnimation { duration: 200; easing.type: Easing.OutCubic } 
+        Behavior on width {
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
         }
 
-        // --- Active Indicator Animation ---
         WorkspaceAnim {
             anchors.verticalCenter: parent.verticalCenter
             targetIndex: wsService.activeIndex
@@ -32,7 +37,6 @@ Row {
             startOffset: 3
         }
 
-        // --- Icons ---
         Row {
             id: workspaceRow
             anchors.fill: parent
@@ -55,25 +59,39 @@ Row {
                         text: active ? "󰫢" : ""
                         color: active ? "#1e1e2e" : "#585b70"
                         scale: active ? 1.0 : 0.6
-                        
-                        // Icon Scale Animation
-                        Behavior on scale { 
-                            NumberAnimation { duration: 150; easing.type: Easing.OutBack } 
+                        Behavior on scale {
+                            NumberAnimation {
+                                duration: 150
+                            }
+                        }
+                        rotation: active ? 180 : 0
+
+                        Behavior on rotation {
+                            NumberAnimation {
+                                duration: 700
+                                easing.type: Easing.OutCubic
+                            }
                         }
                     }
 
                     MouseArea {
                         anchors.fill: parent
+                        anchors.margins: -4
                         cursorShape: Qt.PointingHandCursor
                         hoverEnabled: true
-                        onClicked: wsService.focus(idx)
+
+                        onClicked: {
+                            niriCommand.running = false;
+                            niriCommand.command = ["niri", "msg", "action", "focus-workspace", model.idx];
+                            niriCommand.running = true;
+                            console.log("Exec: niri msg action focus-workspace " + model.idx);
+                        }
                     }
                 }
             }
         }
     }
 
-    // Window Title Text
     Text {
         text: wsService.activeWindowTitle
         font.pixelSize: 14
