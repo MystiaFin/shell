@@ -26,7 +26,6 @@ PanelWindow {
     Item {
         id: container
         anchors.fill: parent
-        anchors.topMargin: 40
         
         Rectangle {
             anchors.fill: parent
