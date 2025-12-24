@@ -20,7 +20,8 @@ PanelWindow {
     height: 40
     color: "transparent"
 
-		WlrLayershell.layer: WlrLayer.Overlay
+		WlrLayershell.layer: WlrLayer.Top
+		WlrLayershell.namespace: "bar"
     WlrLayershell.exclusiveZone: 40
 
     Process {

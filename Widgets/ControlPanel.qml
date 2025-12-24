@@ -27,6 +27,7 @@ PanelWindow {
     margins.top: show ? 44 : -220
     
 		WlrLayershell.layer: WlrLayer.Top
+		WlrLayershell.namespace: "popup"
     
     Behavior on margins.top {
         NumberAnimation {
