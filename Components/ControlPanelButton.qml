@@ -27,7 +27,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             ringColor: "#89b4fa"
             bgColor: "#45475a"
-            ringWidth: 4
+            ringWidth: 3
             value: volumeService.volume
             showNumber: false
             onScroll: delta => volumeService.setVolume(volumeService.volume + delta)
@@ -39,7 +39,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             ringColor: "#f38ba8"
             bgColor: "#45475a"
-            ringWidth: 4
+            ringWidth: 3
             showNumber: false
             value: micService.volume
             onScroll: delta => micService.setVolume(micService.volume + delta)

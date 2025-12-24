@@ -62,7 +62,7 @@ Item {
         anchors.centerIn: parent
         text: Math.round(root.displayValue * 100)
         color: "#cdd6f4"
-        font.pixelSize: root.width * 0.3
+        font.pixelSize: root.width * 0.27
         font.family: "Poppins"
     }
     

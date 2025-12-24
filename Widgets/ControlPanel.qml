@@ -51,7 +51,7 @@ PanelWindow {
                 width: 90
                 height: 90
                 ringColor: "#89b4fa"
-                ringWidth: 8
+                ringWidth: 3
                 value: volumeService.volume
                 onScroll: delta => volumeService.setVolume(volumeService.volume + delta)
             }
@@ -59,7 +59,7 @@ PanelWindow {
                 width: 90
                 height: 90
                 ringColor: "#f38ba8"
-                ringWidth: 8
+                ringWidth: 3
                 value: micService.volume
                 onScroll: delta => micService.setVolume(micService.volume + delta)
             }
