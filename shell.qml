@@ -10,10 +10,10 @@ ShellRoot {
     property bool launcherVisible: false
 
     WG.Wallpaper {}
-		WG.Overlay {
-						bgColor: root.systemColor
-		}
     WG.Bar {
+        bgColor: root.systemColor
+    }
+    WG.Overlay {
         bgColor: root.systemColor
     }
     WG.NotificationPopups {}

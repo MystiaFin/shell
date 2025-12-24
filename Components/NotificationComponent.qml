@@ -40,9 +40,10 @@ Rectangle {
     NotificationAnim {
         id: animLogic
         targetTransform: slideTransform
-        targetModel: model 
+        targetModel: model
         targetIndex: index
         autoHideDuration: 6000
+        onRemoveRequested: ListView.view.model.removeNotification(notifId)
     }
 
     // Layout for Icon + Text
