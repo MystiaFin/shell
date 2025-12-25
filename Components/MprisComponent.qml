@@ -9,7 +9,7 @@ Item {
 
     property color surfaceColor: "#313244"
     property color textColor: "#cdd6f4"
-    
+
     MprisService {
         id: mprisService
     }
@@ -46,14 +46,15 @@ Item {
                 color: "#a6e3a1"
                 font.pixelSize: 14
                 anchors.verticalCenter: parent.verticalCenter
+                font.family: "Poppins"
             }
 
             Text {
                 text: "- No media"
                 color: root.textColor
                 font.pixelSize: 13
-                font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
+                font.family: "Poppins"
             }
         }
     }
@@ -90,6 +91,7 @@ Item {
                 color: "#a6e3a1"
                 font.pixelSize: 14
                 anchors.verticalCenter: parent.verticalCenter
+                font.family: "Poppins"
             }
 
             Item {
@@ -103,9 +105,9 @@ Item {
                     property bool isLong: mprisService.fullText.length > 32
 
                     text: isLong ? mprisService.fullText + " •  " + mprisService.fullText : mprisService.fullText
+                    font.family: "Poppins"
                     color: root.textColor
                     font.pixelSize: 13
-                    font.bold: true
                     anchors.verticalCenter: parent.verticalCenter
 
                     MprisAnim {

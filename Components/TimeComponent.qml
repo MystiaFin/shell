@@ -4,7 +4,7 @@ import "../Services"
 Row {
     id: root
     property color textColor: "#cdd6f4"
-    
+
     Text {
         anchors.verticalCenter: parent.verticalCenter
         text: Qt.formatTime(TimeService.current, "hh:mm AP •")
@@ -13,6 +13,7 @@ Row {
         font.family: "Poppins"
         font.weight: Font.Light
         leftPadding: 10
+        topPadding: 1
     }
 
     Text {
