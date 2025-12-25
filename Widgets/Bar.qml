@@ -41,7 +41,7 @@ PanelWindow {
         anchors.bottom: parent.bottom
         height: 40
         color: panel.bgColor
-        radius: 16
+        radius: 18
 
         Rectangle {
             anchors.left: parent.left
