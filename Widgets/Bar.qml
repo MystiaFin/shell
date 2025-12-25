@@ -20,8 +20,8 @@ PanelWindow {
     height: 40
     color: "transparent"
 
-		WlrLayershell.layer: WlrLayer.Top
-		WlrLayershell.namespace: "bar"
+    WlrLayershell.layer: WlrLayer.Top
+    WlrLayershell.namespace: "bar"
     WlrLayershell.exclusiveZone: 40
 
     Process {
@@ -91,6 +91,9 @@ PanelWindow {
             }
 
             TimeComponent {}
+            BatteryComponent {}
+            CpuComponent {}
+            RamComponent {}
         }
 
         // --- Right Side ---

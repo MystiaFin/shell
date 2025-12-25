@@ -10,6 +10,7 @@ ShellRoot {
     property bool launcherVisible: false
 
     WG.Wallpaper {}
+    WG.ControlPanel {}
     WG.Bar {
         bgColor: root.systemColor
     }

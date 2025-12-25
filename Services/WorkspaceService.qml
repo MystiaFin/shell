@@ -80,7 +80,7 @@ Item {
     }
 
     Timer {
-        interval: 200
+        interval: 250
         running: true
         repeat: true
         onTriggered: { 

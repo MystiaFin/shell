@@ -24,8 +24,14 @@ PanelWindow {
     anchors {
         top: true
     }
-    margins.top: 40
-    
+    margins.top: show ? 40 : -246
+
+    Behavior on margins.top {
+        NumberAnimation {
+            duration: 300
+            easing.type: Easing.OutCubic
+        }
+    }
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "popup"
     
@@ -33,21 +39,10 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width
         height: parent.height - 4
-        y: show ? 4 : -height
+        y: 4
         
         radius: 20
         color: panel.bgColor
-        border {
-            color: panel.borderColor
-            width: 2
-        }
-        
-        Behavior on y {
-            NumberAnimation {
-                duration: 300
-                easing.type: Easing.OutCubic
-            }
-        }
         
         Column {
             anchors.centerIn: parent

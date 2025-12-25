@@ -99,7 +99,7 @@ Row {
     }
 
     Text {
-        text: wsService.activeWindowTitle
+        text: "Workspace " + (wsService.activeIndex + 1)
         font.pixelSize: 14
         font.family: "Poppins"
         font.weight: Font.Medium
