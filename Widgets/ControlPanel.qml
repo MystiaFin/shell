@@ -24,26 +24,31 @@ PanelWindow {
     anchors {
         top: true
     }
-    margins.top: show ? 44 : -220
+    margins.top: 40
     
-		WlrLayershell.layer: WlrLayer.Top
-		WlrLayershell.namespace: "popup"
-    
-    Behavior on margins.top {
-        NumberAnimation {
-            duration: 300
-            easing.type: Easing.OutCubic
-        }
-    }
+    WlrLayershell.layer: WlrLayer.Top
+    WlrLayershell.namespace: "popup"
     
     Rectangle {
-        anchors.fill: parent
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width
+        height: parent.height - 4
+        y: show ? 4 : -height
+        
         radius: 20
         color: panel.bgColor
         border {
             color: panel.borderColor
             width: 2
         }
+        
+        Behavior on y {
+            NumberAnimation {
+                duration: 300
+                easing.type: Easing.OutCubic
+            }
+        }
+        
         Column {
             anchors.centerIn: parent
             spacing: 20
@@ -51,7 +56,7 @@ PanelWindow {
                 width: 90
                 height: 90
                 ringColor: "#89b4fa"
-                ringWidth: 3
+                ringWidth: 4
                 value: volumeService.volume
                 onScroll: delta => volumeService.setVolume(volumeService.volume + delta)
             }
@@ -59,7 +64,7 @@ PanelWindow {
                 width: 90
                 height: 90
                 ringColor: "#f38ba8"
-                ringWidth: 3
+                ringWidth: 4
                 value: micService.volume
                 onScroll: delta => micService.setVolume(micService.volume + delta)
             }

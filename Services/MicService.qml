@@ -17,12 +17,12 @@ Singleton {
         id: setVolumeProcess
         
         onExited: {
-            getMicVolumeProcess.running = true
+            getVolumeProcess.running = true
         }
     }
     
     Process {
-        id: getMicVolumeProcess
+        id: getVolumeProcess
         command: ["bash", "-c", "wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | awk '{print $2}'"]
         running: true
         
@@ -31,6 +31,20 @@ Singleton {
                 var vol = parseFloat(line.trim())
                 if (!isNaN(vol)) {
                     root.volume = vol
+                }
+            }
+        }
+    }
+    
+    Process {
+        id: monitor
+        running: true
+        command: ["pw-mon"]
+        
+        stdout: SplitParser {
+            onRead: line => {
+                if (line.includes("changed") || line.includes("Props")) {
+                    getVolumeProcess.running = true
                 }
             }
         }

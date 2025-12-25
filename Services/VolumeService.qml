@@ -35,4 +35,18 @@ Singleton {
             }
         }
     }
+    
+    Process {
+        id: monitor
+        running: true
+        command: ["pw-mon"]
+        
+        stdout: SplitParser {
+            onRead: line => {
+                if (line.includes("changed") || line.includes("Props")) {
+                    getVolumeProcess.running = true
+                }
+            }
+        }
+    }
 }
