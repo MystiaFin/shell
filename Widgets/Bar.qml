@@ -10,8 +10,8 @@ PanelWindow {
     property color bgColor
     property color surfaceColor: "#313244"
     property color textColor: "#cdd6f4"
-    property bool sidebarVisible: false  // Add this
-    signal toggleSidebar  // Add this signal
+    property bool sidebarVisible: false
+    signal toggleSidebar
 
     anchors {
         top: true
@@ -116,7 +116,7 @@ PanelWindow {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        panel.toggleSidebar();  // Emit the signal
+                        panel.toggleSidebar();
                     }
                 }
 
