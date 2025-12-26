@@ -1,90 +1,97 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
 
 Rectangle {
     id: root
-    
+
     property var wifiService
-    
+    property string expandedSSID: ""
+
     color: "transparent"
-    
+
     Flickable {
         anchors.fill: parent
         contentWidth: width
         contentHeight: content.height
         clip: true
-        
+
         Column {
             id: content
             width: parent.width
-            spacing: 16
-            padding: 16
-            
+            spacing: 12
+            padding: 12
+
+            // --- Header Control ---
             Rectangle {
-                width: parent.width - 32
-                height: 80
+                width: parent.width - 24
+                height: 60
                 radius: 12
                 color: "#1e1e2e"
-                border.width: 2
+                border.width: 1
                 border.color: wifiService.isEnabled ? "#89b4fa" : "#313244"
-                
+
                 RowLayout {
                     anchors.fill: parent
-                    anchors.margins: 16
-                    spacing: 16
-                    
+                    anchors.margins: 12
+                    spacing: 12
+
                     Rectangle {
-                        Layout.preferredWidth: 48
-                        Layout.preferredHeight: 48
-                        radius: 24
+                        Layout.preferredWidth: 36
+                        Layout.preferredHeight: 36
+                        radius: 18
                         color: wifiService.isEnabled ? "#89b4fa" : "#313244"
-                        
+
                         Text {
                             anchors.centerIn: parent
                             text: "󰖩"
-                            font.pixelSize: 28
+                            font.pixelSize: 20
                             color: "#1e1e2e"
                         }
                     }
-                    
+
                     Column {
                         Layout.fillWidth: true
-                        spacing: 4
-                        
+                        spacing: 2
+
                         Text {
                             text: wifiService.isEnabled ? "WiFi" : "WiFi Off"
-                            font.pixelSize: 18
-                            font.bold: true
+                            font.pixelSize: 14
+                            font.family: "Poppins"
                             color: "#cdd6f4"
                         }
-                        
+
                         Text {
                             text: wifiService.connectedSSID || "Not connected"
-                            font.pixelSize: 14
-                            color: "#a6adc8"
+                            font.pixelSize: 12
+                            font.family: "Poppins"
+                            color: wifiService.connectedSSID ? "#89b4fa" : "#a6adc8"
                             visible: wifiService.isEnabled
                         }
                     }
-                    
+
+                    // Toggle Switch
                     Rectangle {
-                        Layout.preferredWidth: 56
-                        Layout.preferredHeight: 32
-                        radius: 16
+                        Layout.preferredWidth: 40
+                        Layout.preferredHeight: 24
+                        radius: 12
                         color: wifiService.isEnabled ? "#89b4fa" : "#313244"
-                        
+
                         Rectangle {
-                            width: 26
-                            height: 26
-                            radius: 13
+                            width: 20
+                            height: 20
+                            radius: 10
                             color: "#ffffff"
                             anchors.verticalCenter: parent.verticalCenter
-                            x: wifiService.isEnabled ? parent.width - width - 3 : 3
-                            
+                            x: wifiService.isEnabled ? parent.width - width - 2 : 2
+
                             Behavior on x {
-                                NumberAnimation { duration: 200 }
+                                NumberAnimation {
+                                    duration: 200
+                                }
                             }
                         }
-                        
+
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
@@ -93,133 +100,228 @@ Rectangle {
                     }
                 }
             }
-            
-            Rectangle {
-                width: parent.width - 32
-                height: 50
-                radius: 12
-                color: "#f38ba8"
-                visible: wifiService.connectedSSID !== ""
-                
-                Text {
-                    anchors.centerIn: parent
-                    text: "Disconnect from " + wifiService.connectedSSID
-                    font.pixelSize: 14
-                    font.bold: true
-                    color: "#1e1e2e"
-                }
-                
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: wifiService.disconnect()
-                }
-            }
-            
+
+            // --- Network List ---
             Column {
-                width: parent.width - 32
-                spacing: 12
+                width: parent.width - 24
+                spacing: 8
                 visible: wifiService.isEnabled
-                
+
                 Text {
                     text: "Available Networks"
-                    font.pixelSize: 16
-                    font.bold: true
+                    font.pixelSize: 13
+                    font.family: "Poppins"
                     color: "#cdd6f4"
                 }
-                
+
                 Repeater {
                     model: wifiService.networks
-                    
+
                     Rectangle {
+                        id: netCard
                         width: parent.width
-                        height: 70
-                        radius: 12
+                        height: isExpanded ? 110 : 50
+                        radius: 10
                         color: "#1e1e2e"
-                        border.width: model.ssid === wifiService.connectedSSID ? 2 : 1
-                        border.color: model.ssid === wifiService.connectedSSID ? "#89b4fa" : "#313244"
-                        
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.margins: 12
-                            spacing: 12
-                            
-                            Text {
-                                text: model.signal > 75 ? "󰤨" : 
-                                      model.signal > 50 ? "󰤥" :
-                                      model.signal > 25 ? "󰤢" : "󰤟"
-                                font.pixelSize: 24
-                                color: "#89b4fa"
+                        clip: true
+
+                        property bool isConnected: model.ssid === wifiService.connectedSSID
+                        property bool isExpanded: root.expandedSSID === model.ssid && !isConnected
+                        property string passwordInput: ""
+
+                        Behavior on height {
+                            NumberAnimation {
+                                duration: 200
+                                easing.type: Easing.OutCubic
                             }
-                            
-                            Column {
-                                Layout.fillWidth: true
-                                spacing: 2
-                                
-                                Text {
-                                    text: model.ssid
-                                    font.pixelSize: 16
-                                    font.bold: model.ssid === wifiService.connectedSSID
-                                    color: "#cdd6f4"
+                        }
+
+                        // Main Click Logic for the Row
+                        MouseArea {
+                            width: parent.width
+                            height: 50
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (netCard.isConnected) {
+                                    wifiService.disconnect();
+                                } else {
+                                    if (root.expandedSSID === model.ssid) {
+                                        root.expandedSSID = "";
+                                    } else {
+                                        root.expandedSSID = model.ssid;
+                                        netCard.passwordInput = "";
+                                    }
                                 }
-                                
-                                Row {
-                                    spacing: 8
-                                    
+                            }
+                        }
+
+                        ColumnLayout {
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            spacing: 8
+
+                            // Header Row
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 30
+                                spacing: 10
+
+                                Text {
+                                    text: model.signal > 75 ? "󰤨" : model.signal > 50 ? "󰤥" : model.signal > 25 ? "󰤢" : "󰤟"
+                                    font.pixelSize: 18
+                                    color: "#89b4fa"
+                                }
+
+                                Column {
+                                    Layout.fillWidth: true
+
+                                    Text {
+                                        text: model.ssid
+                                        font.pixelSize: 13
+                                        font.family: "Poppins"
+                                        color: netCard.isConnected ? "#89b4fa" : "#cdd6f4"
+                                    }
+
                                     Text {
                                         text: model.secured ? "🔒 Secured" : "🔓 Open"
-                                        font.pixelSize: 12
+                                        font.pixelSize: 10
+                                        font.family: "Poppins"
                                         color: "#a6adc8"
                                     }
-                                    
-                                    Text {
-                                        text: model.signal + "%"
-                                        font.pixelSize: 12
-                                        color: "#a6adc8"
-                                    }
+                                }
+
+                                Text {
+                                    visible: netCard.isConnected
+                                    text: "Connected"
+                                    font.pixelSize: 11
+                                    font.family: "Poppins"
+                                    color: "#a6e3a1"
                                 }
                             }
-                            
-                            Rectangle {
-                                width: 80
-                                height: 36
-                                radius: 10
-                                color: model.ssid === wifiService.connectedSSID ? "#a6e3a1" : "#89b4fa"
-                                visible: model.ssid === wifiService.connectedSSID || !wifiService.connectedSSID
-                                
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: model.ssid === wifiService.connectedSSID ? "Connected" : "Connect"
-                                    font.pixelSize: 13
-                                    font.bold: true
-                                    color: "#1e1e2e"
+
+                            // Expanded Input Row
+                            RowLayout {
+                                visible: netCard.isExpanded
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 36
+                                spacing: 8
+                                opacity: netCard.isExpanded ? 1 : 0
+
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 200
+                                    }
                                 }
-                                
-                                MouseArea {
-                                    anchors.fill: parent
-                                    enabled: model.ssid !== wifiService.connectedSSID
-                                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                    onClicked: wifiService.connect(model.ssid)
+
+                                // Password Input
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    implicitHeight: 28
+                                    color: "#313244"
+                                    radius: 6
+
+                                    TextInput {
+                                        id: passInput
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 10
+                                        anchors.rightMargin: 30
+                                        verticalAlignment: Text.AlignVCenter
+                                        font.pixelSize: 12
+                                        font.family: "Poppins"
+                                        color: "#cdd6f4"
+                                        echoMode: showPassBtn.show ? TextInput.Normal : TextInput.Password
+                                        passwordCharacter: "•"
+                                        text: netCard.passwordInput
+                                        onTextChanged: netCard.passwordInput = text
+                                        clip: true
+
+                                        // Auto focus when expanded
+                                        onVisibleChanged: if (visible)
+                                            forceActiveFocus()
+                                        onAccepted: {
+                                            wifiService.connect(model.ssid, netCard.passwordInput);
+                                            root.expandedSSID = "";
+                                        }
+                                    }
+
+                                    Text {
+                                        id: showPassBtn
+                                        property bool show: false
+                                        anchors.right: parent.right
+                                        anchors.rightMargin: 8
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: show ? "󰈈" : "󰈉"
+                                        font.pixelSize: 14
+                                        color: "#a6adc8"
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: showPassBtn.show = !showPassBtn.show
+                                        }
+                                    }
+                                }
+
+                                // Cancel Button
+                                Rectangle {
+                                    implicitWidth: 28
+                                    implicitHeight: 28
+                                    radius: 6
+                                    color: "#313244"
+                                    border.width: 1
+                                    border.color: "#f38ba8"
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "󰅖"
+                                        font.pixelSize: 14
+                                        color: "#f38ba8"
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: root.expandedSSID = ""
+                                    }
+                                }
+
+                                Rectangle {
+                                    implicitWidth: 28
+                                    implicitHeight: 28
+                                    radius: 6
+                                    color: "#a6e3a1"
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "󰄬"
+                                        font.pixelSize: 16
+                                        color: "#1e1e2e"
+                                        font.bold: true
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            wifiService.connect(model.ssid, netCard.passwordInput);
+                                            root.expandedSSID = "";
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                
-                Rectangle {
-                    width: parent.width
-                    height: 100
-                    radius: 12
-                    color: "#1e1e2e"
-                    visible: wifiService.networks.count === 0
-                    
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Scanning for networks..."
-                        font.pixelSize: 14
-                        color: "#6c7086"
-                    }
-                }
+            }
+
+            Text {
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                text: "Scanning..."
+                font.pixelSize: 12
+                font.family: "Poppins"
+                color: "#6c7086"
+                visible: wifiService.networks.count === 0 && wifiService.isEnabled
             }
         }
     }

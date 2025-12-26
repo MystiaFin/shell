@@ -12,10 +12,12 @@ PanelWindow {
 
     screen: modelData
     exclusionMode: ExclusionMode.Ignore
+    focusable: true
 
     // --- Services ---
     Services.WifiService {
         id: wifiService
+        typing: passInput.activeFocus
     }
     Services.BluetoothService {
         id: bluetoothService
@@ -38,7 +40,7 @@ PanelWindow {
 
     margins {
         top: 40
-        right: visible ? 0 : -459
+        right: visible ? 0 : -399
         Behavior on right {
             NumberAnimation {
                 duration: 400
@@ -47,7 +49,7 @@ PanelWindow {
         }
     }
 
-    implicitWidth: 460
+    implicitWidth: 400
     color: "transparent"
 
     Rectangle {
@@ -59,7 +61,6 @@ PanelWindow {
 
         property string currentView: "notifications"
 
-        // FIX: Use ColumnLayout to stack items automatically
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: 16
@@ -94,13 +95,12 @@ PanelWindow {
                 service: brightnessService
             }
 
-            // 3. Middle Section (Takes remaining space)
+            // Middle Section
             Item {
                 id: middleContainer
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                // Notifications Widget
                 NotificationPanelComponent {
                     anchors.fill: parent
                     notificationModel: notificationService.notificationModel
@@ -113,7 +113,6 @@ PanelWindow {
                     }
                 }
 
-                // WiFi Widget
                 WifiComponent {
                     anchors.fill: parent
                     wifiService: wifiService
@@ -126,7 +125,6 @@ PanelWindow {
                     }
                 }
 
-                // Bluetooth Widget
                 BluetoothComponent {
                     anchors.fill: parent
                     btService: bluetoothService
@@ -140,7 +138,6 @@ PanelWindow {
                 }
             }
 
-            // Calendar Widget
             CalendarComponent {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 300
