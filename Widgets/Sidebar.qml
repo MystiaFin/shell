@@ -58,6 +58,8 @@ PanelWindow {
         anchors.margins: 4
         color: panel.bgColor
         radius: 18
+        border.width: 2
+        border.color: "#313244"
 
         property string currentView: "notifications"
 
