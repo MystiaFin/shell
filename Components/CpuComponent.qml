@@ -10,14 +10,14 @@ Row {
     }
 
     Item {
-        width: 34
+        width: 28
         height: 24
         anchors.verticalCenter: parent.verticalCenter
 
         Ring {
             id: cpuRing
             anchors.fill: parent
-            anchors.leftMargin: 10
+            anchors.leftMargin: 5
             ringColor: cpuService.usage < 0.5 ? "#a6e3a1" : (cpuService.usage < 0.8 ? "#89b4fa" : "#f38ba8")
             bgColor: "#45475a"
             ringWidth: 3
@@ -29,7 +29,7 @@ Row {
             anchors.centerIn: cpuRing
             text: "󰘚"
             color: root.textColor
-            font.pixelSize: 11
+            font.pixelSize: 10
             font.family: "Jetbrains Mono Nerd Font"
         }
     }

@@ -91,9 +91,6 @@ PanelWindow {
             }
 
             TimeComponent {}
-            BatteryComponent {}
-            CpuComponent {}
-            RamComponent {}
         }
 
         // --- Right Side ---
@@ -102,6 +99,10 @@ PanelWindow {
             anchors.rightMargin: 15
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
+
+            BatteryComponent {}
+            CpuComponent {}
+            RamComponent {}
 
             Rectangle {
                 width: iconsRow.width + 20

@@ -10,14 +10,14 @@ Row {
     }
 
     Item {
-        width: 34
+        width: 28
         height: 24
         anchors.verticalCenter: parent.verticalCenter
 
         Ring {
             id: ramRing
             anchors.fill: parent
-            anchors.leftMargin: 10
+            anchors.leftMargin: 5
             ringColor: ramService.usage < 0.5 ? "#a6e3a1" : (ramService.usage < 0.8 ? "#89b4fa" : "#f38ba8")
             bgColor: "#45475a"
             ringWidth: 3
