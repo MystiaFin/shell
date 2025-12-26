@@ -8,11 +8,18 @@ ShellRoot {
     property color systemColor: "#181825"
     property color systemBlue: "#89b4fa"
     property bool launcherVisible: false
-
+    property bool sidebarVisible: false  
+    
     WG.Wallpaper {}
     WG.ControlPanel {}
-    WG.Bar {
+    WG.Sidebar {
         bgColor: root.systemColor
+        visible: root.sidebarVisible
+    }
+		WG.Bar {
+        bgColor: root.systemColor
+        sidebarVisible: root.sidebarVisible  // Pass the property
+        onToggleSidebar: root.sidebarVisible = !root.sidebarVisible  // Handle the signal
     }
     WG.Overlay {
         bgColor: root.systemColor

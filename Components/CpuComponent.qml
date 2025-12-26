@@ -10,14 +10,13 @@ Row {
     }
 
     Item {
-        width: 28
+        width: 24
         height: 24
         anchors.verticalCenter: parent.verticalCenter
 
         Ring {
             id: cpuRing
             anchors.fill: parent
-            anchors.leftMargin: 5
             ringColor: cpuService.usage < 0.5 ? "#a6e3a1" : (cpuService.usage < 0.8 ? "#89b4fa" : "#f38ba8")
             bgColor: "#45475a"
             ringWidth: 3
