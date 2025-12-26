@@ -18,8 +18,8 @@ ShellRoot {
     }
 		WG.Bar {
         bgColor: root.systemColor
-        sidebarVisible: root.sidebarVisible  // Pass the property
-        onToggleSidebar: root.sidebarVisible = !root.sidebarVisible  // Handle the signal
+        sidebarVisible: root.sidebarVisible
+        onToggleSidebar: root.sidebarVisible = !root.sidebarVisible
     }
     WG.Overlay {
         bgColor: root.systemColor
