@@ -14,7 +14,6 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     focusable: true
 
-    // --- Services ---
     Services.WifiService {
         id: wifiService
         typing: passInput.activeFocus
@@ -62,6 +61,7 @@ PanelWindow {
         border.color: "#313244"
 
         property string currentView: "notifications"
+        readonly property int viewIndex: currentView === "wifi" ? 1 : (currentView === "bluetooth" ? 2 : 0)
 
         ColumnLayout {
             anchors.fill: parent
@@ -70,6 +70,7 @@ PanelWindow {
 
             Row {
                 Layout.alignment: Qt.AlignHCenter
+                Layout.topMargin: 20
                 spacing: 12
 
                 IconButton {
@@ -97,44 +98,50 @@ PanelWindow {
                 service: brightnessService
             }
 
-            // Middle Section
             Item {
                 id: middleContainer
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                clip: true
 
                 NotificationPanelComponent {
-                    anchors.fill: parent
+                    width: parent.width
+                    height: parent.height
                     notificationModel: notificationService.notificationModel
-                    opacity: mainRect.currentView === "notifications" ? 1 : 0
-                    visible: opacity > 0
-                    Behavior on opacity {
+                    
+                    x: (0 - mainRect.viewIndex) * width
+                    Behavior on x {
                         NumberAnimation {
                             duration: 300
+                            easing.type: Easing.OutCubic
                         }
                     }
                 }
 
                 WifiComponent {
-                    anchors.fill: parent
+                    width: parent.width
+                    height: parent.height
                     wifiService: wifiService
-                    opacity: mainRect.currentView === "wifi" ? 1 : 0
-                    visible: opacity > 0
-                    Behavior on opacity {
+
+                    x: (1 - mainRect.viewIndex) * width
+                    Behavior on x {
                         NumberAnimation {
                             duration: 300
+                            easing.type: Easing.OutCubic
                         }
                     }
                 }
 
                 BluetoothComponent {
-                    anchors.fill: parent
+                    width: parent.width
+                    height: parent.height
                     btService: bluetoothService
-                    opacity: mainRect.currentView === "bluetooth" ? 1 : 0
-                    visible: opacity > 0
-                    Behavior on opacity {
+
+                    x: (2 - mainRect.viewIndex) * width
+                    Behavior on x {
                         NumberAnimation {
                             duration: 300
+                            easing.type: Easing.OutCubic
                         }
                     }
                 }
