@@ -85,6 +85,7 @@ PanelWindow {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: controlPanel.show = !controlPanel.show
+                    cursorShape: Qt.PointingHandCursor
                 }
             }
 

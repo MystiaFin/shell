@@ -45,4 +45,11 @@ Rectangle {
             onScroll: delta => micService.setVolume(micService.volume + delta)
         }
     }
+
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        acceptedButtons: Qt.NoButton
+    }
 }
