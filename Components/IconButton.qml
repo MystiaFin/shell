@@ -10,8 +10,8 @@ Rectangle {
     
     signal clicked()
     
-    width: 60
-    height: 60
+    width: 54
+    height: 54
     radius: 18
     color: active ? buttonColor : "#313244"
     
@@ -25,7 +25,7 @@ Rectangle {
         anchors.centerIn: parent
         text: button.icon
         color: active ? button.iconColor : "#cdd6f4"
-        font.pixelSize: 24
+        font.pixelSize: 20
     }
     
     MouseArea {

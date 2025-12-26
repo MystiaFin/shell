@@ -21,7 +21,6 @@ Rectangle {
             width: parent.width
             spacing: 12
             
-            // Animation when items are removed
             move: Transition {
                 NumberAnimation {
                     properties: "y"
@@ -120,8 +119,8 @@ Rectangle {
                         
                         // Close Button
                         Rectangle {
-                            Layout.preferredWidth: 28
-                            Layout.preferredHeight: 28
+                            Layout.preferredWidth: 24
+                            Layout.preferredHeight: 24
                             Layout.alignment: Qt.AlignTop
                             color: closeMouseArea.containsMouse ? "#f38ba8" : "#313244"
                             radius: 14
@@ -132,8 +131,14 @@ Rectangle {
                             
                             Text {
                                 anchors.centerIn: parent
+                                // FIX 1: Push down by 1px to correct visual alignment
+                                anchors.verticalCenterOffset: 1 
+                                
                                 text: "✕"
-                                color: "#cdd6f4"
+                                
+                                // FIX 2: Dark text on hover
+                                color: closeMouseArea.containsMouse ? "#1e1e2e" : "#cdd6f4"
+                                
                                 font.pixelSize: 14
                                 font.bold: true
                             }
@@ -151,20 +156,14 @@ Rectangle {
                     }
                 }
             }
-            
-            // Empty state when no notifications
-            Item {
-                width: parent.width
-                height: 100
-                visible: notificationPanel.notificationModel.count === 0
-                
-                Text {
-                    anchors.centerIn: parent
-                    text: "No notifications"
-                    color: "#6c7086"
-                    font.pixelSize: 16
-                }
-            }
         }
+    }
+
+    Text {
+        anchors.centerIn: parent
+        text: "No notifications"
+        color: "#6c7086"
+        font.pixelSize: 16
+        visible: notificationPanel.notificationModel.count === 0
     }
 }
