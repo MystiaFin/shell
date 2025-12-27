@@ -48,7 +48,7 @@ PanelWindow {
         }
     }
 
-    implicitWidth: 400
+    implicitWidth: 340
     color: "transparent"
 
     Rectangle {

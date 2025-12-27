@@ -4,14 +4,14 @@ import QtQuick.Layouts
 
 Item {
     id: root
-    height: 40 
+    height: 40
     Layout.fillWidth: true
 
     property var service
 
     RowLayout {
         anchors.bottom: parent.bottom
-				anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
         spacing: 12
 
         Text {
@@ -26,7 +26,7 @@ Item {
             from: 0
             to: 100
             value: root.service ? root.service.percentage : 0
-            
+
             background: Rectangle {
                 x: slider.leftPadding
                 y: slider.topPadding + slider.availableHeight / 2 - height / 2
@@ -36,6 +36,9 @@ Item {
                 height: implicitHeight
                 radius: 2
                 color: "#45475a"
+                HoverHandler {
+                    cursorShape: Qt.PointingHandCursor
+                }
 
                 Rectangle {
                     width: slider.visualPosition * parent.width
@@ -54,17 +57,20 @@ Item {
                 radius: 8
                 color: "#f5e0dc"
                 border.color: "#89b4fa"
+                HoverHandler {
+                    cursorShape: Qt.PointingHandCursor
+                }
 
                 Rectangle {
                     id: bubble
                     visible: slider.pressed
                     z: 100
-                    
+
                     width: 20
                     height: 20
                     radius: 4
                     color: "#1e1e2e"
-                    
+
                     x: (parent.width - width) / 2
                     y: -height - 8
 
@@ -76,7 +82,7 @@ Item {
                         color: "#cdd6f4"
                         font.family: "Poppins"
                     }
-                    
+
                     Rectangle {
                         width: 6
                         height: 6
@@ -91,7 +97,7 @@ Item {
 
             onMoved: {
                 if (root.service) {
-                    root.service.setBrightness(value)
+                    root.service.setBrightness(value);
                 }
             }
         }
