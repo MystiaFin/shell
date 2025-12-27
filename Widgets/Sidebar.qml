@@ -16,7 +16,6 @@ PanelWindow {
 
     Services.WifiService {
         id: wifiService
-        typing: passInput.activeFocus
     }
     Services.BluetoothService {
         id: bluetoothService
@@ -39,7 +38,7 @@ PanelWindow {
 
     margins {
         top: 40
-        right: visible ? 0 : -399
+        right: visible ? 0 : -335
         Behavior on right {
             NumberAnimation {
                 duration: 400
@@ -135,7 +134,6 @@ PanelWindow {
                 BluetoothComponent {
                     width: parent.width
                     height: parent.height
-                    btService: bluetoothService
 
                     x: (2 - mainRect.viewIndex) * width
                     Behavior on x {

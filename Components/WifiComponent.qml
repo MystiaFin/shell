@@ -22,7 +22,6 @@ Rectangle {
             spacing: 12
             padding: 12
 
-            // --- Header Control ---
             Rectangle {
                 width: parent.width - 24
                 height: 60
@@ -70,7 +69,6 @@ Rectangle {
                         }
                     }
 
-                    // Toggle Switch
                     Rectangle {
                         Layout.preferredWidth: 40
                         Layout.preferredHeight: 24
@@ -101,7 +99,6 @@ Rectangle {
                 }
             }
 
-            // --- Network List ---
             Column {
                 width: parent.width - 24
                 spacing: 8
@@ -136,7 +133,6 @@ Rectangle {
                             }
                         }
 
-                        // Main Click Logic for the Row
                         MouseArea {
                             width: parent.width
                             height: 50
@@ -145,11 +141,17 @@ Rectangle {
                                 if (netCard.isConnected) {
                                     wifiService.disconnect();
                                 } else {
-                                    if (root.expandedSSID === model.ssid) {
+                                    if (model.isKnown) {
+                                        console.log("Connecting to known network: " + model.ssid);
+                                        wifiService.connect(model.ssid, "");
                                         root.expandedSSID = "";
                                     } else {
-                                        root.expandedSSID = model.ssid;
-                                        netCard.passwordInput = "";
+                                        if (root.expandedSSID === model.ssid) {
+                                            root.expandedSSID = "";
+                                        } else {
+                                            root.expandedSSID = model.ssid;
+                                            netCard.passwordInput = "";
+                                        }
                                     }
                                 }
                             }

@@ -3,93 +3,70 @@ import Quickshell
 import Quickshell.Io
 
 Item {
-    id: service
+    id: btService
 
     property bool isPowered: false
     property bool isScanning: false
-    property string connectedDeviceName: ""
-    property string connectedDeviceMac: ""
-    property ListModel devices: ListModel {}
+    
+    property ListModel pairedDevices: ListModel {}
+    property ListModel newDevices: ListModel {}
 
-    function hasDevice(mac) {
-        for (let i = 0; i < devices.count; i++) {
-            if (devices.get(i).mac === mac)
-                return true;
-        }
-        return false;
-    }
+    property var _tempPaired: []
+    property var _tempAll: []
 
     Process {
-        id: statusProcess
+        id: statusProc
         command: ["bluetoothctl", "show"]
         stdout: SplitParser {
             onRead: data => {
-                service.isPowered = data.toLowerCase().includes("powered: yes");
-                service.isScanning = data.toLowerCase().includes("discovering: yes");
+                if (data.includes("Powered: yes")) btService.isPowered = true
+                else if (data.includes("Powered: no")) btService.isPowered = false
             }
         }
     }
 
     Process {
-        id: connectedProcess
-        command: ["bluetoothctl", "info"]
+        id: scanProc
+        command: ["bluetoothctl", "--", "timeout", "5", "scan", "on"]
+        onStarted: btService.isScanning = true
+        onExited: {
+            btService.isScanning = false
+            console.log("[BT] Scan finished. Fetching devices...")
+            fetchPairedProc.running = true
+        }
+    }
+
+    Process {
+        id: fetchPairedProc
+        command: ["bluetoothctl", "paired-devices"]
+        onStarted: btService._tempPaired = []
         stdout: SplitParser {
-            onRead: data => {
-                if (data.includes("Missing device")) {
-                    service.connectedDeviceName = "";
-                    service.connectedDeviceMac = "";
-                    return;
-                }
-
-                const lines = data.split('\n');
-                let foundName = "";
-                let foundMac = "";
-                let isConnected = false;
-
-                for (const line of lines) {
-                    const trim = line.trim();
-                    if (trim.startsWith("Device"))
-                        foundMac = trim.split(" ")[1];
-                    if (trim.startsWith("Name:"))
-                        foundName = trim.substring(5).trim();
-                    if (trim.startsWith("Connected: yes"))
-                        isConnected = true;
-                }
-
-                if (isConnected) {
-                    service.connectedDeviceName = foundName;
-                    service.connectedDeviceMac = foundMac;
-                } else {
-                    service.connectedDeviceName = "";
-                    service.connectedDeviceMac = "";
-                }
-            }
+            onRead: data => parseDeviceLine(data, btService._tempPaired, "Paired")
         }
+        onExited: fetchAllProc.running = true
     }
 
     Process {
-        id: listProcess
+        id: fetchAllProc
         command: ["bluetoothctl", "devices"]
+        onStarted: btService._tempAll = []
+        stdout: SplitParser {
+            onRead: data => parseDeviceLine(data, btService._tempAll, "All")
+        }
+        onExited: updateModels()
+    }
 
+    Process {
+        id: infoProc
+        property string targetMac: ""
+        property int listIndex: -1
+        
+        command: ["bluetoothctl", "info", targetMac]
         stdout: SplitParser {
             onRead: data => {
-                const lines = data.split('\n');
-                for (const line of lines) {
-                    if (!line || line.trim() === '')
-                        continue;
-
-                    const parts = line.split(" ");
-                    if (parts[0] !== "Device")
-                        continue;
-                    const mac = parts[1];
-                    const name = parts.slice(2).join(" ");
-
-                    if (mac && !service.hasDevice(mac)) {
-                        service.devices.append({
-                            mac: mac,
-                            name: name,
-                            connected: mac === service.connectedDeviceMac
-                        });
+                if (data.includes("Connected: yes")) {
+                    if (listIndex >= 0 && listIndex < pairedDevices.count) {
+                        pairedDevices.setProperty(listIndex, "connected", true)
                     }
                 }
             }
@@ -97,55 +74,114 @@ Item {
     }
 
     Process {
-        id: discoveryProcess
-        command: ["timeout", "10", "bluetoothctl", "scan", "on"]
-
-        onExited: service.update()
+        id: actionProc
+        stdout: SplitParser { onRead: data => console.log("[BT Action Out]: " + data) }
+        stderr: SplitParser { onRead: data => console.log("[BT Action Err]: " + data) }
     }
 
-    Timer {
-        interval: 2000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: service.update()
-    }
+    function parseDeviceLine(line, targetArray, context) {
+        if (!line || line.trim() === "") return;
 
-    function update() {
-        statusProcess.running = true;
-        connectedProcess.running = true;
-
-        if (isPowered) {
-            devices.clear();
-            listProcess.running = true;
+        var clean = line.replace(/\x1B\[[0-9;]*[a-zA-Z]/g, "").trim();
+        
+        var parts = clean.split(" ")
+        
+        if (parts.length >= 2 && parts[0] === "Device") {
+            var mac = parts[1]
+            var name = parts.slice(2).join(" ") || "Unknown Device"
+            
+            console.log("[BT Parse " + context + "]: MAC=" + mac + " Name=" + name)
+            
+            targetArray.push({ mac: mac, name: name, connected: false })
         } else {
-            devices.clear();
+        }
+    }
+
+    function updateModels() {
+        console.log("[BT] Updating Models...")
+        
+        pairedDevices.clear()
+        for (var i = 0; i < _tempPaired.length; i++) {
+            pairedDevices.append(_tempPaired[i])
+            checkConnection(_tempPaired[i].mac, i)
+        }
+
+        newDevices.clear()
+        var pairedMacs = _tempPaired.map(d => d.mac)
+        
+        for (var j = 0; j < _tempAll.length; j++) {
+            var dev = _tempAll[j]
+            if (!pairedMacs.includes(dev.mac)) {
+                newDevices.append(dev)
+            }
+        }
+    }
+
+    function checkConnection(mac, index) {
+        infoProc.targetMac = mac
+        infoProc.listIndex = index
+        infoProc.running = true
+    }
+
+    function refresh() {
+        if (scanProc.running) return
+        console.log("[BT] Refreshing...")
+        statusProc.running = true
+        if (isPowered) scanProc.running = true
+        else {
+            pairedDevices.clear()
+            newDevices.clear()
         }
     }
 
     function togglePower() {
-        const cmd = isPowered ? "off" : "on";
-        Quickshell.execDetached(["sh", "-c", "bluetoothctl power " + cmd]);
-
-        service.isPowered = !service.isPowered;
+        var cmd = isPowered ? "off" : "on"
+        actionProc.command = ["bluetoothctl", "power", cmd]
+        actionProc.running = true
+        delayTimer.callback = refresh
+        delayTimer.start()
     }
 
-    function startDiscovery() {
-        if (isPowered) {
-            discoveryProcess.running = true;
-            service.isScanning = true;
-        }
+    function connectDevice(mac) {
+        actionProc.command = ["bluetoothctl", "connect", mac]
+        actionProc.running = true
+        delayTimer.callback = refresh
+        delayTimer.start()
     }
 
-    function connect(mac) {
-        Quickshell.execDetached(["pkill", "-f", "bluetoothctl scan on"]);
-
-        Quickshell.execDetached(["sh", "-c", "bluetoothctl connect " + mac]);
+    function disconnectDevice(mac) {
+        actionProc.command = ["bluetoothctl", "disconnect", mac]
+        actionProc.running = true
+        delayTimer.callback = refresh
+        delayTimer.start()
     }
 
-    function disconnect() {
-        if (service.connectedDeviceMac) {
-            Quickshell.execDetached(["sh", "-c", "bluetoothctl disconnect " + service.connectedDeviceMac]);
-        }
+    function pairAndConnect(mac) {
+        // Pair -> Trust -> Connect
+        actionProc.command = ["bash", "-c", "bluetoothctl pair " + mac + " && bluetoothctl trust " + mac + " && bluetoothctl connect " + mac]
+        actionProc.running = true
+        delayTimer.callback = refresh
+        delayTimer.start()
     }
+
+    function forgetDevice(mac) {
+        actionProc.command = ["bluetoothctl", "remove", mac]
+        actionProc.running = true
+        delayTimer.callback = refresh
+        delayTimer.start()
+    }
+
+    Timer {
+        id: delayTimer
+        interval: 3500
+        property var callback: function(){}
+        onTriggered: callback()
+    }
+    
+    Timer {
+        interval: 20000; running: true; repeat: true
+        onTriggered: refresh()
+    }
+
+    Component.onCompleted: refresh()
 }
