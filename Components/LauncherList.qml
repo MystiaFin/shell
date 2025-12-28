@@ -34,17 +34,19 @@ Rectangle {
     visible: opacity > 0
 
     Behavior on opacity {
-        LauncherAnim { duration: 200 }
+        LauncherAnim {
+            duration: 200
+        }
     }
 
     ListView {
         id: list
         anchors.fill: parent
         anchors.margins: 5
-        
+
         clip: true
         model: service.appModel
-        
+
         interactive: service.appModel.count > maxItems
 
         highlight: Rectangle {
@@ -62,9 +64,10 @@ Rectangle {
                 spacing: 10
 
                 Item {
-                    width: 24; height: 24
+                    width: 24
+                    height: 24
                     anchors.verticalCenter: parent.verticalCenter
-                    
+
                     Image {
                         anchors.fill: parent
                         source: "image://icon/" + model.id
@@ -84,8 +87,7 @@ Rectangle {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    service.runner.command = ["gtk-launch", model.id];
-                    service.runner.running = true;
+                    model.entry.execute();
                     rootWindow.requestClose();
                 }
             }

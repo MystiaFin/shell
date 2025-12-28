@@ -9,15 +9,12 @@ Item {
     property alias appModel: appModel
     property alias runner: runner
 
-    property string currentQuery: ""
-
     Process { id: runner }
 
     FolderListModel {
         id: srcSystem
         folder: "file:///run/current-system/sw/share/applications"
         nameFilters: ["*.desktop"]; showDirs: false
-        // When apps load, rebuild using the last known query
         onCountChanged: service.rebuildList(service.currentQuery)
     }
 
@@ -29,6 +26,8 @@ Item {
     }
 
     ListModel { id: appModel }
+
+    property string currentQuery: ""
 
     function rebuildList(text) {
         currentQuery = text.toLowerCase();
@@ -48,4 +47,6 @@ Item {
         add(srcUser); 
         add(srcSystem);
     }
+    
+    Component.onCompleted: rebuildList("")
 }
