@@ -7,7 +7,7 @@ Item {
 
     property bool isPowered: false
     property bool isScanning: false
-    
+
     property ListModel pairedDevices: ListModel {}
     property ListModel newDevices: ListModel {}
 
@@ -21,18 +21,18 @@ Item {
             onRead: data => {
                 if (data.includes("Powered: yes")) btService.isPowered = true
                 else if (data.includes("Powered: no")) btService.isPowered = false
+
+                if (data.includes("Discovering: yes")) btService.isScanning = true
+                else if (data.includes("Discovering: no")) btService.isScanning = false
             }
         }
     }
 
     Process {
         id: scanProc
-        command: ["bluetoothctl", "--", "timeout", "5", "scan", "on"]
-        onStarted: btService.isScanning = true
+        command: ["bluetoothctl", "scan", "on"]
         onExited: {
-            btService.isScanning = false
-            console.log("[BT] Scan finished. Fetching devices...")
-            fetchPairedProc.running = true
+            console.log("[BT] Scan process exited.")
         }
     }
 
@@ -89,17 +89,11 @@ Item {
         if (parts.length >= 2 && parts[0] === "Device") {
             var mac = parts[1]
             var name = parts.slice(2).join(" ") || "Unknown Device"
-            
-            console.log("[BT Parse " + context + "]: MAC=" + mac + " Name=" + name)
-            
             targetArray.push({ mac: mac, name: name, connected: false })
-        } else {
         }
     }
 
     function updateModels() {
-        console.log("[BT] Updating Models...")
-        
         pairedDevices.clear()
         for (var i = 0; i < _tempPaired.length; i++) {
             pairedDevices.append(_tempPaired[i])
@@ -124,20 +118,34 @@ Item {
     }
 
     function refresh() {
-        if (scanProc.running) return
-        console.log("[BT] Refreshing...")
         statusProc.running = true
-        if (isPowered) scanProc.running = true
-        else {
+        if (isPowered) {
+            fetchPairedProc.running = true
+        } else {
             pairedDevices.clear()
             newDevices.clear()
         }
+    }
+
+    function toggleScan() {
+        if (isScanning) {
+            scanProc.running = false
+            actionProc.command = ["bluetoothctl", "scan", "off"]
+            actionProc.running = true
+        } else {
+            scanProc.running = true
+        }
+        delayTimer.callback = refresh
+        delayTimer.start()
     }
 
     function togglePower() {
         var cmd = isPowered ? "off" : "on"
         actionProc.command = ["bluetoothctl", "power", cmd]
         actionProc.running = true
+        
+        if (isPowered) scanProc.running = false
+
         delayTimer.callback = refresh
         delayTimer.start()
     }
@@ -157,7 +165,6 @@ Item {
     }
 
     function pairAndConnect(mac) {
-        // Pair -> Trust -> Connect
         actionProc.command = ["bash", "-c", "bluetoothctl pair " + mac + " && bluetoothctl trust " + mac + " && bluetoothctl connect " + mac]
         actionProc.running = true
         delayTimer.callback = refresh

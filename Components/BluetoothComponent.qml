@@ -38,33 +38,39 @@ Rectangle {
 
                 Column {
                     Layout.fillWidth: true
+                    // CHANGED: Header text reflects Scanning state
                     Text { 
-                        text: btService.isPowered ? "Bluetooth On" : "Bluetooth Off"
+                        text: btService.isScanning ? "Scanning On" : "Scanning Off"
                         color: "#cdd6f4"
                         font.bold: true
                     }
                     Text {
-                        text: btService.isScanning ? "Scanning..." : "Idle"
+                        text: btService.isPowered ? "Bluetooth Powered" : "Power Off"
                         color: "#a6adc8"
                         font.pixelSize: 10
-                        visible: btService.isPowered
                     }
                 }
 
-                // Toggle Switch
+                // CHANGED: Toggle Switch now controls SCANNING
                 Rectangle {
                     width: 40; height: 20; radius: 10
-                    color: btService.isPowered ? "#89b4fa" : "#313244"
+                    // Color based on Scanning, dimmed if power is off
+                    color: !btService.isPowered ? "#313244" : (btService.isScanning ? "#89b4fa" : "#45475a")
+                    
                     Rectangle {
-                        width: 16; height: 16; radius: 8; color: "white"
+                        width: 16; height: 16; radius: 8; 
+                        color: !btService.isPowered ? "#585b70" : "white"
                         anchors.verticalCenter: parent.verticalCenter
-                        x: btService.isPowered ? 22 : 2
+                        // Position based on Scanning
+                        x: btService.isScanning ? 22 : 2
                         Behavior on x { NumberAnimation { duration: 150 } }
                     }
+                    
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: btService.togglePower()
-                        cursorShape: Qt.PointingHandCursor
+                        enabled: btService.isPowered // Disable toggle if BT is off
+                        cursorShape: btService.isPowered ? Qt.PointingHandCursor : Qt.ForbiddenCursor
+                        onClicked: btService.toggleScan()
                     }
                 }
             }
@@ -132,10 +138,8 @@ Rectangle {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: (mouse) => {
                                 if (mouse.button === Qt.RightButton) {
-                                    // Right click to Forget
                                     btService.forgetDevice(model.mac)
                                 } else {
-                                    // Left click to Toggle Connection
                                     if (model.connected) btService.disconnectDevice(model.mac)
                                     else btService.connectDevice(model.mac)
                                 }
@@ -184,17 +188,12 @@ Rectangle {
                     }
                 }
                 
-                Item {
-                    visible: btService.isScanning
-                    Layout.fillWidth: true
-                    height: 30
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Scanning for devices..."
-                        color: "#585b70"
-                        font.italic: true
-                        font.pixelSize: 11
-                    }
+                Text {
+                    visible: btService.newDevices.count === 0 && !btService.isScanning
+                    text: "Turn on scanning to find devices"
+                    color: "#45475a"
+                    font.italic: true
+                    Layout.alignment: Qt.AlignHCenter
                 }
             }
         }
