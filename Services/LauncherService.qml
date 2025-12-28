@@ -6,86 +6,46 @@ import Qt.labs.folderlistmodel 2.15
 Item {
     id: service
 
-    // Logic Inputs
-    property string user: Quickshell.env("USER")
-    property string home: Quickshell.env("HOME")
-    property string searchText: ""
+    property alias appModel: appModel
+    property alias runner: runner
 
-    // Logic Outputs
-    property alias displayModel: displayModel
+    property string currentQuery: ""
 
-    // Triggers
-    onSearchTextChanged: rebuildList()
-
-    Process {
-        id: runner
-    }
+    Process { id: runner }
 
     FolderListModel {
         id: srcSystem
         folder: "file:///run/current-system/sw/share/applications"
-        nameFilters: ["*.desktop"]
-        showDirs: false
-        onCountChanged: rebuildList()
+        nameFilters: ["*.desktop"]; showDirs: false
+        // When apps load, rebuild using the last known query
+        onCountChanged: service.rebuildList(service.currentQuery)
     }
+
     FolderListModel {
-        id: srcUserModern
-        folder: "file:///etc/profiles/per-user/" + user + "/share/applications"
-        nameFilters: ["*.desktop"]
-        showDirs: false
-        onCountChanged: rebuildList()
-    }
-    FolderListModel {
-        id: srcUserLegacy
-        folder: "file://" + home + "/.nix-profile/share/applications"
-        nameFilters: ["*.desktop"]
-        showDirs: false
-        onCountChanged: rebuildList()
-    }
-    FolderListModel {
-        id: srcLocal
-        folder: "file://" + home + "/.local/share/applications"
-        nameFilters: ["*.desktop"]
-        showDirs: false
-        onCountChanged: rebuildList()
+        id: srcUser
+        folder: "file:///etc/profiles/per-user/" + Quickshell.env("USER") + "/share/applications"
+        nameFilters: ["*.desktop"]; showDirs: false
+        onCountChanged: service.rebuildList(service.currentQuery)
     }
 
-    ListModel {
-        id: displayModel
-    }
+    ListModel { id: appModel }
 
-    function rebuildList() {
-        var query = searchText.toLowerCase();
-        displayModel.clear();
+    function rebuildList(text) {
+        currentQuery = text.toLowerCase();
+        appModel.clear();
 
-        function addFrom(sourceModel) {
-            for (var i = 0; i < sourceModel.count; i++) {
-                var fileName = sourceModel.get(i, "fileName");
-
-                var launchId = fileName.toString().replace(".desktop", "");
-
-                var displayName = launchId;
-                displayName = displayName.replace(/^org\.gnome\./, "").replace(/^com\.[a-z]+\./, "").replace(/^io\.[a-z]+\./, "");
-                displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
-
-                // 3. Filter and Add
-                if (displayName.toLowerCase().includes(query)) {
-                    displayModel.append({
-                        "displayName": displayName,
-                        "launchId": launchId
-                    });
+        function add(src) {
+            for (var i = 0; i < src.count; i++) {
+                var name = src.get(i, "fileName").replace(".desktop", "");
+                var display = name.replace(/^org\.gnome\./, "").replace(/^com\.[a-z]+\./, "");
+                display = display.charAt(0).toUpperCase() + display.slice(1);
+                
+                if (display.toLowerCase().includes(currentQuery)) {
+                    appModel.append({ "name": display, "id": name });
                 }
             }
         }
-
-        addFrom(srcUserModern);
-        addFrom(srcSystem);
-        addFrom(srcUserLegacy);
-        addFrom(srcLocal);
-    }
-
-    function launch(launchId) {
-        runner.command = ["gtk-launch", launchId];
-        runner.running = true;
+        add(srcUser); 
+        add(srcSystem);
     }
 }
