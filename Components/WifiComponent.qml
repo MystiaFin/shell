@@ -185,7 +185,7 @@ Rectangle {
                                     }
 
                                     Text {
-                                        text: model.secured ? "🔒 Secured" : "🔓 Open"
+                                        text: model.secured ? "󰌾  Secured" : "󰿆  Open"
                                         font.pixelSize: 10
                                         font.family: "Poppins"
                                         color: "#a6adc8"
