@@ -9,14 +9,16 @@ PanelWindow {
     property color bgColor
     property color borderColor
     property bool show: false
-    
+
     VolumeService {
         id: volumeService
+        monitorEnabled: !panel.show
     }
     MicService {
         id: micService
+        monitorEnabled: !panel.show
     }
-    
+
     width: 500
     height: 250
     exclusionMode: ExclusionMode.Ignore
@@ -34,34 +36,37 @@ PanelWindow {
     }
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "popup"
-    
+
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width
         height: parent.height - 4
         y: 4
-        
+
         radius: 20
         color: panel.bgColor
-        
+
         Column {
             anchors.centerIn: parent
+            width: parent.width - 60
             spacing: 20
-            Ring {
-                width: 90
-                height: 90
-                ringColor: "#89b4fa"
-                ringWidth: 4
+
+            SliderController {
+                width: parent.width
+                sliderColor: "#89b4fa"
+                startIcon: "󰕾"
+
                 value: volumeService.volume
-                onScroll: delta => volumeService.setVolume(volumeService.volume + delta)
+                onMoved: newValue => volumeService.setVolume(newValue)
             }
-            Ring {
-                width: 90
-                height: 90
-                ringColor: "#f38ba8"
-                ringWidth: 4
+
+            SliderController {
+                width: parent.width
+                sliderColor: "#f38ba8"
+                startIcon: "󰍬"
+
                 value: micService.volume
-                onScroll: delta => micService.setVolume(micService.volume + delta)
+                onMoved: newValue => micService.setVolume(newValue)
             }
         }
     }
