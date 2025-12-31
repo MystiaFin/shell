@@ -46,9 +46,10 @@ PanelWindow {
         width: parent.width
         height: parent.height - 4
         y: 4
-
         radius: 18
         color: panel.bgColor
+        border.width: 2
+        border.color: "#313244"
 
         Column {
             anchors.centerIn: parent
