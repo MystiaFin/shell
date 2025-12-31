@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 Item {
     id: root
-    height: 40
+    height: 24
     implicitWidth: 300
     property color sliderColor: "#89b4fa"
     property color bgColor: "#45475a"
@@ -72,34 +72,13 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                 }
                 
-                Rectangle {
+                Text {
                     visible: slider.pressed
-                    z: 100
-                    width: 24
-                    height: 24
-                    radius: 4
-                    color: "#1e1e2e"
                     x: (parent.width - width) / 2
-                    y: -height - 8
-                    
-                    Text {
-                        anchors.centerIn: parent
-                        text: Math.round(slider.value * 100)
-                        font.pixelSize: 10
-                        font.bold: true
-                        color: "#cdd6f4"
-                        font.family: "Poppins"
-                    }
-                    
-                    Rectangle {
-                        width: 6
-                        height: 6
-                        rotation: 45
-                        color: "#1e1e2e"
-                        x: (parent.width - width) / 2
-                        y: parent.height - 3
-                        z: -1
-                    }
+                    y: parent.height + 8
+                    text: Math.round(slider.value * 100) + "%"
+                    font.pixelSize: 11
+                    color: "#cdd6f4"
                 }
             }
         }

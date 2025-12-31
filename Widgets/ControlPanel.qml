@@ -10,6 +10,10 @@ PanelWindow {
     property color borderColor
     property bool show: false
 
+    MediaService {
+        id: mediaService
+        monitorEnabled: !panel.show
+    }
     VolumeService {
         id: volumeService
         monitorEnabled: !panel.show
@@ -20,13 +24,13 @@ PanelWindow {
     }
 
     width: 500
-    height: 250
+    height: 260
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
     anchors {
         top: true
     }
-    margins.top: show ? 40 : -246
+    margins.top: show ? 40 : -259
 
     Behavior on margins.top {
         NumberAnimation {
@@ -43,13 +47,13 @@ PanelWindow {
         height: parent.height - 4
         y: 4
 
-        radius: 20
+        radius: 18
         color: panel.bgColor
 
         Column {
             anchors.centerIn: parent
             width: parent.width - 60
-            spacing: 20
+            spacing: 24
 
             SliderController {
                 width: parent.width
@@ -67,6 +71,19 @@ PanelWindow {
 
                 value: micService.volume
                 onMoved: newValue => micService.setVolume(newValue)
+            }
+            MediaPlayer {
+                width: parent.width
+                title: mediaService.title
+                artist: mediaService.artist
+                artUrl: mediaService.artUrl
+                status: mediaService.status
+                position: mediaService.position
+                length: mediaService.length
+
+                onPlayPause: mediaService.playPause()
+                onNext: mediaService.next()
+                onPrevious: mediaService.previous()
             }
         }
     }
