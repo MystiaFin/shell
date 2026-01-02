@@ -16,15 +16,15 @@ PanelWindow {
 
     anchors.bottom: true
     width: 450
-    height: 500
+    height: 350
     color: "transparent"
 
     margins {
-        bottom: (visible && !closing) ? 0 : -499
+        bottom: (visible && !closing) ? -2 : -349
         Behavior on bottom {
             NumberAnimation {
                 id: slideAnim
-                duration: 300
+                duration: 320
                 easing.type: Easing.OutQuad
                 onRunningChanged: {
                     if (!running && root.closing) {
@@ -62,7 +62,8 @@ PanelWindow {
             anchors.margins: -10
 
             color: "#181825"
-            radius: 10
+            topLeftRadius: 18
+            topRightRadius: 18
             border.width: 2
             border.color: "#313244"
         }
@@ -79,10 +80,10 @@ PanelWindow {
             DesktopEntriesComponent {
                 id: entriesList
                 width: parent.width
-                height: Math.min(contentHeight, 420)
+                height: Math.min(contentHeight, 270)
                 Behavior on height {
                     NumberAnimation {
-                        duration: 200
+                        duration: 250
                         easing.type: Easing.OutQuad
                     }
                 }
