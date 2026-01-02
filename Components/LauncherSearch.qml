@@ -10,9 +10,9 @@ FocusScope {
     
     Rectangle {
         anchors.fill: parent
-        color: "#2a2a2a"
+        color: "#1e1e2e"
         radius: 8
-        border.color: "#3a3a3a"
+        border.color: "#313244"
         border.width: 1
 
         TextInput {
