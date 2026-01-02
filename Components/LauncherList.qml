@@ -87,7 +87,7 @@ Rectangle {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    model.entry.execute();
+                    service.runner.command = ["sh", "-c", "gtk-launch " + model.id + " > /dev/null 2>&1 &"];
                     rootWindow.requestClose();
                 }
             }

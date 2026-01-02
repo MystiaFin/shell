@@ -2,11 +2,11 @@ import QtQuick
 
 Rectangle {
     id: root
-    
+
     property var service
     property var rootWindow
     property var targetList
-    
+
     property int fixedHeight
     property int padding
 
@@ -26,13 +26,14 @@ Rectangle {
         activeFocusOnTab: true
 
         onTextChanged: service.rebuildList(text)
-        
+
         Keys.onEscapePressed: rootWindow.requestClose()
         Keys.onDownPressed: targetList.incrementCurrentIndex()
         Keys.onUpPressed: targetList.decrementCurrentIndex()
         Keys.onReturnPressed: {
             if (service.appModel.count > 0) {
-                service.runner.command = ["gtk-launch", service.appModel.get(targetList.currentIndex).id];
+                var appID = service.appModel.get(targetList.currentIndex).id;
+                service.runner.command = ["sh", "-c", "gtk-launch " + appID + " > /dev/null 2>&1 &"];
                 service.runner.running = true;
                 rootWindow.requestClose();
             }

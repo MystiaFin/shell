@@ -9,23 +9,31 @@ Item {
     property alias appModel: appModel
     property alias runner: runner
 
-    Process { id: runner }
+    Process {
+        id: runner
+        stdout: null
+        stderr: null
+    }
 
     FolderListModel {
         id: srcSystem
         folder: "file:///run/current-system/sw/share/applications"
-        nameFilters: ["*.desktop"]; showDirs: false
+        nameFilters: ["*.desktop"]
+        showDirs: false
         onCountChanged: service.rebuildList(service.currentQuery)
     }
 
     FolderListModel {
         id: srcUser
         folder: "file:///etc/profiles/per-user/" + Quickshell.env("USER") + "/share/applications"
-        nameFilters: ["*.desktop"]; showDirs: false
+        nameFilters: ["*.desktop"]
+        showDirs: false
         onCountChanged: service.rebuildList(service.currentQuery)
     }
 
-    ListModel { id: appModel }
+    ListModel {
+        id: appModel
+    }
 
     property string currentQuery: ""
 
@@ -38,15 +46,18 @@ Item {
                 var name = src.get(i, "fileName").replace(".desktop", "");
                 var display = name.replace(/^org\.gnome\./, "").replace(/^com\.[a-z]+\./, "");
                 display = display.charAt(0).toUpperCase() + display.slice(1);
-                
+
                 if (display.toLowerCase().includes(currentQuery)) {
-                    appModel.append({ "name": display, "id": name });
+                    appModel.append({
+                        "name": display,
+                        "id": name
+                    });
                 }
             }
         }
-        add(srcUser); 
+        add(srcUser);
         add(srcSystem);
     }
-    
+
     Component.onCompleted: rebuildList("")
 }

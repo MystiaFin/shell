@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "Widgets" as WG
+import Quickshell.Wayland
 
 ShellRoot {
     id: root
@@ -13,7 +14,6 @@ ShellRoot {
 
     IpcHandler {
         target: "launcher"
-
         function toggle(): void {
             root.launcherVisible = !root.launcherVisible;
         }
@@ -36,6 +36,7 @@ ShellRoot {
     WG.NotificationPopups {}
     WG.LauncherV2 {
         visible: root.launcherVisible
-				onRequestClose: root.launcherVisible = false
+        onRequestClose: root.launcherVisible = false
     }
+
 }
