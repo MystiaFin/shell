@@ -257,8 +257,7 @@ PanelWindow {
 
                 onTextChanged: {
                     launcher.searchText = text.toLowerCase();
-                    var count = launcher.getVisibleCount();
-                    launcher.highlightedIndex = count > 0 ? count - 1 : 0;
+                    launcher.highlightedIndex = 0;
                 }
 
                 Keys.onEscapePressed: {
