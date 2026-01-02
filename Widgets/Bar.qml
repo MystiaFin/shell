@@ -127,7 +127,7 @@ PanelWindow {
                     spacing: 8
 
                     Text {
-                        text: "󰂯"
+                        text: "󰂚"
                         color: "#303446"
                         font.pixelSize: 16
                         anchors.verticalCenter: parent.verticalCenter
@@ -141,7 +141,7 @@ PanelWindow {
                     }
 
                     Text {
-                        text: "󰂚"
+                        text: "󰂯"
                         color: "#303446"
                         font.pixelSize: 16
                         anchors.verticalCenter: parent.verticalCenter
