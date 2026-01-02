@@ -15,7 +15,7 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
 
     anchors.bottom: true
-    width: 420
+    width: 450
     height: 500
     color: "transparent"
 
