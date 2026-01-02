@@ -1,291 +1,86 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Io
-import "../Anim"
+import "../Services"
+import "../Components"
 
 PanelWindow {
-    id: launcher
-
+    id: root
     signal requestClose
 
-    property bool visible: false
-    property int itemHeight: 42
-    property int maxItems: 9
-    property int searchHeight: 50
-    property int spacing: 10
-    property int padding: 10
-    property int extraHeight: 10
-    property int totalMaxHeight: (maxItems * itemHeight) + searchHeight + spacing + (padding * 2) + extraHeight
-
-    property string searchText: ""
-    property int highlightedIndex: 0
-
+    visible: LauncherService.launcherVisible
     WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     anchors.bottom: true
-    margins {
-        bottom: visible ? 0 : -(totalMaxHeight - 1)
-        Behavior on bottom {
-            LauncherAnim { duration: 400 }
-        }
-    }
-
-    implicitWidth: 500
-    implicitHeight: totalMaxHeight
-    exclusionMode: ExclusionMode.Ignore
+    anchors.left: true
+    width: 500
+    height: 500
     color: "transparent"
 
-    Process {
-        id: appLauncher
-        running: false
-    }
-
-    function launchApp(desktopId) {
-        if (desktopId) {
-            appLauncher.command = ["sh", "-c", "gtk-launch " + desktopId];
-            appLauncher.running = true;
-            launcher.requestClose();
-        }
-    }
-
-    function getVisibleCount() {
-        var count = 0;
-        for (var i = 0; i < DesktopEntries.applications.length; i++) {
-            var app = DesktopEntries.applications[i];
-            if (launcher.searchText === "") {
-                count++;
-            } else {
-                var n = (app.name || "").toLowerCase();
-                var d = (app.description || "").toLowerCase();
-                if (n.indexOf(launcher.searchText) !== -1 || d.indexOf(launcher.searchText) !== -1) {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
-    Rectangle {
-        id: background
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-
-        height: {
-            var listHeight = appColumn.height;
-            var extras = launcher.searchHeight + launcher.spacing + (launcher.padding * 2);
-            return Math.min(listHeight + extras, parent.height);
-        }
-
-        color: root.systemColor
-        radius: 16
-
-        Behavior on height {
-            NumberAnimation { duration: 350; easing.type: Easing.OutExpo }
-        }
-    }
-
-    Item {
-        id: entriesContainer
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: searchBar.top
-        anchors.top: parent.top
-        anchors.margins: launcher.padding
-        anchors.bottomMargin: launcher.spacing
-        clip: true
-
-        Column {
-            id: appColumn
-            width: parent.width
-            spacing: 5
-            anchors.bottom: parent.bottom
-
-            Repeater {
-                model: DesktopEntries.applications
-
-                delegate: Rectangle {
-                    required property var modelData
-                    required property int index
-
-                    property bool shouldBeVisible: {
-                        if (launcher.searchText === "") return true;
-                        var n = (modelData.name || "").toLowerCase();
-                        var d = (modelData.description || "").toLowerCase();
-                        return n.indexOf(launcher.searchText) !== -1 || d.indexOf(launcher.searchText) !== -1;
-                    }
-
-                    property int visibleIndex: {
-                        var trigger = launcher.searchText;
-                        if (launcher.searchText === "") return index;
-
-                        var count = 0;
-                        for (var i = 0; i < index; i++) {
-                            var app = DesktopEntries.applications[i];
-                            var n = (app.name || "").toLowerCase();
-                            var d = (app.description || "").toLowerCase();
-                            if (n.indexOf(launcher.searchText) !== -1 || d.indexOf(launcher.searchText) !== -1)
-                                count++;
-                        }
-                        return count;
-                    }
-
-                    property bool isHighlighted: shouldBeVisible && visibleIndex === launcher.highlightedIndex
-
-                    visible: height > 0
-                    width: parent.width
-                    height: shouldBeVisible ? launcher.itemHeight : 0
-                    opacity: shouldBeVisible ? 1 : 0
-                    color: isHighlighted ? "#3a3a3a"
-                          : (mouseArea.containsMouse ? "#2a2a2a" : "transparent")
-                    radius: 6
-
-                    Behavior on height { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
-                    Behavior on opacity { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
-
-                    Row {
-                        spacing: 10
-                        anchors.fill: parent
-                        anchors.leftMargin: 10
-
-                        Image {
-                            width: 32
-                            height: 32
-                            source: modelData.icon ? "image://icon/" + modelData.icon : ""
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Column {
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 2
-                            width: parent.width - 52
-
-                            Text {
-                                text: modelData.name || ""
-                                color: "white"
-                                font.pixelSize: 14
-                                font.bold: true
-                                elide: Text.ElideRight
-                                width: parent.width
-                            }
-
-                            Text {
-                                text: modelData.description || ""
-                                color: "#b0b0b0"
-                                font.pixelSize: 11
-                                elide: Text.ElideRight
-                                width: parent.width
-                            }
-                        }
-                    }
-
-                    MouseArea {
-                        id: mouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        enabled: parent.shouldBeVisible
-                        onClicked: launcher.launchApp(modelData.id)
-                        onEntered: launcher.highlightedIndex = parent.visibleIndex
-                    }
-                }
+    margins {
+        bottom: visible ? 0 : -499
+        Behavior on bottom {
+            NumberAnimation {
+                duration: 300
             }
         }
     }
 
-    Rectangle {
-        id: searchBar
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.margins: launcher.padding
-        height: launcher.searchHeight
-        color: "#2a2a2a"
-        radius: 8
-        border.color: "#4a9eff"
-        border.width: 2
+    FocusScope {
+        id: mainFocus
+        anchors.fill: parent
+        focus: true
 
-        Row {
+        Keys.onUpPressed: {
+            entriesList.selectPrevious();
+        }
+
+        Keys.onDownPressed: {
+            entriesList.selectNext();
+        }
+
+        Keys.onReturnPressed: {
+            LauncherService.launchSelected();
+            root.requestClose();
+        }
+
+        Keys.onEscapePressed: {
+            root.requestClose();
+        }
+
+        Rectangle {
             anchors.fill: parent
-            anchors.margins: 10
-            spacing: 10
+            color: "#1e1e1e"
+            radius: 10
+            clip: true
 
-            Text {
-                text: "🔍"
-                font.pixelSize: 20
-                anchors.verticalCenter: parent.verticalCenter
-            }
+            Column {
+                anchors.fill: parent
+                anchors.margins: 10
+                spacing: 10
 
-            TextInput {
-                id: searchInput
-                width: parent.width - 60
-                anchors.verticalCenter: parent.verticalCenter
-                color: "white"
-                font.pixelSize: 16
-                selectByMouse: true
-                clip: true
-                focus: true
-                cursorVisible: false
-
-                Text {
-                    text: "Search applications..."
-                    color: "#808080"
-                    font.pixelSize: 16
-                    visible: searchInput.text.length === 0
+                DesktopEntriesComponent {
+                    id: entriesList
+                    width: parent.width
+                    height: parent.height - 60
                 }
 
-                onTextChanged: {
-                    launcher.searchText = text.toLowerCase();
-                    launcher.highlightedIndex = -1;
-                    launcher.highlightedIndex = 0;
+                LauncherSearch {
+                    id: searchBar
+                    focus: true
                 }
-
-                Keys.onPressed: function(event) {
-                    if (event.key === Qt.Key_Down) {
-                        var count = launcher.getVisibleCount();
-                        if (launcher.highlightedIndex < count - 1)
-                            launcher.highlightedIndex++;
-                        event.accepted = true;
-                    } else if (event.key === Qt.Key_Up) {
-                        if (launcher.highlightedIndex > 0)
-                            launcher.highlightedIndex--;
-                        event.accepted = true;
-                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                        var current = 0;
-                        for (var i = 0; i < DesktopEntries.applications.length; i++) {
-                            var app = DesktopEntries.applications[i];
-                            var n = (app.name || "").toLowerCase();
-                            var d = (app.description || "").toLowerCase();
-                            var match = launcher.searchText === "" ||
-                                        n.indexOf(launcher.searchText) !== -1 ||
-                                        d.indexOf(launcher.searchText) !== -1;
-                            if (match) {
-                                if (current === launcher.highlightedIndex) {
-                                    launcher.launchApp(app.id);
-                                    break;
-                                }
-                                current++;
-                            }
-                        }
-                        event.accepted = true;
-                    } else if (event.key === Qt.Key_Escape) {
-                        if (text.length > 0) text = "";
-                        else launcher.requestClose();
-                        event.accepted = true;
-                    }
-                }
-
-                Component.onCompleted: forceActiveFocus()
             }
         }
     }
 
     onVisibleChanged: {
         if (visible) {
-            searchInput.text = "";
-            launcher.highlightedIndex = 0;
-            searchInput.forceActiveFocus();
+            LauncherService.selectedIndex = 0;
+            LauncherService.searchText = "";
+            searchBar.text = "";
+            Qt.callLater(function () {
+                searchBar.forceActiveFocus();
+            });
         }
     }
 }
-
