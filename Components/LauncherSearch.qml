@@ -1,40 +1,41 @@
 import QtQuick
+import "../Services"
 
-Rectangle {
-    id: root
+FocusScope {
+    id: searchScope
+    width: parent.width
+    height: 50
     
-    property var service
-    property var rootWindow
-    property var targetList
+    property alias text: textInput.text
     
-    property int fixedHeight
-    property int padding
-
-    property alias input: searchInput
-
-    height: fixedHeight
-    color: "#1e1e2e"
-    radius: 12
-
-    TextInput {
-        id: searchInput
+    Rectangle {
         anchors.fill: parent
-        anchors.margins: 15
-        color: "#cdd6f4"
-        font.pixelSize: 16
-        verticalAlignment: Text.AlignVCenter
-        activeFocusOnTab: true
+        color: "#2a2a2a"
+        radius: 8
+        border.color: "#3a3a3a"
+        border.width: 1
 
-        onTextChanged: service.rebuildList(text)
-        
-        Keys.onEscapePressed: rootWindow.requestClose()
-        Keys.onDownPressed: targetList.incrementCurrentIndex()
-        Keys.onUpPressed: targetList.decrementCurrentIndex()
-        Keys.onReturnPressed: {
-            if (service.appModel.count > 0) {
-                service.runner.command = ["gtk-launch", service.appModel.get(targetList.currentIndex).id];
-                service.runner.running = true;
-                rootWindow.requestClose();
+        TextInput {
+            id: textInput
+            anchors.fill: parent
+            anchors.margins: 15
+            color: "white"
+            font.pixelSize: 16
+            verticalAlignment: TextInput.AlignVCenter
+            
+            focus: true
+            
+            onTextChanged: {
+                LauncherService.searchText = text
+            }
+            
+            Text {
+                anchors.fill: parent
+                text: "Search applications..."
+                color: "#666666"
+                font.pixelSize: 16
+                verticalAlignment: Text.AlignVCenter
+                visible: textInput.text.length === 0
             }
         }
     }

@@ -2,120 +2,85 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "../Services"
-import "../Anim"
 import "../Components"
 
 PanelWindow {
-    id: launcher
+    id: root
     signal requestClose
 
-    property bool visible: false
-
-    property int itemHeight: 42
-    property int maxItems: 9
-    property int searchHeight: 50
-    property int spacing: 10
-    property int padding: 10 
-    property int extraHeight: 10 
-    
-    property int totalMaxHeight: (maxItems * itemHeight) + searchHeight + spacing + (padding * 2) + extraHeight
-
+    visible: LauncherService.launcherVisible
     WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     anchors.bottom: true
+    anchors.left: true
+    width: 500
+    height: 500
+    color: "transparent"
 
     margins {
-        bottom: visible ? 0 : -(totalMaxHeight - 1)
+        bottom: visible ? 0 : -499
         Behavior on bottom {
-            LauncherAnim { duration: 400 }
+            NumberAnimation {
+                duration: 300
+            }
         }
     }
 
-    implicitWidth: 500
-    implicitHeight: totalMaxHeight
-    
-    exclusionMode: ExclusionMode.Ignore
-    color: "transparent"
+    FocusScope {
+        id: mainFocus
+        anchors.fill: parent
+        focus: true
 
-    LauncherService {
-        id: service
-    }
+        Keys.onUpPressed: {
+            entriesList.selectPrevious();
+        }
 
-    Item {
-        id: mainContainer
-        width: parent.width
-        
-        anchors.bottom: parent.bottom 
-        anchors.left: parent.left
-        anchors.right: parent.right
+        Keys.onDownPressed: {
+            entriesList.selectNext();
+        }
 
-        height: (Math.min(service.appModel.count, maxItems) * itemHeight) + searchHeight + spacing + (padding * 2) + extraHeight
+        Keys.onReturnPressed: {
+            LauncherService.launchSelected();
+            root.requestClose();
+        }
 
-        Behavior on height {
-            LauncherAnim { duration: 300 }
+        Keys.onEscapePressed: {
+            root.requestClose();
         }
 
         Rectangle {
             anchors.fill: parent
-            color: "#11111b"
-            radius: 16
+            color: "#1e1e1e"
+            radius: 10
+            clip: true
 
-            Rectangle {
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: parent.radius
-                color: parent.color
+            Column {
+                anchors.fill: parent
+                anchors.margins: 10
+                spacing: 10
+
+                DesktopEntriesComponent {
+                    id: entriesList
+                    width: parent.width
+                    height: parent.height - 60
+                }
+
+                LauncherSearch {
+                    id: searchBar
+                    focus: true
+                }
             }
         }
-
-        LauncherList {
-            id: listComponent
-            
-            service: service
-            rootWindow: launcher
-            anchorTarget: searchBar
-
-            itemHeight: launcher.itemHeight
-            maxItems: launcher.maxItems
-            spacing: launcher.spacing
-            padding: launcher.padding
-            searchHeight: launcher.searchHeight
-            containerHeight: mainContainer.height
-        }
-
-        LauncherSearch {
-            id: searchBar
-            
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.margins: padding
-            
-            fixedHeight: searchHeight
-            padding: launcher.padding
-            
-            service: service
-            rootWindow: launcher
-            
-            targetList: listComponent.view 
-        }
-    }
-
-    Timer {
-        id: focusKicker
-        interval: 10
-        repeat: false
-        onTriggered: searchBar.input.forceActiveFocus()
     }
 
     onVisibleChanged: {
         if (visible) {
-            focusKicker.restart();
-            searchBar.input.text = "";
-            service.rebuildList("");
-        } else {
-            searchBar.input.focus = false;
+            LauncherService.selectedIndex = 0;
+            LauncherService.searchText = "";
+            searchBar.text = "";
+            Qt.callLater(function () {
+                searchBar.forceActiveFocus();
+            });
         }
     }
 }
