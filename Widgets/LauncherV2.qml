@@ -17,6 +17,7 @@ PanelWindow {
     property int padding: 10
     property int extraHeight: 10
     property int totalMaxHeight: (maxItems * itemHeight) + searchHeight + spacing + (padding * 2) + extraHeight
+
     property string searchText: ""
     property int highlightedIndex: 0
 
@@ -26,9 +27,7 @@ PanelWindow {
     margins {
         bottom: visible ? 0 : -(totalMaxHeight - 1)
         Behavior on bottom {
-            LauncherAnim {
-                duration: 400
-            }
+            LauncherAnim { duration: 400 }
         }
     }
 
@@ -57,9 +56,9 @@ PanelWindow {
             if (launcher.searchText === "") {
                 count++;
             } else {
-                var name = (app.name || "").toLowerCase();
-                var description = (app.description || "").toLowerCase();
-                if (name.indexOf(launcher.searchText) !== -1 || description.indexOf(launcher.searchText) !== -1) {
+                var n = (app.name || "").toLowerCase();
+                var d = (app.description || "").toLowerCase();
+                if (n.indexOf(launcher.searchText) !== -1 || d.indexOf(launcher.searchText) !== -1) {
                     count++;
                 }
             }
@@ -67,7 +66,6 @@ PanelWindow {
         return count;
     }
 
-    // Background rectangle
     Rectangle {
         id: background
         anchors.left: parent.left
@@ -77,22 +75,17 @@ PanelWindow {
         height: {
             var listHeight = appColumn.height;
             var extras = launcher.searchHeight + launcher.spacing + (launcher.padding * 2);
-            var total = listHeight + extras;
-            return Math.min(total, parent.height);
+            return Math.min(listHeight + extras, parent.height);
         }
 
         color: root.systemColor
         radius: 16
 
         Behavior on height {
-            NumberAnimation {
-                duration: 350
-                easing.type: Easing.OutExpo
-            }
+            NumberAnimation { duration: 350; easing.type: Easing.OutExpo }
         }
     }
 
-    // Desktop entries container (transparent)
     Item {
         id: entriesContainer
         anchors.left: parent.left
@@ -116,53 +109,40 @@ PanelWindow {
                     required property var modelData
                     required property int index
 
+                    property bool shouldBeVisible: {
+                        if (launcher.searchText === "") return true;
+                        var n = (modelData.name || "").toLowerCase();
+                        var d = (modelData.description || "").toLowerCase();
+                        return n.indexOf(launcher.searchText) !== -1 || d.indexOf(launcher.searchText) !== -1;
+                    }
+
                     property int visibleIndex: {
+                        var trigger = launcher.searchText;
+                        if (launcher.searchText === "") return index;
+
                         var count = 0;
                         for (var i = 0; i < index; i++) {
                             var app = DesktopEntries.applications[i];
-                            if (launcher.searchText === "") {
+                            var n = (app.name || "").toLowerCase();
+                            var d = (app.description || "").toLowerCase();
+                            if (n.indexOf(launcher.searchText) !== -1 || d.indexOf(launcher.searchText) !== -1)
                                 count++;
-                            } else {
-                                var n = (app.name || "").toLowerCase();
-                                var d = (app.description || "").toLowerCase();
-                                if (n.indexOf(launcher.searchText) !== -1 || d.indexOf(launcher.searchText) !== -1) {
-                                    count++;
-                                }
-                            }
                         }
                         return count;
                     }
 
-                    property bool shouldBeVisible: {
-                        if (launcher.searchText === "")
-                            return true;
-                        var name = (modelData.name || "").toLowerCase();
-                        var description = (modelData.description || "").toLowerCase();
-                        return name.indexOf(launcher.searchText) !== -1 || description.indexOf(launcher.searchText) !== -1;
-                    }
-
-                    visible: height > 0
                     property bool isHighlighted: shouldBeVisible && visibleIndex === launcher.highlightedIndex
 
+                    visible: height > 0
                     width: parent.width
                     height: shouldBeVisible ? launcher.itemHeight : 0
                     opacity: shouldBeVisible ? 1 : 0
-                    color: isHighlighted ? "#3a3a3a" : (mouseArea.containsMouse ? "#2a2a2a" : "transparent")
+                    color: isHighlighted ? "#3a3a3a"
+                          : (mouseArea.containsMouse ? "#2a2a2a" : "transparent")
                     radius: 6
 
-                    Behavior on height {
-                        NumberAnimation {
-                            duration: 350
-                            easing.type: Easing.OutExpo
-                        }
-                    }
-
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 350
-                            easing.type: Easing.OutExpo
-                        }
-                    }
+                    Behavior on height { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
+                    Behavior on opacity { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
 
                     Row {
                         spacing: 10
@@ -172,7 +152,7 @@ PanelWindow {
                         Image {
                             width: 32
                             height: 32
-                            source: (modelData.icon ? "image://icon/" + modelData.icon : "")
+                            source: modelData.icon ? "image://icon/" + modelData.icon : ""
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -205,16 +185,14 @@ PanelWindow {
                         anchors.fill: parent
                         hoverEnabled: true
                         enabled: parent.shouldBeVisible
-
                         onClicked: launcher.launchApp(modelData.id)
-                        onEntered: launcher.highlightedIndex = visibleIndex
+                        onEntered: launcher.highlightedIndex = parent.visibleIndex
                     }
                 }
             }
         }
     }
 
-    // Search bar
     Rectangle {
         id: searchBar
         anchors.left: parent.left
@@ -247,6 +225,7 @@ PanelWindow {
                 selectByMouse: true
                 clip: true
                 focus: true
+                cursorVisible: false
 
                 Text {
                     text: "Search applications..."
@@ -257,76 +236,46 @@ PanelWindow {
 
                 onTextChanged: {
                     launcher.searchText = text.toLowerCase();
+                    launcher.highlightedIndex = -1;
                     launcher.highlightedIndex = 0;
                 }
 
-                Keys.onEscapePressed: {
-                    if (text.length > 0)
-                        text = "";
-                    else
-                        launcher.requestClose();
-                }
-
-                Keys.onUpPressed: {
-                    if (launcher.highlightedIndex > 0) {
-                        launcher.highlightedIndex--;
-                    }
-                }
-
-                Keys.onDownPressed: {
-                    var count = launcher.getVisibleCount();
-                    if (launcher.highlightedIndex < count - 1) {
-                        launcher.highlightedIndex++;
-                    }
-                }
-
-                Keys.onReturnPressed: {
-                    var currentVisibleIndex = 0;
-
-                    for (var i = 0; i < DesktopEntries.applications.length; i++) {
-                        var app = DesktopEntries.applications[i];
-
-                        var name = (app.name || "").toLowerCase();
-                        var desc = (app.description || "").toLowerCase();
-                        var isMatch = launcher.searchText === "" || name.indexOf(launcher.searchText) !== -1 || desc.indexOf(launcher.searchText) !== -1;
-
-                        if (isMatch) {
-                            if (currentVisibleIndex === launcher.highlightedIndex) {
-                                launcher.launchApp(app.id);
-                                break;
+                Keys.onPressed: function(event) {
+                    if (event.key === Qt.Key_Down) {
+                        var count = launcher.getVisibleCount();
+                        if (launcher.highlightedIndex < count - 1)
+                            launcher.highlightedIndex++;
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Up) {
+                        if (launcher.highlightedIndex > 0)
+                            launcher.highlightedIndex--;
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                        var current = 0;
+                        for (var i = 0; i < DesktopEntries.applications.length; i++) {
+                            var app = DesktopEntries.applications[i];
+                            var n = (app.name || "").toLowerCase();
+                            var d = (app.description || "").toLowerCase();
+                            var match = launcher.searchText === "" ||
+                                        n.indexOf(launcher.searchText) !== -1 ||
+                                        d.indexOf(launcher.searchText) !== -1;
+                            if (match) {
+                                if (current === launcher.highlightedIndex) {
+                                    launcher.launchApp(app.id);
+                                    break;
+                                }
+                                current++;
                             }
-                            currentVisibleIndex++;
                         }
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Escape) {
+                        if (text.length > 0) text = "";
+                        else launcher.requestClose();
+                        event.accepted = true;
                     }
                 }
 
                 Component.onCompleted: forceActiveFocus()
-            }
-
-            Rectangle {
-                width: 24
-                height: 24
-                radius: 12
-                color: clearMouseArea.containsMouse ? "#4a4a4a" : "transparent"
-                visible: searchInput.text.length > 0
-                anchors.verticalCenter: parent.verticalCenter
-
-                Text {
-                    text: "✕"
-                    color: "white"
-                    anchors.centerIn: parent
-                    font.pixelSize: 14
-                }
-
-                MouseArea {
-                    id: clearMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: {
-                        searchInput.text = "";
-                        searchInput.forceActiveFocus();
-                    }
-                }
             }
         }
     }
@@ -334,8 +283,9 @@ PanelWindow {
     onVisibleChanged: {
         if (visible) {
             searchInput.text = "";
-            highlightedIndex = 0;
+            launcher.highlightedIndex = 0;
             searchInput.forceActiveFocus();
         }
     }
 }
+
