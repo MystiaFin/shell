@@ -19,12 +19,8 @@ QtObject {
                 if (data.startsWith("cpu ")) {
                     const parts = data.split(' ').filter(c => c !== '')
                     
-                    // parts[0] is "cpu"
-                    // parts[4] is idle, parts[5] is iowait
                     let idle = parseInt(parts[4]) + parseInt(parts[5])
                     let total = 0
-                    
-                    // Sum all columns
                     for (let i = 1; i < parts.length; i++) {
                         total += parseInt(parts[i])
                     }
