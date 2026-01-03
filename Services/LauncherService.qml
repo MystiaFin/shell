@@ -11,22 +11,15 @@ QtObject {
     property string searchText: ""
 
     property Process launcher: Process {}
-    
-    function launchSelected() {
-        if (!selectedApp || !selectedApp.id) {
-            console.log("ERROR: No app selected or app has no id");
-            return;
-        }
 
-        console.log("Launching:", selectedApp.id);
-        launcher.command = ["gtk-launch", selectedApp.id];
+    function launchSelected() {
+        launcher.command = ["sh", "-c", "gtk-launch " + selectedApp.id + " > /dev/null 2>&1"];
         launcher.running = false;
         launcher.running = true;
-
     }
 
     function closeLauncher() {
         launcherVisible = false;
-        searchText = ""
+        searchText = "";
     }
 }
