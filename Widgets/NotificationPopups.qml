@@ -12,7 +12,7 @@ Scope {
             right: true
         }
         margins {
-            top: 6
+            top: 4
         }
         width: notificationService.notificationModel.count > 0 ? 360 : 0
         height: notificationService.notificationModel.count > 0 ? notifColumn.height : 0
@@ -46,7 +46,7 @@ Scope {
                     width: 355
                     height: 78
                     color: "#1e1e2e"
-                    radius: 8
+                    radius: 16
                     border.width: 2
                     border.color: "#89b4fa"
                     

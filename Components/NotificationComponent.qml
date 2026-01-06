@@ -16,8 +16,6 @@ Rectangle {
     height: 90
     color: baseColor
     radius: 12
-
-    // --- NEW: Blue Border ---
     border.width: 2
     border.color: blueColor
 
@@ -75,7 +73,7 @@ Rectangle {
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: 4 // Increased spacing slightly to accommodate the line
+            spacing: 4
 
             Text {
                 text: model.summary
