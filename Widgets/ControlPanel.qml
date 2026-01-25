@@ -12,7 +12,10 @@ PanelWindow {
 
     MediaService {
         id: mediaService
-        monitorEnabled: !panel.show
+        monitorEnabled: true
+    }
+    CavaService {
+        id: cavaService
     }
     VolumeService {
         id: volumeService
@@ -81,7 +84,7 @@ PanelWindow {
                 status: mediaService.status
                 position: mediaService.position
                 length: mediaService.length
-
+                cavaBars: cavaService.bars
                 onPlayPause: mediaService.playPause()
                 onNext: mediaService.next()
                 onPrevious: mediaService.previous()

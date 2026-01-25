@@ -16,6 +16,7 @@ Item {
     property var onPlayPause: null
     property var onNext: null
     property var onPrevious: null
+    property var cavaBars: []
 
     function formatTime(seconds) {
         var mins = Math.floor(seconds / 60);
@@ -62,9 +63,8 @@ Item {
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: 6
+                spacing: 2
 
-                // Title and Artist
                 Text {
                     Layout.fillWidth: true
                     text: root.title || "No media playing"
@@ -85,11 +85,45 @@ Item {
 
                 Item {
                     Layout.fillHeight: true
+                    Layout.minimumHeight: 2
+                }
+
+                Row {
+                    id: visualizer
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 13
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.bottomMargin: 2
+                    spacing: 2
+
+                    Repeater {
+                        model: root.cavaBars
+                        delegate: Item {
+                            width: 8
+                            height: 13
+
+                            Rectangle {
+                                width: 6
+                                height: Math.max(2, modelData * 10)
+                                radius: 2
+                                color: "#89b4fa"
+                                anchors.bottom: parent.bottom
+
+                                Behavior on height {
+                                    NumberAnimation {
+                                        duration: 50
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 RowLayout {
                     Layout.fillWidth: true
                     spacing: 8
+                    Layout.topMargin: 0
 
                     Text {
                         text: root.formatTime(root.position)
@@ -159,16 +193,15 @@ Item {
                         text: root.status === "Playing" ? "󰏤" : "󰐊"
                         font.pixelSize: 20
                         color: "#1e1e2e"
+                        leftPadding: root.status === "Playing" ? 0 : 2
                     }
-
                     MouseArea {
                         id: playPauseMouse
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if (root.onPlayPause)
-                                root.onPlayPause();
+                            mediaService.playPause();
                         }
                     }
                 }
