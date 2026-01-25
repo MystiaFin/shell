@@ -9,7 +9,11 @@ Item {
     property bool isEnabled: false
     property string connectedSSID: ""
     property ListModel networks: ListModel {}
-
+    
+    // Connection state tracking
+    property string connectingSSID: ""
+    property string connectionError: ""
+    property bool isEthernetConnected: false
     property var _scanResults: []
     property var _knownList: []
 
@@ -19,10 +23,26 @@ Item {
             onRead: data => console.log("[Connect Out]: " + data)
         }
         stderr: SplitParser {
-            onRead: data => console.log("[Connect Err]: " + data)
+            onRead: data => {
+                console.log("[Connect Err]: " + data)
+                // Capture errors
+                if (data.includes("Secrets were required") || 
+                    data.includes("802-11-wireless-security.psk") ||
+                    data.includes("Error:")) {
+                    service.connectionError = "invalid";
+                }
+            }
         }
         onExited: {
             console.log("Connection attempt finished. Exit code: " + exitCode);
+            
+            if (exitCode !== 0) {
+                console.log("Connection failed");
+                if (service.connectionError === "") {
+                    service.connectionError = "failed";
+                }
+            }
+            
             settleTimer.start();
         }
     }
@@ -31,7 +51,15 @@ Item {
         id: settleTimer
         interval: 1000
         repeat: false
-        onTriggered: service.update()
+        onTriggered: {
+            service.update();
+            if (service.connectedSSID === service.connectingSSID) {
+                service.connectingSSID = "";
+                service.connectionError = "";
+            } else if (service.connectingSSID !== "") {
+                service.connectingSSID = "";
+            }
+        }
     }
 
     Process {
@@ -52,6 +80,28 @@ Item {
                     if (line.startsWith('yes:')) {
                         service.connectedSSID = line.substring(4).trim();
                         break;
+                    }
+                }
+            }
+        }
+    }
+
+    Process {
+        id: ethernetProcess
+        command: ["nmcli", "-t", "-f", "DEVICE,TYPE,STATE", "device"]
+        stdout: SplitParser {
+            onRead: data => {
+                service.isEthernetConnected = false;
+                const lines = data.split('\n');
+                for (const line of lines) {
+                    const parts = line.split(':');
+                    if (parts.length >= 3) {
+                        const type = parts[1];
+                        const state = parts[2];
+                        if (type === 'ethernet' && state === 'connected') {
+                            service.isEthernetConnected = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -162,6 +212,7 @@ Item {
 
         statusProcess.running = true;
         connectedProcess.running = true;
+        ethernetProcess.running = true;
 
         if (isEnabled) {
             knownProcess.running = true;
@@ -179,6 +230,11 @@ Item {
 
     function connect(ssid, password) {
         console.log("=== CONNECTING ===");
+        
+        // Set connecting state
+        service.connectingSSID = ssid;
+        service.connectionError = "";
+        
         var cmd = ["nmcli", "dev", "wifi", "connect", ssid];
         if (password && password !== "")
             cmd.push("password", password);
@@ -192,5 +248,9 @@ Item {
             Quickshell.execDetached(["nmcli", "connection", "down", service.connectedSSID]);
             delayedUpdate.start();
         }
+    }
+    
+    function clearError(ssid) {
+        service.connectionError = "";
     }
 }

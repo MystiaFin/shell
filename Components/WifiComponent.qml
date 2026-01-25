@@ -28,7 +28,7 @@ Rectangle {
                 radius: 12
                 color: "#1e1e2e"
                 border.width: 1
-                border.color: wifiService.isEnabled ? "#89b4fa" : "#313244"
+                border.color: wifiService.isEthernetConnected ? "#a6e3a1" : (wifiService.isEnabled ? "#89b4fa" : "#313244")
 
                 RowLayout {
                     anchors.fill: parent
@@ -39,11 +39,11 @@ Rectangle {
                         Layout.preferredWidth: 36
                         Layout.preferredHeight: 36
                         radius: 18
-                        color: wifiService.isEnabled ? "#89b4fa" : "#313244"
+                        color: wifiService.isEthernetConnected ? "#a6e3a1" : (wifiService.isEnabled ? "#89b4fa" : "#313244")
 
                         Text {
                             anchors.centerIn: parent
-                            text: "󰖩"
+                            text: wifiService.isEthernetConnected ? "󰈀" : "󰖩"
                             font.pixelSize: 20
                             color: "#1e1e2e"
                         }
@@ -54,22 +54,23 @@ Rectangle {
                         spacing: 2
 
                         Text {
-                            text: wifiService.isEnabled ? "WiFi" : "WiFi Off"
+                            text: wifiService.isEthernetConnected ? "Network" : (wifiService.isEnabled ? "WiFi" : "WiFi Off")
                             font.pixelSize: 14
                             font.family: "Poppins"
                             color: "#cdd6f4"
                         }
 
                         Text {
-                            text: wifiService.connectedSSID || "Not connected"
+                            text: wifiService.isEthernetConnected ? "Connected" : (wifiService.connectedSSID || "Not connected")
                             font.pixelSize: 12
                             font.family: "Poppins"
-                            color: wifiService.connectedSSID ? "#89b4fa" : "#a6adc8"
-                            visible: wifiService.isEnabled
+                            color: wifiService.isEthernetConnected ? "#a6e3a1" : (wifiService.connectedSSID ? "#89b4fa" : "#a6adc8")
+                            visible: wifiService.isEthernetConnected || wifiService.isEnabled
                         }
                     }
 
                     Rectangle {
+                        visible: !wifiService.isEthernetConnected
                         Layout.preferredWidth: 40
                         Layout.preferredHeight: 24
                         radius: 12
@@ -102,7 +103,7 @@ Rectangle {
             Column {
                 width: parent.width - 24
                 spacing: 8
-                visible: wifiService.isEnabled
+                visible: wifiService.isEnabled && !wifiService.isEthernetConnected
 
                 Text {
                     text: "Available Networks"
@@ -117,12 +118,14 @@ Rectangle {
                     Rectangle {
                         id: netCard
                         width: parent.width
-                        height: isExpanded ? 110 : 50
+                        height: isExpanded ? (hasError ? 140 : 110) : 50
                         radius: 10
                         color: "#1e1e2e"
                         clip: true
 
                         property bool isConnected: model.ssid === wifiService.connectedSSID
+                        property bool isConnecting: model.ssid === wifiService.connectingSSID
+                        property bool hasError: wifiService.connectionError !== "" && wifiService.connectionError !== "failed" && root.expandedSSID === model.ssid
                         property bool isExpanded: root.expandedSSID === model.ssid && !isConnected
                         property string passwordInput: ""
 
@@ -133,10 +136,24 @@ Rectangle {
                             }
                         }
 
+                        // Auto re-open input form on error
+                        Connections {
+                            target: wifiService
+                            function onConnectionErrorChanged() {
+                                if (wifiService.connectionError !== "" && 
+                                    wifiService.connectingSSID === "" && 
+                                    model.ssid !== wifiService.connectedSSID) {
+                                    root.expandedSSID = model.ssid;
+                                }
+                            }
+                        }
+
                         MouseArea {
                             width: parent.width
                             height: 50
                             cursorShape: Qt.PointingHandCursor
+                            enabled: !netCard.isConnecting
+                            
                             onClicked: {
                                 if (netCard.isConnected) {
                                     wifiService.disconnect();
@@ -148,9 +165,11 @@ Rectangle {
                                     } else {
                                         if (root.expandedSSID === model.ssid) {
                                             root.expandedSSID = "";
+                                            wifiService.clearError();
                                         } else {
                                             root.expandedSSID = model.ssid;
                                             netCard.passwordInput = "";
+                                            wifiService.clearError();
                                         }
                                     }
                                 }
@@ -191,6 +210,7 @@ Rectangle {
                                     }
                                 }
 
+                                // Connected status
                                 Text {
                                     visible: netCard.isConnected
                                     text: "Connected"
@@ -198,14 +218,53 @@ Rectangle {
                                     font.family: "Poppins"
                                     color: "#a6e3a1"
                                 }
+
+                                // Connecting status
+                                RowLayout {
+                                    visible: netCard.isConnecting
+                                    spacing: 6
+
+                                    Text {
+                                        text: "󰔟"
+                                        font.pixelSize: 14
+                                        color: "#fab387"
+                                        
+                                        RotationAnimation on rotation {
+                                            running: netCard.isConnecting
+                                            from: 0
+                                            to: 360
+                                            duration: 1000
+                                            loops: Animation.Infinite
+                                        }
+                                    }
+
+                                    Text {
+                                        text: "Connecting"
+                                        font.pixelSize: 11
+                                        font.family: "Poppins"
+                                        color: "#fab387"
+                                    }
+                                }
                             }
 
+                            // Error message
+                            Text {
+                                visible: netCard.hasError
+                                Layout.fillWidth: true
+                                text: "󰀪  Invalid credentials, please try again"
+                                font.pixelSize: 10
+                                font.family: "Poppins"
+                                color: "#f38ba8"
+                                wrapMode: Text.WordWrap
+                            }
+
+                            // Password input row
                             RowLayout {
-                                visible: netCard.isExpanded
+                                visible: netCard.isExpanded && !netCard.isConnecting
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: 36
                                 spacing: 8
-                                opacity: netCard.isExpanded ? 1 : 0
+                                opacity: (netCard.isExpanded && !netCard.isConnecting) ? 1 : 0
 
                                 Behavior on opacity {
                                     NumberAnimation {
@@ -218,6 +277,8 @@ Rectangle {
                                     implicitHeight: 28
                                     color: "#313244"
                                     radius: 6
+                                    border.width: netCard.hasError ? 1 : 0
+                                    border.color: netCard.hasError ? "#f38ba8" : "transparent"
 
                                     TextInput {
                                         id: passInput
@@ -231,11 +292,15 @@ Rectangle {
                                         echoMode: showPassBtn.show ? TextInput.Normal : TextInput.Password
                                         passwordCharacter: "•"
                                         text: netCard.passwordInput
-                                        onTextChanged: netCard.passwordInput = text
+                                        onTextChanged: {
+                                            netCard.passwordInput = text;
+                                            if (wifiService.connectionError !== "") {
+                                                wifiService.clearError();
+                                            }
+                                        }
                                         clip: true
 
-                                        onVisibleChanged: if (visible)
-                                            forceActiveFocus()
+                                        onVisibleChanged: if (visible) forceActiveFocus()
                                         onAccepted: {
                                             wifiService.connect(model.ssid, netCard.passwordInput);
                                             root.expandedSSID = "";
@@ -278,7 +343,10 @@ Rectangle {
                                     MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
-                                        onClicked: root.expandedSSID = ""
+                                        onClicked: {
+                                            root.expandedSSID = "";
+                                            wifiService.clearError();
+                                        }
                                     }
                                 }
 
