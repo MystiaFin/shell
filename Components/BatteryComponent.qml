@@ -27,7 +27,7 @@ Row {
         
         Text {
             anchors.centerIn: batteryRing
-            text: batteryService.isCharging ? "󰂄" : (
+            text: batteryService.isCharging ? "󰚥" : (
                 batteryService.batteryLevel > 0.9 ? "󰁹" :
                 batteryService.batteryLevel > 0.8 ? "󰂂" :
                 batteryService.batteryLevel > 0.7 ? "󰂁" :
