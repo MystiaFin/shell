@@ -33,6 +33,7 @@ Item {
         command: ["bluetoothctl", "scan", "on"]
         onExited: {
             console.log("[BT] Scan process exited.")
+            btService.isScanning = false
         }
     }
 
@@ -75,8 +76,7 @@ Item {
 
     Process {
         id: actionProc
-        stdout: SplitParser { onRead: data => console.log("[BT Action Out]: " + data) }
-        stderr: SplitParser { onRead: data => console.log("[BT Action Err]: " + data) }
+        stdout: SplitParser { onRead: data => console.log("[BT]: " + data) }
     }
 
     function parseDeviceLine(line, targetArray, context) {
@@ -129,13 +129,17 @@ Item {
 
     function toggleScan() {
         if (isScanning) {
+            btService.isScanning = false
             scanProc.running = false
-            actionProc.command = ["bluetoothctl", "scan", "off"]
+            actionProc.command = ["pkill", "-f", "bluetoothctl scan"]
             actionProc.running = true
         } else {
+            btService.isScanning = true
             scanProc.running = true
         }
-        delayTimer.callback = refresh
+        
+        delayTimer.callback = function() { statusProc.running = true }
+        delayTimer.interval = 1000
         delayTimer.start()
     }
 
@@ -186,7 +190,9 @@ Item {
     }
     
     Timer {
-        interval: 20000; running: true; repeat: true
+        interval: 20000
+        running: true
+        repeat: true
         onTriggered: refresh()
     }
 
