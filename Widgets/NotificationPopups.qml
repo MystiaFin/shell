@@ -14,7 +14,6 @@ Scope {
         }
         margins {
             top: 4
-            right: 4
         }
         width: notificationService.notificationModel.count > 0 ? 360 : 0
         height: notificationService.notificationModel.count > 0 ? notifColumn.height : 0
