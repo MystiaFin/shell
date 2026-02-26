@@ -12,11 +12,11 @@ Item {
     property string endIcon: ""
     property real value: 0
     property var onMoved: null
-    
+
     RowLayout {
         anchors.fill: parent
         spacing: 12
-        
+
         Text {
             visible: root.startIcon !== ""
             text: root.startIcon
@@ -24,7 +24,7 @@ Item {
             color: "#cdd6f4"
             Layout.alignment: Qt.AlignVCenter
         }
-        
+
         Slider {
             id: slider
             Layout.fillWidth: true
@@ -33,45 +33,46 @@ Item {
             to: 1.0
             stepSize: 0.01
             value: root.value
-            
+
             onMoved: {
                 if (root.onMoved) {
-                    root.onMoved(value)
+                    root.onMoved(value);
                 }
             }
-            
+
             background: Rectangle {
                 x: slider.leftPadding
                 y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                implicitHeight: 6
+                implicitHeight: 16
                 width: slider.availableWidth
                 height: implicitHeight
-                radius: 3
+                radius: 16
                 color: root.bgColor
-                
+
                 Rectangle {
                     width: slider.visualPosition * parent.width
                     height: parent.height
                     color: root.sliderColor
-                    radius: 3
+                    topLeftRadius: 16
+                    bottomLeftRadius: 16
                 }
             }
-            
+
             handle: Rectangle {
                 x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
                 y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                
-                implicitWidth: 10
+
+                implicitWidth: 6
                 implicitHeight: 24
                 radius: 5
                 color: "#f5e0dc"
                 border.color: root.sliderColor
                 border.width: 1
-                
+
                 HoverHandler {
                     cursorShape: Qt.PointingHandCursor
                 }
-                
+
                 Text {
                     visible: slider.pressed
                     x: (parent.width - width) / 2
@@ -82,7 +83,7 @@ Item {
                 }
             }
         }
-        
+
         Text {
             visible: root.endIcon !== ""
             text: root.endIcon

@@ -47,7 +47,7 @@ PanelWindow {
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width
-        height: parent.height - 4
+        height: parent.height - 28
         y: 4
         radius: 18
         color: panel.bgColor
@@ -56,8 +56,8 @@ PanelWindow {
 
         Column {
             anchors.centerIn: parent
-            width: parent.width - 60
-            spacing: 24
+            width: parent.width - 40
+            spacing: 22
 
             SliderController {
                 width: parent.width
