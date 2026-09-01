@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "../components"
 import "../services"
 
 Item {
@@ -49,7 +50,7 @@ Item {
         anchors {
             fill: parent
             topMargin: 28
-            rightMargin: LiquidMetrics.edgeContentInset
+            rightMargin: WidgetMetrics.edgeContentInset
             bottomMargin: 16
             leftMargin: 16
         }

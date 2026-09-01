@@ -1,12 +1,13 @@
 import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
+import "../components"
 import "../services"
 
 Item {
     id: root
 
-    property real topPadding: LiquidMetrics.edgeOverlap + 28
+    property real topPadding: WidgetMetrics.edgeOverlap + 28
     property bool hoverArmed: false
 
     function formatTime(seconds) {

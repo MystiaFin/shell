@@ -1,0 +1,204 @@
+@define-color theme_bg_color @BACKGROUND@;
+@define-color theme_fg_color @FOREGROUND@;
+@define-color theme_base_color @BACKGROUND@;
+@define-color theme_text_color @FOREGROUND@;
+@define-color theme_selected_bg_color @ACCENT@;
+@define-color theme_selected_fg_color @SURFACE_DARK@;
+@define-color insensitive_bg_color @SURFACE@;
+@define-color insensitive_fg_color @MUTED@;
+@define-color borders @BORDER@;
+@define-color accent_color @ACCENT@;
+@define-color accent_bg_color @ACCENT@;
+@define-color accent_fg_color @SURFACE_DARK@;
+@define-color destructive_color @RED@;
+@define-color destructive_bg_color @RED@;
+@define-color success_color @GREEN@;
+@define-color success_bg_color @GREEN@;
+@define-color warning_color @YELLOW@;
+@define-color warning_bg_color @YELLOW@;
+@define-color window_bg_color @BACKGROUND@;
+@define-color window_fg_color @FOREGROUND@;
+@define-color view_bg_color @BACKGROUND@;
+@define-color view_fg_color @FOREGROUND@;
+@define-color headerbar_bg_color @SURFACE@;
+@define-color headerbar_fg_color @FOREGROUND@;
+@define-color card_bg_color @SURFACE@;
+@define-color card_fg_color @FOREGROUND@;
+@define-color dialog_bg_color @BACKGROUND@;
+@define-color dialog_fg_color @FOREGROUND@;
+@define-color popover_bg_color @SURFACE@;
+@define-color popover_fg_color @FOREGROUND@;
+
+* {
+  -gtk-secondary-caret-color: @ACCENT@;
+  outline-color: alpha(@ACCENT@, 0.45);
+}
+
+window,
+.background,
+.view,
+textview text,
+iconview {
+  background-color: @BACKGROUND@;
+  color: @FOREGROUND@;
+}
+
+headerbar,
+.titlebar,
+toolbar,
+menubar {
+  background-color: @SURFACE@;
+  color: @FOREGROUND@;
+  border-color: @BORDER@;
+}
+
+button,
+modelbutton,
+combobox button {
+  background-color: @SURFACE@;
+  color: @FOREGROUND@;
+  border: 1px solid @BORDER@;
+  box-shadow: none;
+}
+
+button:hover,
+modelbutton:hover {
+  background-color: mix(@SURFACE@, @ACCENT@, 0.18);
+}
+
+button:active,
+button:checked,
+button.suggested-action,
+.suggested-action {
+  background-color: @ACCENT@;
+  color: @SURFACE_DARK@;
+  border-color: @ACCENT@;
+}
+
+button.destructive-action,
+.destructive-action,
+.error {
+  background-color: @RED@;
+  color: @SURFACE_DARK@;
+  border-color: @RED@;
+}
+
+entry,
+spinbutton,
+searchentry,
+textview border {
+  background-color: @SURFACE@;
+  color: @FOREGROUND@;
+  border: 1px solid @BORDER@;
+}
+
+entry:focus,
+spinbutton:focus,
+searchentry:focus {
+  border-color: @ACCENT@;
+  box-shadow: 0 0 0 1px @ACCENT@;
+}
+
+selection,
+*:selected,
+.view:selected,
+row:selected {
+  background-color: @ACCENT@;
+  color: @SURFACE_DARK@;
+}
+
+popover,
+popover.background,
+menu,
+.menu,
+context-menu {
+  background-color: @SURFACE@;
+  color: @FOREGROUND@;
+  border-color: @BORDER@;
+}
+
+notebook > header,
+notebook > stack,
+tabbar,
+tabview {
+  background-color: @BACKGROUND@;
+  color: @FOREGROUND@;
+  border-color: @BORDER@;
+}
+
+notebook > header tab:checked,
+tabbar tab:checked {
+  background-color: @SURFACE@;
+  color: @ACCENT@;
+  border-color: @ACCENT@;
+}
+
+switch,
+scale trough,
+progressbar trough,
+scrollbar trough {
+  background-color: @BORDER@;
+}
+
+switch:checked,
+scale highlight,
+progressbar progress {
+  background-color: @ACCENT@;
+  color: @SURFACE_DARK@;
+}
+
+switch slider,
+scale slider {
+  background-color: @FOREGROUND@;
+  border-color: @BORDER@;
+}
+
+scrollbar slider {
+  background-color: @MUTED@;
+  border-color: transparent;
+}
+
+scrollbar slider:hover,
+scrollbar slider:active {
+  background-color: @ACCENT@;
+}
+
+check,
+radio {
+  background-color: @SURFACE@;
+  color: @SURFACE_DARK@;
+  border-color: @BORDER@;
+}
+
+check:checked,
+check:indeterminate,
+radio:checked,
+radio:indeterminate {
+  background-color: @ACCENT@;
+  color: @SURFACE_DARK@;
+  border-color: @ACCENT@;
+}
+
+tooltip,
+tooltip.background {
+  background-color: @SURFACE_DARK@;
+  color: @FOREGROUND@;
+  border-color: @BORDER@;
+}
+
+.dim-label,
+:disabled {
+  color: @MUTED@;
+}
+
+.success {
+  color: @GREEN@;
+}
+
+.warning {
+  color: @YELLOW@;
+}
+
+separator {
+  background-color: @BORDER@;
+}

@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Widgets
 import QtQuick
+import "../components"
 
 Item {
     id: root
@@ -9,7 +10,7 @@ Item {
     property real maximumHeight: 620
     property real rowHeight: 60
     property real chromeHeight: 122
-    property real bottomPadding: LiquidMetrics.edgeContentInset
+    property real bottomPadding: WidgetMetrics.edgeContentInset
     property int resizeSourceCount: 0
 
     readonly property real minimumHeight: chromeHeight + rowHeight

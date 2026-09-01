@@ -7,20 +7,19 @@ PanelWindow {
 
     default property alias widgets: widgetLayer.data
 
-    readonly property bool isLiquidWidgetHost: true
     property bool animationsReady: false
     property color liquidColor: Theme.liquidColor
-    property real edgeFieldOffset: LiquidMetrics.edgeFieldOffset
-    property real connectionRadius: LiquidMetrics.connectionRadius
+    property real edgeFieldOffset: WidgetMetrics.edgeFieldOffset
+    property real connectionRadius: WidgetMetrics.connectionRadius
 
-    readonly property var liquidWidgets: widgetLayer.children.filter(widget =>
-        widget.isLiquidWidget === true && widget.contributesToShape)
-    readonly property bool keyboardRequested: liquidWidgets.some(widget =>
+    readonly property var edgeWidgets: widgetLayer.children.filter(widget =>
+        widget.isEdgeWidget === true && widget.contributesToShape)
+    readonly property bool keyboardRequested: edgeWidgets.some(widget =>
         widget.shown && widget.wantsKeyboardFocus)
 
     function widgetAt(index: int): Item {
-        return index >= 0 && index < liquidWidgets.length
-            ? liquidWidgets[index]
+        return index >= 0 && index < edgeWidgets.length
+            ? edgeWidgets[index]
             : null;
     }
 
@@ -65,7 +64,7 @@ PanelWindow {
         color: root.liquidColor
         edgeOffset: root.edgeFieldOffset
         connectionRadius: root.connectionRadius
-        shapeCount: Math.min(root.liquidWidgets.length, 8)
+        shapeCount: Math.min(root.edgeWidgets.length, 8)
 
         shape0: root.widgetRect(0)
         shape1: root.widgetRect(1)
@@ -92,7 +91,7 @@ PanelWindow {
     }
 
     Timer {
-        interval: LiquidMetrics.initializationDelay
+        interval: WidgetMetrics.initializationDelay
         running: root.backingWindowVisible && !root.animationsReady
         onTriggered: root.animationsReady = true
     }

@@ -1,6 +1,7 @@
 import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
+import "../components"
 import "../services"
 
 Item {
@@ -17,7 +18,7 @@ Item {
         anchors {
             fill: parent
             topMargin: 16
-            rightMargin: LiquidMetrics.edgeContentInset
+            rightMargin: WidgetMetrics.edgeContentInset
             bottomMargin: 32
             leftMargin: 16
         }

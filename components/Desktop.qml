@@ -1,65 +1,66 @@
 import Quickshell
 import QtQuick
 import "../services"
+import "../widgets"
 
-LiquidWidgetHost {
+WidgetOverlay {
     id: root
 
     required property var modelData
 
     screen: modelData
 
-    LiquidWidget {
+    EdgeWidget {
         id: utilityCenterWidget
 
         host: root
-        edge: LiquidWidget.Right
-        edgeAlignment: LiquidWidget.Start
+        edge: EdgeWidget.Right
+        edgeAlignment: EdgeWidget.Start
         y: -10
-        edgeOffset: LiquidMetrics.edgeOverlap
+        edgeOffset: WidgetMetrics.edgeOverlap
         shown: UtilityCenterState.visible
         wantsKeyboardFocus: true
         closedWidthScale: 1
         targetWidth: 360
         targetHeight: Math.max(1, Math.min(800, root.height - 96))
-        radius: LiquidMetrics.widgetRadius
+        radius: WidgetMetrics.widgetRadius
 
-        LiquidUtilityCenter {
+        UtilityCenter {
             anchors.fill: parent
         }
     }
 
-    LiquidWidget {
+    EdgeWidget {
         id: controlCenterWidget
 
         host: root
-        edge: LiquidWidget.Top
-        edgeAlignment: LiquidWidget.Center
-        edgeOffset: LiquidMetrics.edgeOverlap
+        edge: EdgeWidget.Top
+        edgeAlignment: EdgeWidget.Center
+        edgeOffset: WidgetMetrics.edgeOverlap
         shown: ControlCenterState.visible
         targetWidth: Math.max(1, Math.min(780, root.width - 64))
         targetHeight: 410
-        radius: LiquidMetrics.widgetRadius
+        radius: WidgetMetrics.widgetRadius
 
-        LiquidControlCenter {
+        ControlCenter {
             anchors.fill: parent
         }
     }
 
-    LiquidWidget {
+    EdgeWidget {
         id: launcherWidget
 
         host: root
-        edge: LiquidWidget.Bottom
-        edgeAlignment: LiquidWidget.Center
-        edgeOffset: LiquidMetrics.edgeOverlap
+        edge: EdgeWidget.Bottom
+        edgeAlignment: EdgeWidget.Center
+        edgeOffset: WidgetMetrics.edgeOverlap
         shown: LauncherState.launcherVisible
         wantsKeyboardFocus: true
         focusTarget: launcher.focusTarget
 
         targetWidth: Math.max(1, Math.min(620, root.width - 80))
         targetHeight: launcher.desiredHeight
-        radius: LiquidMetrics.widgetRadius
+        radius: WidgetMetrics.widgetRadius
         resizeDuration: launcher.resizeDuration
 
         ApplicationLauncher {
@@ -67,28 +68,28 @@ LiquidWidgetHost {
             anchors.fill: parent
             shown: launcherWidget.shown
             maximumHeight: Math.max(1, Math.min(620, root.height - 60))
-            bottomPadding: LiquidMetrics.edgeContentInset
+            bottomPadding: WidgetMetrics.edgeContentInset
 
             onCloseRequested: LauncherState.hide()
         }
     }
 
-    LiquidWidget {
+    EdgeWidget {
         id: notificationWidget
 
         host: root
-        edge: LiquidWidget.Right
-        edgeAlignment: LiquidWidget.End
+        edge: EdgeWidget.Right
+        edgeAlignment: EdgeWidget.End
         alongEdgeOffset: -24
-        edgeOffset: LiquidMetrics.edgeOverlap
+        edgeOffset: WidgetMetrics.edgeOverlap
         shown: NotificationService.popupCount > 0 && !UtilityCenterState.visible
         closedWidthScale: 1
         targetWidth: 380
         targetHeight: notificationStack.desiredHeight
-        radius: LiquidMetrics.widgetRadius
+        radius: WidgetMetrics.widgetRadius
         resizeDuration: 240
 
-        LiquidNotificationStack {
+        NotificationStack {
             id: notificationStack
             anchors.fill: parent
             maximumHeight: Math.max(1, root.height - 112)
