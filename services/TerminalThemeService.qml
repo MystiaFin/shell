@@ -11,8 +11,6 @@ Singleton {
     readonly property QtObject dynamic: Theme.dynamic
     readonly property string kittyPath: "/home/mystiafin/.config/quickshell/terminal-colors-kitty.conf"
     readonly property string footPath: "/home/mystiafin/.config/quickshell/terminal-colors-foot.ini"
-    readonly property string configHome: Quickshell.env("XDG_CONFIG_HOME")
-        || Quickshell.env("HOME") + "/.config"
     readonly property string dataHome: Quickshell.env("XDG_DATA_HOME")
         || Quickshell.env("HOME") + "/.local/share"
     readonly property string themeRoot: dataHome + "/themes"
@@ -143,11 +141,9 @@ Singleton {
         gtkThemeIndexFile.setText(root.gtkIndex(themeName));
         gtk3ThemeFile.setText(css);
         gtk4ThemeFile.setText(css);
-        gtk3UserFile.setText(css);
-        gtk4UserFile.setText(css);
 
-        gtkReload.command = ["gsettings", "set",
-            "org.gnome.desktop.interface", "gtk-theme", themeName];
+        gtkReload.command = ["dconf", "write",
+            "/org/gnome/desktop/interface/gtk-theme", "'" + themeName + "'"];
         gtkReload.running = true;
     }
 
@@ -201,28 +197,12 @@ Singleton {
         printErrors: false
     }
 
-    FileView {
-        id: gtk3UserFile
-        path: root.configHome + "/gtk-3.0/gtk.css"
-        atomicWrites: true
-        printErrors: false
-    }
-
-    FileView {
-        id: gtk4UserFile
-        path: root.configHome + "/gtk-4.0/gtk.css"
-        atomicWrites: true
-        printErrors: false
-    }
-
     Process { id: kittyReload }
     Process { id: gtkReload }
 
     Process {
         id: gtkPrepare
         command: ["mkdir", "-p",
-            root.configHome + "/gtk-3.0",
-            root.configHome + "/gtk-4.0",
             root.themeRoot + "/QuickshellDynamicOne/gtk-3.0",
             root.themeRoot + "/QuickshellDynamicOne/gtk-4.0",
             root.themeRoot + "/QuickshellDynamicTwo/gtk-3.0",

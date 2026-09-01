@@ -32,6 +32,8 @@
 * {
   -gtk-secondary-caret-color: @ACCENT@;
   outline-color: alpha(@ACCENT@, 0.45);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 window,
@@ -49,7 +51,9 @@ toolbar,
 menubar {
   background-color: @SURFACE@;
   color: @FOREGROUND@;
-  border-color: @BORDER@;
+  border: none;
+  box-shadow: none;
+  padding: 4px;
 }
 
 button,
@@ -57,8 +61,12 @@ modelbutton,
 combobox button {
   background-color: @SURFACE@;
   color: @FOREGROUND@;
-  border: 1px solid @BORDER@;
+  border: none;
   box-shadow: none;
+  border-radius: 8px;
+  min-height: 24px;
+  padding: 4px 9px;
+  margin: 2px;
 }
 
 button:hover,
@@ -72,7 +80,6 @@ button.suggested-action,
 .suggested-action {
   background-color: @ACCENT@;
   color: @SURFACE_DARK@;
-  border-color: @ACCENT@;
 }
 
 button.destructive-action,
@@ -80,7 +87,6 @@ button.destructive-action,
 .error {
   background-color: @RED@;
   color: @SURFACE_DARK@;
-  border-color: @RED@;
 }
 
 entry,
@@ -89,14 +95,17 @@ searchentry,
 textview border {
   background-color: @SURFACE@;
   color: @FOREGROUND@;
-  border: 1px solid @BORDER@;
+  border: none;
+  border-radius: 8px;
+  min-height: 24px;
+  padding: 4px 8px;
+  margin: 2px;
 }
 
 entry:focus,
 spinbutton:focus,
 searchentry:focus {
-  border-color: @ACCENT@;
-  box-shadow: 0 0 0 1px @ACCENT@;
+  outline-color: alpha(@ACCENT@, 0.65);
 }
 
 selection,
@@ -107,6 +116,40 @@ row:selected {
   color: @SURFACE_DARK@;
 }
 
+row,
+list row,
+flowboxchild {
+  border: none;
+  border-radius: 8px;
+  padding: 4px 6px;
+  margin: 1px 2px;
+}
+
+.sidebar,
+stacksidebar,
+.navigation-sidebar {
+  background-color: @SURFACE@;
+  border-right: 1px solid @BORDER@;
+}
+
+.sidebar row,
+.sidebar row:focus,
+stacksidebar row,
+stacksidebar row:focus,
+.navigation-sidebar row,
+.navigation-sidebar row:focus {
+  outline: none;
+}
+
+.sidebar separator,
+stacksidebar separator,
+.navigation-sidebar separator {
+  background-color: transparent;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+}
+
 popover,
 popover.background,
 menu,
@@ -114,7 +157,17 @@ menu,
 context-menu {
   background-color: @SURFACE@;
   color: @FOREGROUND@;
-  border-color: @BORDER@;
+  border: none;
+  border-radius: 10px;
+  padding: 4px;
+}
+
+menuitem,
+popover modelbutton {
+  border: none;
+  border-radius: 7px;
+  padding: 5px 8px;
+  margin: 1px;
 }
 
 notebook > header,
@@ -123,14 +176,22 @@ tabbar,
 tabview {
   background-color: @BACKGROUND@;
   color: @FOREGROUND@;
-  border-color: @BORDER@;
+  border: none;
+  padding: 3px;
+}
+
+notebook > header tab,
+tabbar tab {
+  border: none;
+  border-radius: 8px;
+  padding: 5px 9px;
+  margin: 2px;
 }
 
 notebook > header tab:checked,
 tabbar tab:checked {
   background-color: @SURFACE@;
   color: @ACCENT@;
-  border-color: @ACCENT@;
 }
 
 switch,
@@ -138,6 +199,7 @@ scale trough,
 progressbar trough,
 scrollbar trough {
   background-color: @BORDER@;
+  border: none;
 }
 
 switch:checked,
@@ -150,12 +212,16 @@ progressbar progress {
 switch slider,
 scale slider {
   background-color: @FOREGROUND@;
-  border-color: @BORDER@;
+  border: none;
 }
 
 scrollbar slider {
   background-color: @MUTED@;
-  border-color: transparent;
+  border: none;
+  border-radius: 999px;
+  min-width: 6px;
+  min-height: 6px;
+  margin: 2px;
 }
 
 scrollbar slider:hover,
@@ -167,7 +233,8 @@ check,
 radio {
   background-color: @SURFACE@;
   color: @SURFACE_DARK@;
-  border-color: @BORDER@;
+  border: none;
+  margin: 2px;
 }
 
 check:checked,
@@ -176,14 +243,15 @@ radio:checked,
 radio:indeterminate {
   background-color: @ACCENT@;
   color: @SURFACE_DARK@;
-  border-color: @ACCENT@;
 }
 
 tooltip,
 tooltip.background {
   background-color: @SURFACE_DARK@;
   color: @FOREGROUND@;
-  border-color: @BORDER@;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 7px;
 }
 
 .dim-label,
@@ -201,4 +269,7 @@ tooltip.background {
 
 separator {
   background-color: @BORDER@;
+  min-width: 1px;
+  min-height: 1px;
+  margin: 3px;
 }
