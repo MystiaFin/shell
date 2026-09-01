@@ -29,11 +29,11 @@ QtObject {
     readonly property color greenColor: harmonize("#a6e3a1", accentColor, 0.24)
     readonly property color redColor: harmonize("#f38ba8", accentColor, 0.22)
 
-    function luminance(colorValue): real {
+    function luminance(colorValue: color): real {
         return colorValue.r * 0.2126 + colorValue.g * 0.7152 + colorValue.b * 0.0722;
     }
 
-    function saturation(colorValue): real {
+    function saturation(colorValue: color): real {
         const maximum = Math.max(colorValue.r, colorValue.g, colorValue.b);
         const minimum = Math.min(colorValue.r, colorValue.g, colorValue.b);
         return maximum - minimum;
@@ -74,14 +74,14 @@ QtObject {
         return selected;
     }
 
-    function tone(colorValue, lightness, minimumSaturation): color {
+    function tone(colorValue: color, lightness: real, minimumSaturation: real): color {
         const hue = colorValue.hslHue >= 0 ? colorValue.hslHue : 0;
         const nextSaturation = Math.max(minimumSaturation,
             Math.min(0.82, colorValue.hslSaturation));
         return Qt.hsla(hue, nextSaturation, lightness, 1);
     }
 
-    function mix(first, second, amount): color {
+    function mix(first: color, second: color, amount: real): color {
         return Qt.rgba(
             first.r + (second.r - first.r) * amount,
             first.g + (second.g - first.g) * amount,
@@ -90,7 +90,7 @@ QtObject {
         );
     }
 
-    function harmonize(semanticColor, wallpaperColor, amount): color {
+    function harmonize(semanticColor: color, wallpaperColor: color, amount: real): color {
         const blended = mix(semanticColor, wallpaperColor, amount);
         return tone(blended, 0.70, 0.48);
     }

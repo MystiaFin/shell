@@ -1,7 +1,10 @@
 import Quickshell
 import "components"
+import "services"
 
 ShellRoot {
+    readonly property var terminalThemeService: TerminalThemeService
+
     WallpaperWindow {}
 
     Variants {
