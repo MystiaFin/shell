@@ -80,8 +80,8 @@ Item {
                             bottom: parent.bottom
                             left: parent.left
                         }
-                        height: faderHandle.height / 2
-                            + control.displayValue * (parent.height - faderHandle.height)
+                        height: Math.min(parent.height, faderHandle.height / 1
+                            + control.displayValue * (parent.height - faderHandle.height))
                         radius: parent.radius
                         color: control.muted
                             ? Theme.statusBarMutedColor
