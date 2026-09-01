@@ -46,7 +46,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             model: NotificationService.model
-            spacing: 8
+            spacing: 20
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
