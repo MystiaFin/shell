@@ -23,7 +23,7 @@ Item {
                 ringColor: MemoryService.usage < 0.5
                     ? Theme.statusBarGreenColor
                     : MemoryService.usage < 0.8
-                        ? Theme.statusBarBlueColor
+                        ? Theme.statusBarAccentColor
                         : Theme.statusBarRedColor
             }
 

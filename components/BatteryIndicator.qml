@@ -24,7 +24,7 @@ Item {
                 ringColor: BatteryService.charging
                     ? Theme.statusBarGreenColor
                     : BatteryService.percent > 20
-                        ? Theme.statusBarBlueColor
+                        ? Theme.statusBarAccentColor
                         : Theme.statusBarRedColor
             }
 

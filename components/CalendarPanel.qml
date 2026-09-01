@@ -107,7 +107,7 @@ Rectangle {
                     Layout.fillHeight: true
                     radius: 8
                     color: today
-                        ? Theme.statusBarBlueColor
+                        ? Theme.statusBarAccentColor
                         : dayHover.hovered && currentMonth
                             ? Theme.statusBarWorkspaceColor : "transparent"
 

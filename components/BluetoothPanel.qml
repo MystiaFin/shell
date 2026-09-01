@@ -28,7 +28,7 @@ Item {
                     Layout.preferredHeight: 36
                     radius: 12
                     color: BluetoothService.enabled
-                        ? Theme.statusBarBlueColor
+                        ? Theme.statusBarAccentColor
                         : Theme.statusBarSurfaceBorderColor
 
                     Text {
@@ -120,7 +120,7 @@ Item {
                             anchors.centerIn: parent
                             visible: !parent.children[0].visible
                             text: "󰂯"
-                            color: Theme.statusBarBlueColor
+                            color: Theme.statusBarAccentColor
                             font.family: "JetBrains Mono Nerd Font"
                             font.pixelSize: 16
                         }

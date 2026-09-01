@@ -4,7 +4,7 @@ Item {
     id: root
 
     property real value: 0
-    property color ringColor: Theme.statusBarBlueColor
+    property color ringColor: Theme.statusBarAccentColor
     property color backgroundColor: Theme.statusBarSurfaceBorderColor
     property real ringWidth: 3
     property real displayValue: value

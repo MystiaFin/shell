@@ -7,7 +7,11 @@ import QtQuick
 Singleton {
     id: root
 
-    readonly property bool available: eventStream.running
+    readonly property string socketPath: Quickshell.env("NIRI_SOCKET")
+    readonly property bool available: ready
+    property bool ready: false
+    property bool started: false
+    property var pendingWorkspaceId: null
     property var workspaces: []
 
     function replaceWorkspace(workspace) {
@@ -60,34 +64,128 @@ Singleton {
         }
     }
 
-    function focusWorkspace(index) {
-        if (focusProcess.running)
+    function focusWorkspace(id) {
+        root.pendingWorkspaceId = id;
+        if (!requestSocket.connected) {
+            requestSocket.connected = true;
             return;
-        focusProcess.command = ["niri", "msg", "action", "focus-workspace", index.toString()];
-        focusProcess.running = true;
+        }
+
+        root.sendPendingWorkspace();
     }
 
-    property Process eventStream: Process {
-        running: true
-        command: ["niri", "msg", "--json", "event-stream"]
+    function sendPendingWorkspace() {
+        if (!requestSocket.connected || root.pendingWorkspaceId === null)
+            return;
 
-        stdout: SplitParser {
-            onRead: data => {
-                try {
-                    root.handleEvent(JSON.parse(data));
-                } catch (error) {
-                    console.warn("Could not parse Niri event:", error);
+        const id = root.pendingWorkspaceId;
+        root.pendingWorkspaceId = null;
+        requestSocket.write(JSON.stringify({
+            Action: {
+                FocusWorkspace: {
+                    reference: { Id: id }
                 }
+            }
+        }) + "\n");
+        requestSocket.flush();
+    }
+
+    Component.onCompleted: {
+        root.started = true;
+        if (!root.socketPath) {
+            console.warn("Niri IPC is unavailable: NIRI_SOCKET is not set");
+            return;
+        }
+
+        eventSocket.connected = true;
+        requestSocket.connected = true;
+    }
+
+    property Socket eventSocket: Socket {
+        property bool awaitingAcknowledgement: false
+
+        path: root.socketPath
+
+        onConnectionStateChanged: {
+            if (connected) {
+                eventReconnectTimer.stop();
+                awaitingAcknowledgement = true;
+                write("\"EventStream\"\n");
+                flush();
+            } else if (root.started && root.socketPath) {
+                root.ready = false;
+                root.workspaces = [];
+                eventReconnectTimer.restart();
             }
         }
 
-        onExited: restartTimer.restart()
+        onError: error => {
+            console.warn("Niri event socket error:", error);
+            connected = false;
+        }
+
+        parser: SplitParser {
+            onRead: data => {
+                try {
+                    const message = JSON.parse(data);
+                    if (eventSocket.awaitingAcknowledgement) {
+                        eventSocket.awaitingAcknowledgement = false;
+                        if (message.Ok !== "Handled") {
+                            console.warn("Niri rejected event stream request:", data);
+                            eventSocket.connected = false;
+                        }
+                        return;
+                    }
+
+                    root.handleEvent(message);
+                    if (message.WorkspacesChanged)
+                        root.ready = true;
+                } catch (error) {
+                    console.warn("Could not parse Niri event:", error);
+                    if (eventSocket.awaitingAcknowledgement)
+                        eventSocket.connected = false;
+                }
+            }
+        }
     }
 
-    property Process focusProcess: Process {}
+    property Socket requestSocket: Socket {
+        path: root.socketPath
 
-    property Timer restartTimer: Timer {
+        onConnectionStateChanged: {
+            if (connected) {
+                requestReconnectTimer.stop();
+                root.sendPendingWorkspace();
+            } else if (root.started && root.socketPath) {
+                requestReconnectTimer.restart();
+            }
+        }
+
+        onError: error => {
+            console.warn("Niri request socket error:", error);
+            connected = false;
+        }
+
+        parser: SplitParser {
+            onRead: data => {
+                try {
+                    const reply = JSON.parse(data);
+                    if (reply.Err)
+                        console.warn("Niri action failed:", reply.Err);
+                } catch (error) {
+                    console.warn("Could not parse Niri action reply:", error);
+                }
+            }
+        }
+    }
+
+    property Timer eventReconnectTimer: Timer {
         interval: 1000
-        onTriggered: eventStream.running = true
+        onTriggered: eventSocket.connected = true
+    }
+
+    property Timer requestReconnectTimer: Timer {
+        interval: 1000
+        onTriggered: requestSocket.connected = true
     }
 }

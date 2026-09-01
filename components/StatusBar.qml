@@ -148,7 +148,7 @@ PanelWindow {
                         ringWidth: 4
                         ringColor: AudioService.muted
                             ? Theme.statusBarMutedColor
-                            : Theme.statusBarBlueColor
+                            : Theme.statusBarAccentColor
                         onClicked: root.toggleControlCenter()
                         onScrolled: delta => AudioService.setVolume(AudioService.volume + delta)
                     }
@@ -161,7 +161,7 @@ PanelWindow {
                         ringWidth: 4
                         ringColor: AudioService.microphoneMuted
                             ? Theme.statusBarMutedColor
-                            : Theme.statusBarRedColor
+                            : Theme.statusBarAccentColor
                         onClicked: root.toggleControlCenter()
                         onScrolled: delta => AudioService.setMicrophoneVolume(
                             AudioService.microphoneVolume + delta)

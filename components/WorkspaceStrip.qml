@@ -13,7 +13,6 @@ Item {
         const position = workspaces.findIndex(workspace => workspace.is_active);
         return Math.max(0, position);
     }
-    readonly property Item activeDelegate: workspaceRepeater.itemAt(activePosition)
     property int previousActivePosition: activePosition
     property real starRotation: 0
 
@@ -35,9 +34,9 @@ Item {
     Rectangle {
         id: highlight
 
-        x: root.activeDelegate ? workspaceRow.x + root.activeDelegate.x : 4
+        x: workspaceRow.x + root.activePosition * (26 + workspaceRow.spacing)
         anchors.verticalCenter: parent.verticalCenter
-        width: root.activeDelegate ? root.activeDelegate.width : 26
+        width: 26
         height: 26
         radius: height / 2
         color: Theme.statusBarHighlightColor
@@ -113,7 +112,7 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: NiriService.focusWorkspace(delegate.modelData.idx)
+                    onClicked: NiriService.focusWorkspace(delegate.modelData.id)
                 }
             }
         }

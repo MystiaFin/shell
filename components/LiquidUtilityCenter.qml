@@ -23,7 +23,7 @@ Item {
         Layout.preferredHeight: 38
         radius: 13
         color: active
-            ? Theme.statusBarBlueColor
+            ? Theme.statusBarAccentColor
             : tabHover.hovered
                 ? Theme.statusBarSurfaceBorderColor
                 : Theme.statusBarSurfaceColor

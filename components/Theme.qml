@@ -34,8 +34,6 @@ Singleton {
         ? dynamic.highlightAccentColor : "#e5c890"
     readonly property color statusBarTextColor: activeTheme.textColor
     readonly property color statusBarMutedColor: activeTheme.placeholderTextColor
-    readonly property color statusBarBlueColor: dynamicActive
-        ? dynamic.blueColor : "#89b4fa"
     readonly property color statusBarGreenColor: dynamicActive
         ? dynamic.greenColor : "#a6e3a1"
     readonly property color statusBarRedColor: dynamicActive

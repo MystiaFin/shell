@@ -20,7 +20,7 @@ Item {
 
         required property string icon
         required property real value
-        property color accentColor: Theme.statusBarBlueColor
+        property color accentColor: Theme.statusBarAccentColor
         property bool muted: false
         property bool dragging: false
         property real displayValue: value
@@ -162,7 +162,7 @@ Item {
         implicitHeight: primary ? 44 : 38
         radius: height / 2
         color: primary
-            ? Theme.statusBarBlueColor
+            ? Theme.statusBarAccentColor
             : pointer.hovered
                 ? Theme.statusBarSurfaceBorderColor
                 : "transparent"
@@ -217,7 +217,7 @@ Item {
                     icon: "󰕾"
                     value: AudioService.volume
                     muted: AudioService.muted
-                    accentColor: Theme.statusBarBlueColor
+                    accentColor: Theme.statusBarAccentColor
                     onValueMoved: value => AudioService.setVolume(value)
                 }
 
@@ -225,7 +225,7 @@ Item {
                     icon: "󰍬"
                     value: AudioService.microphoneVolume
                     muted: AudioService.microphoneMuted
-                    accentColor: Theme.statusBarRedColor
+                    accentColor: Theme.statusBarAccentColor
                     onValueMoved: value => AudioService.setMicrophoneVolume(value)
                 }
             }
@@ -342,7 +342,7 @@ Item {
                                     }
                                     height: Math.max(3, parent.height * modelData)
                                     radius: width / 2
-                                    color: Theme.statusBarBlueColor
+                                    color: Theme.statusBarAccentColor
 
                                     Behavior on height {
                                         NumberAnimation {
@@ -380,7 +380,7 @@ Item {
                                 : 0
                             height: parent.height
                             radius: parent.radius
-                            color: Theme.statusBarBlueColor
+                            color: Theme.statusBarAccentColor
 
                             Behavior on width { NumberAnimation { duration: 200 } }
                         }

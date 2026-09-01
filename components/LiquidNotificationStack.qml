@@ -104,7 +104,7 @@ Item {
                         anchors.centerIn: parent
                         visible: card.icon === ""
                         text: "󰂚"
-                        color: Theme.statusBarBlueColor
+                        color: Theme.statusBarAccentColor
                         font.family: "JetBrains Mono Nerd Font"
                         font.pixelSize: 23
                     }
@@ -118,7 +118,7 @@ Item {
                     Text {
                         Layout.fillWidth: true
                         text: card.appName
-                        color: Theme.statusBarBlueColor
+                        color: Theme.statusBarAccentColor
                         font.family: "Poppins"
                         font.pixelSize: 9
                         font.weight: Font.DemiBold
@@ -196,7 +196,7 @@ Item {
                 width: parent.width - 24
                 height: 3
                 radius: height / 2
-                color: Theme.statusBarBlueColor
+                color: Theme.statusBarAccentColor
 
                 NumberAnimation on width {
                     from: card.width - 24

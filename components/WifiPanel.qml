@@ -35,7 +35,7 @@ Item {
                     Layout.preferredHeight: 36
                     radius: 12
                     color: NetworkService.enabled
-                        ? Theme.statusBarBlueColor
+                        ? Theme.statusBarAccentColor
                         : Theme.statusBarSurfaceBorderColor
 
                     Text {
@@ -124,7 +124,7 @@ Item {
                             text: modelData.signalStrength > 0.75 ? "󰤨"
                                 : modelData.signalStrength > 0.5 ? "󰤥"
                                 : modelData.signalStrength > 0.25 ? "󰤢" : "󰤟"
-                            color: Theme.statusBarBlueColor
+                            color: Theme.statusBarAccentColor
                             font.family: "JetBrains Mono Nerd Font"
                             font.pixelSize: 17
                         }
@@ -178,7 +178,7 @@ Item {
                             color: Theme.statusBarWorkspaceColor
                             border.width: 1
                             border.color: passwordInput.activeFocus
-                                ? Theme.statusBarBlueColor
+                                ? Theme.statusBarAccentColor
                                 : Theme.statusBarSurfaceBorderColor
 
                             TextInput {

@@ -23,7 +23,7 @@ Item {
                 ringColor: CpuService.usage < 0.5
                     ? Theme.statusBarGreenColor
                     : CpuService.usage < 0.8
-                        ? Theme.statusBarBlueColor
+                        ? Theme.statusBarAccentColor
                         : Theme.statusBarRedColor
             }
 

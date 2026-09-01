@@ -9,7 +9,7 @@ Rectangle {
     implicitWidth: 42
     implicitHeight: 24
     radius: height / 2
-    color: checked ? Theme.statusBarBlueColor : Theme.statusBarSurfaceBorderColor
+    color: checked ? Theme.statusBarAccentColor : Theme.statusBarSurfaceBorderColor
 
     Rectangle {
         width: 20

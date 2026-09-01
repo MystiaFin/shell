@@ -108,7 +108,7 @@ Item {
                             anchors.centerIn: parent
                             visible: card.icon === ""
                             text: "󰂚"
-                            color: Theme.statusBarBlueColor
+                            color: Theme.statusBarAccentColor
                             font.family: "JetBrains Mono Nerd Font"
                             font.pixelSize: 17
                         }
