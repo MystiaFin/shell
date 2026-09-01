@@ -60,6 +60,7 @@ Item {
             Layout.preferredHeight: 38
             spacing: 8
 
+            Item { Layout.preferredWidth: 42 }
             Item { Layout.fillWidth: true }
 
             TabButton { page: "notifications"; icon: "󰂚" }
@@ -67,6 +68,38 @@ Item {
             TabButton { page: "bluetooth"; icon: "󰂯" }
 
             Item { Layout.fillWidth: true }
+
+            Rectangle {
+                Layout.preferredWidth: 42
+                Layout.preferredHeight: 38
+                radius: 13
+                color: wallpaperHover.hovered
+                    ? Theme.statusBarAccentColor
+                    : Theme.statusBarWorkspaceColor
+                border.width: 1
+                border.color: Theme.statusBarAccentColor
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "󰸉"
+                    color: wallpaperHover.hovered
+                        ? Theme.statusBarBackgroundColor
+                        : Theme.statusBarAccentColor
+                    font.family: "JetBrains Mono Nerd Font"
+                    font.pixelSize: 19
+                }
+
+                HoverHandler {
+                    id: wallpaperHover
+                    cursorShape: Qt.PointingHandCursor
+                }
+                TapHandler {
+                    onTapped: {
+                        WallpaperPickerState.show();
+                        UtilityCenterState.hide();
+                    }
+                }
+            }
         }
 
         Item {

@@ -13,7 +13,7 @@ Singleton {
         .toString().replace("file://", "")
 
     property Process visualizer: Process {
-        running: false
+        running: true
         command: ["cava", "-p", root.configPath]
         stdout: SplitParser {
             onRead: data => {
@@ -25,28 +25,12 @@ Singleton {
             }
         }
         onExited: {
-            if (ControlCenterState.visible)
-                restartTimer.restart();
+            restartTimer.restart();
         }
     }
 
     property Timer restartTimer: Timer {
         interval: 2000
-        onTriggered: {
-            if (ControlCenterState.visible)
-                visualizer.running = true;
-        }
-    }
-
-    property Connections visibilityWatcher: Connections {
-        target: ControlCenterState
-        function onVisibleChanged() {
-            if (ControlCenterState.visible) {
-                visualizer.running = true;
-            } else {
-                visualizer.running = false;
-                root.bars = Array(root.barCount).fill(0);
-            }
-        }
+        onTriggered: visualizer.running = true
     }
 }

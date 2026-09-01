@@ -2,6 +2,8 @@ import Quickshell
 import "components"
 
 ShellRoot {
+    WallpaperWindow {}
+
     Variants {
         model: Quickshell.screens
 

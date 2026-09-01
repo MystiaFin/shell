@@ -94,4 +94,5 @@ LiquidWidgetHost {
             maximumHeight: Math.max(1, root.height - 112)
         }
     }
+
 }

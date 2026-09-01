@@ -5,13 +5,15 @@ import QtQuick
 import "themes"
 
 Singleton {
-    property string currentTheme: "catppuccin"
+    property string currentTheme: "dynamic"
 
     readonly property QtObject catppuccin: Catppuccin {}
     readonly property QtObject gruvbox: Gruvbox {}
-    readonly property QtObject activeTheme: currentTheme === "gruvbox"
-        ? gruvbox
-        : catppuccin
+    readonly property QtObject dynamic: Dynamic {}
+    readonly property bool dynamicActive: currentTheme === "dynamic"
+    readonly property QtObject activeTheme: dynamicActive
+        ? dynamic
+        : currentTheme === "gruvbox" ? gruvbox : catppuccin
 
     readonly property color liquidColor: activeTheme.foregroundColor
     readonly property color windowColor: activeTheme.windowColor
@@ -28,11 +30,16 @@ Singleton {
     readonly property color statusBarSurfaceColor: activeTheme.searchBackgroundColor
     readonly property color statusBarSurfaceBorderColor: activeTheme.searchBorderColor
     readonly property color statusBarWorkspaceColor: activeTheme.highlightColor
-    readonly property color statusBarHighlightColor: "#e5c890"
+    readonly property color statusBarHighlightColor: dynamicActive
+        ? dynamic.highlightAccentColor : "#e5c890"
     readonly property color statusBarTextColor: activeTheme.textColor
     readonly property color statusBarMutedColor: activeTheme.placeholderTextColor
-    readonly property color statusBarBlueColor: "#89b4fa"
-    readonly property color statusBarGreenColor: "#a6e3a1"
-    readonly property color statusBarRedColor: "#f38ba8"
-    readonly property color statusBarAccentColor: "#ef9f76"
+    readonly property color statusBarBlueColor: dynamicActive
+        ? dynamic.blueColor : "#89b4fa"
+    readonly property color statusBarGreenColor: dynamicActive
+        ? dynamic.greenColor : "#a6e3a1"
+    readonly property color statusBarRedColor: dynamicActive
+        ? dynamic.redColor : "#f38ba8"
+    readonly property color statusBarAccentColor: dynamicActive
+        ? dynamic.accentColor : "#ef9f76"
 }
