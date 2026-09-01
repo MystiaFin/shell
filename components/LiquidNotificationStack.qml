@@ -8,7 +8,7 @@ Item {
 
     property real maximumHeight: 600
     readonly property real desiredHeight: NotificationService.popupCount > 0
-        ? Math.min(maximumHeight, list.contentHeight + 32)
+        ? Math.min(maximumHeight, list.contentHeight + 48)
         : 1
 
     ListView {
@@ -18,7 +18,7 @@ Item {
             fill: parent
             topMargin: 16
             rightMargin: LiquidMetrics.edgeContentInset
-            bottomMargin: 16
+            bottomMargin: 32
             leftMargin: 16
         }
         model: NotificationService.popupModel

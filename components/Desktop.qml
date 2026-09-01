@@ -79,6 +79,7 @@ LiquidWidgetHost {
         host: root
         edge: LiquidWidget.Right
         edgeAlignment: LiquidWidget.End
+        alongEdgeOffset: -24
         edgeOffset: LiquidMetrics.edgeOverlap
         shown: NotificationService.popupCount > 0 && !UtilityCenterState.visible
         closedWidthScale: 1
