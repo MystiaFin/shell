@@ -1,13 +1,6 @@
 # Quickshell Configuration
 
-A personal Quickshell desktop shell for the Niri compositor. It provides a
-per-screen status bar, application launcher, control and utility centers,
-notifications, wallpaper selection, wallpaper-derived colors, and liquid edge
-effects.
-
-The current environment uses Quickshell 0.3.0. See [ARCHITECTURE.md](ARCHITECTURE.md)
-for ownership and dependency rules and [scripts/check.sh](scripts/check.sh) for
-static validation.
+My personal Quickshell desktop shell for the Niri compositor.
 
 ## Dependencies
 
