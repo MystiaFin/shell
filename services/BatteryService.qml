@@ -28,7 +28,8 @@ Singleton {
         return "󰁺";
     }
 
-    property Process reader: Process {
+    Process {
+        id: batteryReader
         running: true
         command: ["sh", "-c", "for b in /sys/class/power_supply/*; do [ \"$(cat \"$b/type\" 2>/dev/null)\" = Battery ] || continue; printf '%s|%s\\n' \"$(cat \"$b/capacity\")\" \"$(cat \"$b/status\")\"; exit; done"]
         stdout: SplitParser {
@@ -44,13 +45,14 @@ Singleton {
         }
     }
 
-    property Timer timer: Timer {
+    Timer {
+        id: refreshTimer
         interval: 5000
         running: true
         repeat: true
         onTriggered: {
-            if (!reader.running)
-                reader.running = true;
+            if (!batteryReader.running)
+                batteryReader.running = true;
         }
     }
 }

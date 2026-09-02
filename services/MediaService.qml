@@ -12,50 +12,58 @@ Singleton {
     property string album: ""
     property string artUrl: ""
     property string playbackStatus: "Stopped"
-    property real position: 0
-    property real length: 0
+    property real positionSeconds: 0
+    property real durationSeconds: 0
     readonly property bool available: title !== "" || artist !== ""
     readonly property bool playing: playbackStatus === "Playing"
+    readonly property real microsecondsPerSecond: 1000000
+    readonly property string metadataSeparator: "␟"
+    readonly property string metadataFormat: "{{title}}" + metadataSeparator
+        + "{{artist}}" + metadataSeparator + "{{album}}" + metadataSeparator
+        + "{{mpris:artUrl}}" + metadataSeparator + "{{status}}" + metadataSeparator
+        + "{{position}}" + metadataSeparator + "{{mpris:length}}"
 
-    function run(process, command) {
+    function run(process: Process, command: string): void {
         if (process.running)
             return;
         process.command = ["playerctl", command];
         process.running = true;
     }
 
-    function previous() { run(controlProcess, "previous"); }
-    function playPause() { run(controlProcess, "play-pause"); }
-    function next() { run(controlProcess, "next"); }
+    function previous(): void { run(controlProcess, "previous"); }
+    function playPause(): void { run(controlProcess, "play-pause"); }
+    function next(): void { run(controlProcess, "next"); }
 
-    function clear() {
+    function clear(): void {
         title = "";
         artist = "";
         album = "";
         artUrl = "";
         playbackStatus = "Stopped";
-        position = 0;
-        length = 0;
+        positionSeconds = 0;
+        durationSeconds = 0;
     }
 
-    property Process metadataMonitor: Process {
+    function applyMetadataLine(data: string): void {
+        const fields = data.trim().split(metadataSeparator);
+        if (fields.length < 7)
+            return;
+        title = fields[0] || "";
+        artist = fields[1] || "";
+        album = fields[2] || "";
+        artUrl = fields[3] || "";
+        playbackStatus = fields[4] || "Stopped";
+        positionSeconds = Number(fields[5]) / microsecondsPerSecond || 0;
+        durationSeconds = Number(fields[6]) / microsecondsPerSecond || 0;
+    }
+
+    Process {
+        id: metadataMonitor
         running: true
-        command: ["playerctl", "metadata", "--follow", "--format",
-            "{{title}}|{{artist}}|{{album}}|{{mpris:artUrl}}|{{status}}|{{position}}|{{mpris:length}}"]
+        command: ["playerctl", "metadata", "--follow", "--format", root.metadataFormat]
 
         stdout: SplitParser {
-            onRead: data => {
-                const fields = data.trim().split("|");
-                if (fields.length < 7)
-                    return;
-                root.title = fields[0] || "";
-                root.artist = fields[1] || "";
-                root.album = fields[2] || "";
-                root.artUrl = fields[3] || "";
-                root.playbackStatus = fields[4] || "Stopped";
-                root.position = Number(fields[5]) / 1000000 || 0;
-                root.length = Number(fields[6]) / 1000000 || 0;
-            }
+            onRead: data => root.applyMetadataLine(data)
         }
 
         onExited: {
@@ -64,37 +72,30 @@ Singleton {
         }
     }
 
-    property Process controlProcess: Process {
+    Process {
+        id: controlProcess
         onExited: metadataRefresh.running = true
     }
 
-    property Process metadataRefresh: Process {
-        command: ["playerctl", "metadata", "--format",
-            "{{title}}|{{artist}}|{{album}}|{{mpris:artUrl}}|{{status}}|{{position}}|{{mpris:length}}"]
+    Process {
+        id: metadataRefresh
+        command: ["playerctl", "metadata", "--format", root.metadataFormat]
         stdout: SplitParser {
-            onRead: data => {
-                const fields = data.trim().split("|");
-                if (fields.length >= 7) {
-                    root.title = fields[0] || "";
-                    root.artist = fields[1] || "";
-                    root.album = fields[2] || "";
-                    root.artUrl = fields[3] || "";
-                    root.playbackStatus = fields[4] || "Stopped";
-                    root.position = Number(fields[5]) / 1000000 || 0;
-                    root.length = Number(fields[6]) / 1000000 || 0;
-                }
-            }
+            onRead: data => root.applyMetadataLine(data)
         }
     }
 
-    property Timer positionTimer: Timer {
+    Timer {
+        id: positionTimer
         interval: 1000
         running: root.playing
         repeat: true
-        onTriggered: root.position = Math.min(root.length, root.position + 1)
+        onTriggered: root.positionSeconds = Math.min(root.durationSeconds,
+            root.positionSeconds + 1)
     }
 
-    property Timer monitorRestart: Timer {
+    Timer {
+        id: monitorRestart
         interval: 2000
         onTriggered: metadataMonitor.running = true
     }

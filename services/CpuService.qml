@@ -12,7 +12,7 @@ Singleton {
     property real previousIdle: 0
     property real previousTotal: 0
 
-    function update(values) {
+    function update(values: var): void {
         const idle = values[3] + values[4];
         const total = values.reduce((sum, value) => sum + value, 0);
         const totalDelta = total - root.previousTotal;
@@ -25,7 +25,8 @@ Singleton {
         root.previousTotal = total;
     }
 
-    property Process reader: Process {
+    Process {
+        id: cpuStatReader
         running: true
         command: ["cat", "/proc/stat"]
         stdout: SplitParser {
@@ -36,13 +37,14 @@ Singleton {
         }
     }
 
-    property Timer timer: Timer {
+    Timer {
+        id: refreshTimer
         interval: 2000
         running: true
         repeat: true
         onTriggered: {
-            if (!reader.running)
-                reader.running = true;
+            if (!cpuStatReader.running)
+                cpuStatReader.running = true;
         }
     }
 }

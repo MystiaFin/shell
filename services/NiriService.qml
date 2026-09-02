@@ -14,7 +14,7 @@ Singleton {
     property var pendingWorkspaceId: null
     property var workspaces: []
 
-    function replaceWorkspace(workspace) {
+    function replaceWorkspace(workspace: var): void {
         const next = root.workspaces.slice();
         const index = next.findIndex(item => item.id === workspace.id);
         if (index === -1)
@@ -24,7 +24,7 @@ Singleton {
         root.workspaces = next;
     }
 
-    function handleEvent(event) {
+    function handleEvent(event: var): void {
         if (event.WorkspacesChanged) {
             root.workspaces = event.WorkspacesChanged.workspaces.slice();
             return;
@@ -64,7 +64,7 @@ Singleton {
         }
     }
 
-    function focusWorkspace(id) {
+    function focusWorkspace(id: int): void {
         root.pendingWorkspaceId = id;
         if (!requestSocket.connected) {
             requestSocket.connected = true;
@@ -74,7 +74,7 @@ Singleton {
         root.sendPendingWorkspace();
     }
 
-    function sendPendingWorkspace() {
+    function sendPendingWorkspace(): void {
         if (!requestSocket.connected || root.pendingWorkspaceId === null)
             return;
 
@@ -101,7 +101,8 @@ Singleton {
         requestSocket.connected = true;
     }
 
-    property Socket eventSocket: Socket {
+    Socket {
+        id: eventSocket
         property bool awaitingAcknowledgement: false
 
         path: root.socketPath
@@ -149,7 +150,8 @@ Singleton {
         }
     }
 
-    property Socket requestSocket: Socket {
+    Socket {
+        id: requestSocket
         path: root.socketPath
 
         onConnectionStateChanged: {
@@ -179,12 +181,14 @@ Singleton {
         }
     }
 
-    property Timer eventReconnectTimer: Timer {
+    Timer {
+        id: eventReconnectTimer
         interval: 1000
         onTriggered: eventSocket.connected = true
     }
 
-    property Timer requestReconnectTimer: Timer {
+    Timer {
+        id: requestReconnectTimer
         interval: 1000
         onTriggered: requestSocket.connected = true
     }

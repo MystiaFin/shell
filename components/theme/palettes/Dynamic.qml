@@ -1,0 +1,116 @@
+import Quickshell
+import QtQuick
+import "../../../services"
+
+QtObject {
+    id: root
+
+    readonly property real vibrancySaturationWeight: 1.4
+    readonly property real vibrancyTargetLuminance: 0.52
+    readonly property real vibrancyLuminancePenalty: 0.35
+    readonly property real maximumToneSaturation: 0.82
+    readonly property int quantizerDepth: 4
+    readonly property int quantizerRescaleSize: 64
+
+    readonly property var palette: quantizer.colors
+    // Dark swatches anchor surfaces while vibrant midtones supply readable accents.
+    readonly property color baseColor: darkestColor(palette)
+    readonly property color accentSeed: mostVibrantColor(palette)
+
+    readonly property color foregroundColor: withToneAndMinimumSaturation(baseColor, 0.075, 0.30)
+    readonly property color highlightColor: mix(foregroundColor, accentColor, 0.15)
+    readonly property color windowColor: "transparent"
+    readonly property color maskColor: withToneAndMinimumSaturation(baseColor, 0.90, 0.10)
+    readonly property color textColor: withToneAndMinimumSaturation(baseColor, 0.91, 0.10)
+    readonly property color secondaryTextColor: withToneAndMinimumSaturation(baseColor, 0.72, 0.14)
+    readonly property color itemHoverColor: mix(foregroundColor, accentColor, 0.20)
+    readonly property color searchBackgroundColor: withToneAndMinimumSaturation(baseColor, 0.12, 0.28)
+    readonly property color searchBorderColor: mix(searchBackgroundColor, accentColor, 0.32)
+    readonly property color placeholderTextColor: withToneAndMinimumSaturation(baseColor, 0.52, 0.16)
+    readonly property color wallpaperFallbackColor: foregroundColor
+    readonly property color accentHoverColor: highlightAccentColor
+    readonly property color successColor: greenColor
+    readonly property color dangerColor: redColor
+
+    readonly property color accentColor: withToneAndMinimumSaturation(accentSeed, 0.68,
+        Math.max(0.58, saturation(accentSeed)))
+    readonly property color highlightAccentColor: withToneAndMinimumSaturation(accentSeed, 0.78,
+        Math.max(0.48, saturation(accentSeed)))
+    readonly property color blueColor: harmonize("#89b4fa", accentColor, 0.30)
+    readonly property color greenColor: harmonize("#a6e3a1", accentColor, 0.24)
+    readonly property color redColor: harmonize("#f38ba8", accentColor, 0.22)
+
+    function luminance(colorValue: color): real {
+        return colorValue.r * 0.2126 + colorValue.g * 0.7152 + colorValue.b * 0.0722;
+    }
+
+    function saturation(colorValue: color): real {
+        const maximum = Math.max(colorValue.r, colorValue.g, colorValue.b);
+        const minimum = Math.min(colorValue.r, colorValue.g, colorValue.b);
+        return maximum - minimum;
+    }
+
+    function darkestColor(colors): color {
+        if (!colors || colors.length === 0)
+            return "#11111b";
+
+        let selected = colors[0];
+        let selectedScore = luminance(selected);
+        for (let index = 1; index < colors.length; index++) {
+            const score = luminance(colors[index]);
+            if (score < selectedScore) {
+                selected = colors[index];
+                selectedScore = score;
+            }
+        }
+        return selected;
+    }
+
+    function mostVibrantColor(colors): color {
+        if (!colors || colors.length === 0)
+            return "#89b4fa";
+
+        let selected = colors[0];
+        let selectedScore = -1;
+        for (let index = 0; index < colors.length; index++) {
+            const colorValue = colors[index];
+            const brightness = luminance(colorValue);
+            const score = saturation(colorValue) * vibrancySaturationWeight
+                - Math.abs(brightness - vibrancyTargetLuminance)
+                    * vibrancyLuminancePenalty;
+            if (score > selectedScore) {
+                selected = colorValue;
+                selectedScore = score;
+            }
+        }
+        return selected;
+    }
+
+    function withToneAndMinimumSaturation(colorValue: color, lightness: real,
+            minimumSaturation: real): color {
+        const hue = colorValue.hslHue >= 0 ? colorValue.hslHue : 0;
+        const nextSaturation = Math.max(minimumSaturation,
+            Math.min(maximumToneSaturation, colorValue.hslSaturation));
+        return Qt.hsla(hue, nextSaturation, lightness, 1);
+    }
+
+    function mix(first: color, second: color, amount: real): color {
+        return Qt.rgba(
+            first.r + (second.r - first.r) * amount,
+            first.g + (second.g - first.g) * amount,
+            first.b + (second.b - first.b) * amount,
+            1
+        );
+    }
+
+    function harmonize(semanticColor: color, wallpaperColor: color, amount: real): color {
+        const blended = mix(semanticColor, wallpaperColor, amount);
+        return withToneAndMinimumSaturation(blended, 0.70, 0.48);
+    }
+
+    property ColorQuantizer quantizer: ColorQuantizer {
+        source: WallpaperService.source
+        depth: root.quantizerDepth
+        rescaleSize: root.quantizerRescaleSize
+    }
+}

@@ -8,12 +8,14 @@ Singleton {
     id: root
 
     property int barCount: 24
-    property real intensity: 1.75
+    property real amplitudeMultiplier: 1.75
+    // Keep barCount aligned with cava-raw.conf's bars value.
     property var bars: Array(barCount).fill(0)
     readonly property string configPath: Qt.resolvedUrl("cava-raw.conf")
         .toString().replace("file://", "")
 
-    property Process visualizer: Process {
+    Process {
+        id: cavaProcess
         running: true
         command: ["cava", "-p", root.configPath]
         stdout: SplitParser {
@@ -22,7 +24,8 @@ Singleton {
                 root.bars = Array.from({ length: root.barCount }, (_, index) => {
                     const value = Number(values[index]);
                     return isNaN(value) ? 0
-                        : Math.max(0, Math.min(1, value / 100 * root.intensity));
+                        : Math.max(0, Math.min(1,
+                            value / 100 * root.amplitudeMultiplier));
                 });
             }
         }
@@ -31,8 +34,9 @@ Singleton {
         }
     }
 
-    property Timer restartTimer: Timer {
+    Timer {
+        id: restartTimer
         interval: 2000
-        onTriggered: visualizer.running = true
+        onTriggered: cavaProcess.running = true
     }
 }

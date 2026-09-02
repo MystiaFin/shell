@@ -1,0 +1,36 @@
+pragma Singleton
+
+import Quickshell
+
+Singleton {
+    readonly property string power: "⏻"
+    readonly property string notifications: "󰂚"
+    readonly property string wifi: "󰖩"
+    readonly property string bluetooth: "󰂯"
+    readonly property string wallpaper: "󰸉"
+    readonly property string brightness: "󰃠"
+    readonly property string close: "󰅖"
+    readonly property string confirm: "󰄬"
+    readonly property string lock: "󰌾"
+    readonly property string passwordVisible: "󰈈"
+    readonly property string passwordHidden: "󰈉"
+    readonly property string wifiStrong: "󰤨"
+    readonly property string wifiGood: "󰤥"
+    readonly property string wifiWeak: "󰤢"
+    readonly property string wifiNone: "󰤟"
+    readonly property string previousMonth: "󰁍"
+    readonly property string nextMonth: "󰁔"
+    readonly property string emptyFolder: "󰉏"
+    readonly property string volume: "󰕾"
+    readonly property string microphone: "󰍬"
+    readonly property string media: "󰎈"
+    readonly property string emptyMedia: "󰝚"
+    readonly property string previousTrack: "󰒮"
+    readonly property string pause: "󰏤"
+    readonly property string play: "󰐊"
+    readonly property string nextTrack: "󰒭"
+    readonly property string cpu: "󰘚"
+    readonly property string memory: "󰍛"
+    readonly property string activeWorkspace: "󰫢"
+    readonly property string inactiveWorkspace: ""
+}

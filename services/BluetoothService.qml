@@ -15,6 +15,7 @@ Singleton {
     readonly property var pairedDevices: devices.filter(device => device.paired)
     readonly property var availableDevices: devices.filter(device => !device.paired)
     property var pendingPairDevice: null
+    property bool scanningRequested: false
 
     function togglePower(): void {
         if (adapter) {
@@ -26,32 +27,27 @@ Singleton {
     function updateScanner(): void {
         if (adapter) {
             adapter.discovering = adapter.enabled
-                && UtilityCenterState.visible
-                && UtilityCenterState.page === "bluetooth";
+                && scanningRequested;
         }
     }
 
-    function connectDevice(device): void {
+    function connectDevice(device: var): void {
         if (device.connected)
             device.disconnect();
         else
             device.connect();
     }
 
-    function pairDevice(device): void {
+    function pairDevice(device: var): void {
         pendingPairDevice = device;
         device.pair();
     }
 
-    function forgetDevice(device): void {
+    function forgetDevice(device: var): void {
         device.forget();
     }
 
-    Connections {
-        target: UtilityCenterState
-        function onVisibleChanged() { root.updateScanner(); }
-        function onPageChanged() { root.updateScanner(); }
-    }
+    onScanningRequestedChanged: updateScanner()
 
     Connections {
         target: Bluetooth

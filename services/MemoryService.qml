@@ -13,7 +13,8 @@ Singleton {
     readonly property real usage: totalKiB > 0 ? usedKiB / totalKiB : 0
     readonly property string usedFormatted: (usedKiB / 1048576).toFixed(1) + "G"
 
-    property Process reader: Process {
+    Process {
+        id: memoryInfoReader
         running: true
         command: ["cat", "/proc/meminfo"]
         stdout: SplitParser {
@@ -27,13 +28,14 @@ Singleton {
         }
     }
 
-    property Timer timer: Timer {
+    Timer {
+        id: refreshTimer
         interval: 5000
         running: true
         repeat: true
         onTriggered: {
-            if (!reader.running)
-                reader.running = true;
+            if (!memoryInfoReader.running)
+                memoryInfoReader.running = true;
         }
     }
 }

@@ -16,6 +16,7 @@ Singleton {
     readonly property bool enabled: Networking.wifiEnabled
     readonly property bool hardwareEnabled: Networking.wifiHardwareEnabled
     readonly property bool scanning: wifiDevice ? wifiDevice.scannerEnabled : false
+    property bool scanningRequested: false
 
     function toggleWifi(): void {
         if (hardwareEnabled) {
@@ -29,24 +30,15 @@ Singleton {
             connectedNetwork.disconnect();
     }
 
-    Connections {
-        target: UtilityCenterState
-
-        function onVisibleChanged() { root.updateScanner(); }
-        function onPageChanged() { root.updateScanner(); }
-    }
-
     onWifiDeviceChanged: updateScanner()
+    onScanningRequestedChanged: updateScanner()
 
     function updateScanner(): void {
         if (wifiDevice) {
-            const shouldScan = UtilityCenterState.visible
-                && UtilityCenterState.page === "wifi";
-
-            if (shouldScan) {
+            if (scanningRequested) {
                 scannerStopTimer.stop();
                 wifiDevice.scannerEnabled = true;
-            } else if (!UtilityCenterState.visible && wifiDevice.scannerEnabled) {
+            } else if (wifiDevice.scannerEnabled) {
                 scannerStopTimer.restart();
             } else {
                 scannerStopTimer.stop();
@@ -59,7 +51,7 @@ Singleton {
         id: scannerStopTimer
         interval: 500
         onTriggered: {
-            if (root.wifiDevice && !UtilityCenterState.visible)
+            if (root.wifiDevice && !root.scanningRequested)
                 root.wifiDevice.scannerEnabled = false;
         }
     }

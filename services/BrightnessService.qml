@@ -10,14 +10,14 @@ Singleton {
     property real brightness: 0
     property real pendingBrightness: 0
 
-    function setBrightness(value): void {
+    function setBrightness(value: real): void {
         const clamped = Math.max(0.01, Math.min(1, value));
         brightness = clamped;
         pendingBrightness = clamped;
         writeTimer.restart();
     }
 
-    function readOutput(data): void {
+    function readOutput(data: string): void {
         const fields = data.trim().split(",");
         if (fields.length < 4)
             return;

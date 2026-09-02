@@ -1,22 +1,41 @@
 import Quickshell
-import "components"
+import QtQuick
+import "components/core"
+import "components/state"
+import "components/windows"
+import "integrations"
 import "services"
+import "widgets/statusbar"
 
 ShellRoot {
-    readonly property var terminalThemeService: TerminalThemeService
+    Component.onCompleted: ThemeExportService.activateExternalThemeIntegration()
 
-    WallpaperWindow {}
+    Binding {
+        target: NetworkService
+        property: "scanningRequested"
+        value: OverlayState.utilityCenterVisible
+            && OverlayState.utilityPage === "wifi"
+    }
+
+    Binding {
+        target: BluetoothService
+        property: "scanningRequested"
+        value: OverlayState.utilityCenterVisible
+            && OverlayState.utilityPage === "bluetooth"
+    }
+
+    WallpaperPickerWindow {}
 
     Variants {
         model: Quickshell.screens
 
-        Wallpaper {}
+        WallpaperLayer {}
     }
 
     Variants {
         model: Quickshell.screens
 
-        Desktop {}
+        ScreenOverlay {}
     }
 
     Variants {

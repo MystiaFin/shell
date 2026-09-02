@@ -7,12 +7,12 @@ import QtQuick
 Singleton {
     id: root
 
-    property alias model: notifications
-    property alias popupModel: popups
-    readonly property int count: notifications.count
-    readonly property int popupCount: popups.count
+    property alias notificationModel: notificationListModel
+    property alias popupNotificationModel: popupListModel
+    readonly property int notificationCount: notificationListModel.count
+    readonly property int popupNotificationCount: popupListModel.count
 
-    function iconSource(notification) {
+    function iconSource(notification: var): string {
         const source = notification.image || notification.appIcon;
         if (!source)
             return "";
@@ -23,50 +23,63 @@ Singleton {
         return Quickshell.iconPath(source);
     }
 
-    function removeById(id) {
-        for (let index = 0; index < notifications.count; index++) {
-            if (notifications.get(index).notificationId === id) {
-                notifications.remove(index);
+    function notificationRecord(notification: var): var {
+        return {
+            notification: notification,
+            notificationId: notification.id,
+            appName: notification.appName || "Notification",
+            summary: notification.summary || "Notification",
+            body: notification.body || "",
+            icon: iconSource(notification),
+            receivedAt: new Date()
+        };
+    }
+
+    function removeById(notificationId: int): void {
+        for (let index = 0; index < notificationListModel.count; index++) {
+            if (notificationListModel.get(index).notificationId === notificationId) {
+                notificationListModel.remove(index);
                 break;
             }
         }
-        removePopupById(id);
+        removePopupById(notificationId);
     }
 
-    function removePopupById(id) {
-        for (let index = 0; index < popups.count; index++) {
-            if (popups.get(index).notificationId === id) {
-                popups.remove(index);
+    function removePopupById(notificationId: int): void {
+        for (let index = 0; index < popupListModel.count; index++) {
+            if (popupListModel.get(index).notificationId === notificationId) {
+                popupListModel.remove(index);
                 return;
             }
         }
     }
 
-    function dismiss(index) {
-        if (index < 0 || index >= notifications.count)
-            return;
-        const notification = notifications.get(index).notification;
-        const notificationId = notifications.get(index).notificationId;
-        notifications.remove(index);
-        removePopupById(notificationId);
-        if (notification)
-            notification.dismiss();
+    function dismissById(notificationId: int): void {
+        for (let index = 0; index < notificationListModel.count; index++) {
+            const record = notificationListModel.get(index);
+            if (record.notificationId === notificationId) {
+                removeById(notificationId);
+                if (record.notification)
+                    record.notification.dismiss();
+                return;
+            }
+        }
     }
 
-    function clear() {
+    function clear(): void {
         const tracked = [];
-        for (let index = 0; index < notifications.count; index++)
-            tracked.push(notifications.get(index).notification);
-        notifications.clear();
-        popups.clear();
+        for (let index = 0; index < notificationListModel.count; index++)
+            tracked.push(notificationListModel.get(index).notification);
+        notificationListModel.clear();
+        popupListModel.clear();
         for (const notification of tracked) {
             if (notification)
                 notification.dismiss();
         }
     }
 
-    ListModel { id: notifications }
-    ListModel { id: popups }
+    ListModel { id: notificationListModel }
+    ListModel { id: popupListModel }
 
     NotificationServer {
         id: server
@@ -81,22 +94,9 @@ Singleton {
         onNotification: notification => {
             notification.tracked = true;
             root.removeById(notification.id);
-            notifications.insert(0, {
-                notification: notification,
-                notificationId: notification.id,
-                appName: notification.appName || "Notification",
-                summary: notification.summary || "Notification",
-                body: notification.body || "",
-                icon: root.iconSource(notification),
-                receivedAt: new Date()
-            });
-            popups.append({
-                notificationId: notification.id,
-                appName: notification.appName || "Notification",
-                summary: notification.summary || "Notification",
-                body: notification.body || "",
-                icon: root.iconSource(notification)
-            });
+            const record = root.notificationRecord(notification);
+            notificationListModel.insert(0, record);
+            popupListModel.append(record);
         }
     }
 }

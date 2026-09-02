@@ -14,21 +14,21 @@ Singleton {
     property real pendingVolume: 0
     property real pendingMicrophoneVolume: 0
 
-    function setVolume(value) {
+    function setVolume(value: real): void {
         const clamped = Math.max(0, Math.min(1, value));
         pendingVolume = clamped;
         root.volume = clamped;
         sinkWriteTimer.restart();
     }
 
-    function setMicrophoneVolume(value) {
+    function setMicrophoneVolume(value: real): void {
         const clamped = Math.max(0, Math.min(1, value));
         pendingMicrophoneVolume = clamped;
         root.microphoneVolume = clamped;
         sourceWriteTimer.restart();
     }
 
-    function readOutput(data, microphone) {
+    function readOutput(data: string, microphone: bool): void {
         const match = data.match(/Volume:\s+([0-9.]+)/);
         if (!match)
             return;
@@ -42,7 +42,8 @@ Singleton {
         }
     }
 
-    property Process sinkReader: Process {
+    Process {
+        id: sinkReader
         running: true
         command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
         stdout: SplitParser {
@@ -50,7 +51,8 @@ Singleton {
         }
     }
 
-    property Process sourceReader: Process {
+    Process {
+        id: sourceReader
         running: true
         command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SOURCE@"]
         stdout: SplitParser {
@@ -58,15 +60,18 @@ Singleton {
         }
     }
 
-    property Process sinkSetter: Process {
+    Process {
+        id: sinkSetter
         onExited: sinkReader.running = true
     }
 
-    property Process sourceSetter: Process {
+    Process {
+        id: sourceSetter
         onExited: sourceReader.running = true
     }
 
-    property Timer sinkWriteTimer: Timer {
+    Timer {
+        id: sinkWriteTimer
         interval: 40
         onTriggered: {
             if (sinkSetter.running) {
@@ -79,7 +84,8 @@ Singleton {
         }
     }
 
-    property Timer sourceWriteTimer: Timer {
+    Timer {
+        id: sourceWriteTimer
         interval: 40
         onTriggered: {
             if (sourceSetter.running) {
@@ -92,7 +98,8 @@ Singleton {
         }
     }
 
-    property Timer refreshTimer: Timer {
+    Timer {
+        id: refreshTimer
         interval: 2000
         running: true
         repeat: true

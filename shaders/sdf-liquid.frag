@@ -1,5 +1,8 @@
 #version 440
 
+// QML and this uniform block intentionally support at most eight shapes.
+#define MAX_SHAPES 8
+
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;
 
