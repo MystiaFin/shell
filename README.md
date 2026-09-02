@@ -36,19 +36,6 @@ Optional feature integrations:
 Developer validation requires `git`, `bash`, `cmp`, and Qt's `qsb`. The check
 script also uses `qmlformat` and `qmllint` when they are installed.
 
-## Source Layout
-
-Shared shell code is grouped by responsibility under `components/common/`,
-`components/core/`, `components/effects/`, `components/state/`,
-`components/theme/`, and `components/windows/`. Palette implementations live in
-`components/theme/palettes/`.
-
-Feature UI is grouped under `widgets/launcher/`, `widgets/controlcenter/`,
-`widgets/utilitycenter/`, `widgets/connectivity/`, `widgets/notifications/`,
-`widgets/statusbar/`, and `widgets/wallpaper/`. See
-[ARCHITECTURE.md](ARCHITECTURE.md) for the complete file map and dependency
-rules.
-
 ## Run
 
 ```sh
@@ -107,14 +94,3 @@ two generated theme names, overwrite their files, and run `dconf write` on
 `/org/gnome/desktop/interface/gtk-theme` so GTK observes a theme-name change.
 This changes the user's current GTK theme setting. Generated files and the
 wallpaper selection are intentionally ignored by Git.
-
-## Validation
-
-```sh
-./scripts/check.sh
-```
-
-The script checks diffs, validates and reproducibly rebuilds both committed QSB
-shader packs in a temporary directory, and conditionally runs Qt QML tools over
-all tracked and untracked non-ignored QML files. It never starts Quickshell. See
-[ARCHITECTURE.md](ARCHITECTURE.md) for the source map and maintenance rules.
