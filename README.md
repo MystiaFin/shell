@@ -4,7 +4,7 @@ My personal Quickshell desktop shell for Niri.
 
 ## Preview
 
-[![Watch the demo](https://img.youtube.com/vi/G-VcE13d5as/maxresdefault.jpg)](https://youtu.be/G-VcE13d5as)
+https://github.com/user-attachments/assets/d3447ed8-9405-47df-9776-420c4a8a13fe
 
 ## Features
 
