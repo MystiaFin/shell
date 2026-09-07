@@ -16,6 +16,9 @@ Singleton {
     readonly property int initializationDelayMs: 100
 
     readonly property real statusBarHeight: 40
+    readonly property int startupBlockFadeDurationMs: 280
+    readonly property int startupMaskRevealDurationMs: 700
+    readonly property int startupStatusBarDurationMs: 420
     readonly property int fastAnimationMs: 180
     readonly property int pageTransitionDurationMs: 260
     readonly property int popupTimeoutMs: 6000

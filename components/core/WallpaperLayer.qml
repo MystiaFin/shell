@@ -3,6 +3,7 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import QtQuick
 import "../../services"
+import "../state"
 import "../theme"
 
 PanelWindow {
@@ -22,6 +23,16 @@ PanelWindow {
     property real margin: 0
     property real cornerRadius: 28
     property int imageFillMode: Image.PreserveAspectCrop
+    property bool startupIntroStarted: false
+
+    function startStartupIntro(): void {
+        if (startupIntroStarted)
+            return;
+
+        startupIntroStarted = true;
+        StartupState.startSequence(targetScreen.name);
+        startupIntro.start();
+    }
 
     function queueWallpaper(nextSource): void {
         if (nextSource.toString() === displayedSource.toString())
@@ -56,7 +67,7 @@ PanelWindow {
     }
 
     screen: targetScreen
-    color: Theme.wallpaperFallbackColor
+    color: "transparent"
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Background
     WlrLayershell.namespace: "wallpaper"
@@ -70,16 +81,28 @@ PanelWindow {
 
     mask: Region {}
 
+    Rectangle {
+        id: solidBlock
+
+        anchors.fill: parent
+        color: Theme.shellBackgroundColor
+        opacity: 0
+    }
+
     ClippingRectangle {
         id: wallpaperFrame
 
-        anchors.fill: parent
-        anchors.margins: root.margin
+        x: root.margin
+        y: root.height
+        width: root.width - root.margin * 2
+        height: root.height - root.margin * 2
         radius: root.cornerRadius
         color: Theme.wallpaperFallbackColor
         contentUnderBorder: true
 
         Image {
+            id: displayedImage
+
             anchors.fill: parent
             source: root.displayedSource
             fillMode: root.imageFillMode
@@ -87,6 +110,11 @@ PanelWindow {
             cache: true
             smooth: true
             mipmap: true
+
+            onStatusChanged: {
+                if (status === Image.Ready)
+                    root.startStartupIntro();
+            }
         }
 
         Image {
@@ -169,6 +197,30 @@ PanelWindow {
             if (incomingImage.status === Image.Ready)
                 root.startReveal();
         }
+    }
+
+    SequentialAnimation {
+        id: startupIntro
+
+        NumberAnimation {
+            target: solidBlock
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: ShellMetrics.startupBlockFadeDurationMs
+            easing.type: Easing.OutCubic
+        }
+
+        NumberAnimation {
+            target: wallpaperFrame
+            property: "y"
+            from: root.height
+            to: root.margin
+            duration: ShellMetrics.startupMaskRevealDurationMs
+            easing.type: Easing.OutCubic
+        }
+
+        onFinished: StartupState.finishMaskReveal(root.targetScreen.name)
     }
 
     NumberAnimation {
