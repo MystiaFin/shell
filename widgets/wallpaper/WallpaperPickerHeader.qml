@@ -26,7 +26,7 @@ RowLayout {
         Text {
             anchors.centerIn: parent
             text: Icons.wallpaper
-            color: Theme.shellBackgroundColor
+            color: Theme.accentTextColor
             font.family: Typography.nerdIconFontFamily
             font.pixelSize: 22
         }
@@ -67,7 +67,7 @@ RowLayout {
             anchors.centerIn: parent
             text: Icons.close
             color: closeHover.hovered
-                ? Theme.shellBackgroundColor
+                ? Theme.accentTextColor
                 : Theme.primaryTextColor
             font.family: Typography.nerdIconFontFamily
             font.pixelSize: 17

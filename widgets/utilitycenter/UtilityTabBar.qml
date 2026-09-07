@@ -41,7 +41,7 @@ RowLayout {
                 anchors.centerIn: parent
                 text: tabButton.modelData.icon
                 color: tabButton.active
-                    ? Theme.shellBackgroundColor
+                    ? Theme.accentTextColor
                     : Theme.primaryTextColor
                 font.family: Typography.nerdIconFontFamily
                 font.pixelSize: 18
@@ -74,7 +74,7 @@ RowLayout {
             anchors.centerIn: parent
             text: Icons.wallpaper
             color: wallpaperHover.hovered
-                ? Theme.shellBackgroundColor
+                ? Theme.accentTextColor
                 : Theme.accentColor
             font.family: Typography.nerdIconFontFamily
             font.pixelSize: 19

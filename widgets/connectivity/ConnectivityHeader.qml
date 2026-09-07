@@ -36,7 +36,7 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 text: root.icon
-                color: Theme.shellBackgroundColor
+                color: Theme.accentTextColor
                 font.family: Typography.nerdIconFontFamily
                 font.pixelSize: 18
             }

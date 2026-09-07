@@ -75,7 +75,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 text: Icons.confirm
-                color: Theme.shellBackgroundColor
+                color: Theme.accentTextColor
                 font.family: Typography.nerdIconFontFamily
                 font.pixelSize: 13
             }

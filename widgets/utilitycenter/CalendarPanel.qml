@@ -116,7 +116,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: dayNumber
                         color: today
-                            ? Theme.shellBackgroundColor
+                            ? Theme.accentTextColor
                             : currentMonth
                                 ? Theme.primaryTextColor
                                 : Theme.surfaceBorderColor

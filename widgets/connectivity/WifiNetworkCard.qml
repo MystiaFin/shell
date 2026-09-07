@@ -188,7 +188,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: Icons.confirm
                     color: connectHover.hovered
-                        ? Theme.shellBackgroundColor
+                        ? Theme.accentTextColor
                         : Theme.successColor
                     font.family: Typography.nerdIconFontFamily
                     font.pixelSize: 14

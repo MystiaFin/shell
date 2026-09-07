@@ -21,7 +21,7 @@ Rectangle {
         anchors.centerIn: parent
         text: mediaControlButton.icon
         color: mediaControlButton.primaryAction
-            ? Theme.shellBackgroundColor
+            ? Theme.accentTextColor
             : Theme.primaryTextColor
         font.family: Typography.nerdIconFontFamily
         font.pixelSize: mediaControlButton.primaryAction ? 21 : 18

@@ -14,6 +14,7 @@ QtObject {
     readonly property color wallpaperFallbackColor: "#11111b"
     readonly property color accentColor: "#ef9f76"
     readonly property color accentHoverColor: "#e5c890"
+    readonly property color accentTextColor: "#11111b"
     readonly property color successColor: "#a6e3a1"
     readonly property color dangerColor: "#f38ba8"
 }

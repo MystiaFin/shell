@@ -45,7 +45,7 @@ Item {
         Text {
             anchors.centerIn: parent
             text: Icons.activeWorkspace
-            color: Theme.shellBackgroundColor
+            color: Theme.accentTextColor
             font.family: Typography.symbolIconFontFamily
             font.pixelSize: 18
             rotation: root.starRotation

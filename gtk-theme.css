@@ -3,13 +3,13 @@
 @define-color theme_base_color @BACKGROUND@;
 @define-color theme_text_color @FOREGROUND@;
 @define-color theme_selected_bg_color @ACCENT@;
-@define-color theme_selected_fg_color @SURFACE_DARK@;
+@define-color theme_selected_fg_color @ON_ACCENT@;
 @define-color insensitive_bg_color @SURFACE@;
 @define-color insensitive_fg_color @MUTED@;
 @define-color borders @BORDER@;
 @define-color accent_color @ACCENT@;
 @define-color accent_bg_color @ACCENT@;
-@define-color accent_fg_color @SURFACE_DARK@;
+@define-color accent_fg_color @ON_ACCENT@;
 @define-color destructive_color @RED@;
 @define-color destructive_bg_color @RED@;
 @define-color success_color @GREEN@;
@@ -31,6 +31,7 @@
 
 * {
   -gtk-secondary-caret-color: @ACCENT@;
+  color: @FOREGROUND@;
   outline-color: alpha(@ACCENT@, 0.45);
   border-color: transparent;
   box-shadow: none;
@@ -79,14 +80,14 @@ button:checked,
 button.suggested-action,
 .suggested-action {
   background-color: @ACCENT@;
-  color: @SURFACE_DARK@;
+  color: @ON_ACCENT@;
 }
 
 button.destructive-action,
 .destructive-action,
 .error {
   background-color: @RED@;
-  color: @SURFACE_DARK@;
+  color: @ON_ACCENT@;
 }
 
 entry,
@@ -113,7 +114,7 @@ selection,
 .view:selected,
 row:selected {
   background-color: @ACCENT@;
-  color: @SURFACE_DARK@;
+  color: @ON_ACCENT@;
 }
 
 row,
@@ -129,6 +130,7 @@ flowboxchild {
 stacksidebar,
 .navigation-sidebar {
   background-color: @SURFACE@;
+  color: @FOREGROUND@;
   border-right: 1px solid @BORDER@;
 }
 
@@ -138,7 +140,14 @@ stacksidebar row,
 stacksidebar row:focus,
 .navigation-sidebar row,
 .navigation-sidebar row:focus {
+  color: @FOREGROUND@;
   outline: none;
+}
+
+.sidebar row:selected,
+stacksidebar row:selected,
+.navigation-sidebar row:selected {
+  color: @ON_ACCENT@;
 }
 
 .sidebar separator,
@@ -206,7 +215,7 @@ switch:checked,
 scale highlight,
 progressbar progress {
   background-color: @ACCENT@;
-  color: @SURFACE_DARK@;
+  color: @ON_ACCENT@;
 }
 
 switch slider,
@@ -232,7 +241,7 @@ scrollbar slider:active {
 check,
 radio {
   background-color: @SURFACE@;
-  color: @SURFACE_DARK@;
+  color: @ON_ACCENT@;
   border: none;
   margin: 2px;
 }
@@ -242,12 +251,12 @@ check:indeterminate,
 radio:checked,
 radio:indeterminate {
   background-color: @ACCENT@;
-  color: @SURFACE_DARK@;
+  color: @ON_ACCENT@;
 }
 
 tooltip,
 tooltip.background {
-  background-color: @SURFACE_DARK@;
+  background-color: @SURFACE@;
   color: @FOREGROUND@;
   border: none;
   border-radius: 8px;
@@ -272,4 +281,16 @@ separator {
   min-width: 1px;
   min-height: 1px;
   margin: 3px;
+}
+
+paned > separator,
+paned > separator:focus {
+  background-color: @BORDER@;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  min-width: 3px;
+  min-height: 1px;
+  margin: 0;
 }

@@ -37,7 +37,7 @@ RowLayout {
             anchors.centerIn: parent
             text: "Apply"
             color: root.hasPendingSelection
-                ? Theme.shellBackgroundColor
+                ? Theme.accentTextColor
                 : Theme.mutedTextColor
             font.family: Typography.bodyFontFamily
             font.pixelSize: 12

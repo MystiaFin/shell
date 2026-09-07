@@ -29,6 +29,13 @@ Singleton {
     readonly property color mutedTextColor: activeTheme.placeholderTextColor
     readonly property color accentColor: activeTheme.accentColor
     readonly property color accentHoverColor: activeTheme.accentHoverColor
+    readonly property color accentTextColor: activeTheme.accentTextColor
     readonly property color successColor: activeTheme.successColor
     readonly property color dangerColor: activeTheme.dangerColor
+    readonly property bool lightMode: dynamicActive && dynamic.lightMode
+
+    function toggleColorMode(): void {
+        if (dynamicActive)
+            dynamic.toggleMode();
+    }
 }
