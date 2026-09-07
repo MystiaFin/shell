@@ -9,6 +9,8 @@ Singleton {
     readonly property string bluetooth: "󰂯"
     readonly property string wallpaper: "󰸉"
     readonly property string brightness: "󰃠"
+    readonly property string lightMode: "󰖙"
+    readonly property string darkMode: "󰖔"
     readonly property string close: "󰅖"
     readonly property string confirm: "󰄬"
     readonly property string lock: "󰌾"
