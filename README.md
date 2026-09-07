@@ -83,6 +83,8 @@ At startup and after relevant theme colors change, the shell generates:
   managed Quickshell block that Vencord reloads live
 - `${XDG_CACHE_HOME:-$HOME/.cache}/quickshell-theme/spotify.css`, served only
   on `127.0.0.1:17384` for the Spicetify theme extension
+- `${XDG_CONFIG_HOME:-$HOME/.config}/btop/themes/quickshell.theme`
+- `${XDG_CONFIG_HOME:-$HOME/.config}/cava/themes/quickshell`
 
 The terminal files are overwritten atomically. The shell then asks kitty at
 `unix:@quickshell-kitty` to reload the generated kitty palette. It does not

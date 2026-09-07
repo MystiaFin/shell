@@ -131,6 +131,32 @@ PanelWindow {
         }
     }
 
+    ClippingRectangle {
+        anchors {
+            top: parent.top
+            topMargin: ShellMetrics.statusBarHeight
+            right: parent.right
+            bottom: parent.bottom
+            left: parent.left
+        }
+        radius: 18
+        color: "transparent"
+
+        Rectangle {
+            anchors {
+                top: parent.top
+                right: parent.right
+                left: parent.left
+            }
+            height: 8
+            gradient: Gradient {
+                GradientStop { position: 0; color: "#30000000" }
+                GradientStop { position: 0.45; color: "#14000000" }
+                GradientStop { position: 1; color: "transparent" }
+            }
+        }
+    }
+
     Timer {
         id: revealDelay
 

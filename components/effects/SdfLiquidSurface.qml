@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import "../theme"
 
 Item {
@@ -7,6 +8,11 @@ Item {
     property color color: Theme.liquidColor
     property real edgeOffset: 2
     property real connectionRadius: 36
+    property bool shadowEnabled: true
+    property color shadowColor: "#80000000"
+    property real shadowBlur: 0.6
+    property real shadowHorizontalOffset: 0
+    property real shadowVerticalOffset: 4
     // The shader uniform layout has exactly eight shape/radius slots.
     readonly property int maximumShapeCount: 8
     property int shapeCount: 0
@@ -36,6 +42,15 @@ Item {
 
     ShaderEffect {
         anchors.fill: parent
+
+        layer.enabled: root.shadowEnabled
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: root.shadowColor
+            shadowBlur: root.shadowBlur
+            shadowHorizontalOffset: root.shadowHorizontalOffset
+            shadowVerticalOffset: root.shadowVerticalOffset
+        }
 
         property vector2d surfaceSize: Qt.vector2d(root.width, root.height)
         property real edgeOffset: root.edgeOffset
