@@ -73,17 +73,30 @@ At startup and after relevant theme colors change, the shell generates:
 
 - `${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/terminal-colors-kitty.conf`
 - `${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/terminal-colors-foot.ini`
-- `${XDG_DATA_HOME:-$HOME/.local/share}/themes/QuickshellDynamicOne/` with
+- `${XDG_DATA_HOME:-$HOME/.local/share}/themes/QuickshellDynamicLight/` with
   `index.theme`, `gtk-3.0/gtk.css`, and `gtk-4.0/gtk.css`
-- `${XDG_DATA_HOME:-$HOME/.local/share}/themes/QuickshellDynamicTwo/` with the
+- `${XDG_DATA_HOME:-$HOME/.local/share}/themes/QuickshellDynamicDark/` with the
   same GTK files
+- `${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0/gtk.css`, linked to the active
+  variant for libadwaita clients such as the GNOME portal file picker
+- `${XDG_CONFIG_HOME:-$HOME/.config}/vesktop/settings/quickCss.css`, with a
+  managed Quickshell block that Vencord reloads live
+- `${XDG_CACHE_HOME:-$HOME/.cache}/quickshell-theme/spotify.css`, served only
+  on `127.0.0.1:17384` for the Spicetify theme extension
 
 The terminal files are overwritten atomically. The shell then asks kitty at
 `unix:@quickshell-kitty` to reload the generated kitty palette. It does not
 invoke foot.
 
-The GTK directories are created with `mkdir -p`. Exports alternate between the
-two generated theme names, overwrite their files, and run `dconf write` on
-`/org/gnome/desktop/interface/gtk-theme` so GTK observes a theme-name change.
-This changes the user's current GTK theme setting. Generated files and the
-wallpaper selection are intentionally ignored by Git.
+The GTK directories are created with `mkdir -p`. Every export rewrites both
+wallpaper-derived variants. Quickshell selects light or dark mode from the
+wallpaper palette's average luminance, activates the corresponding GTK theme,
+and synchronizes the desktop color-scheme preference. The GNOME portal backend
+is restarted after the GTK4 user stylesheet changes because libadwaita does not
+load custom GTK theme names. Generated files and the wallpaper selection are
+intentionally ignored by Git.
+
+Vesktop keeps user-written Quick CSS outside the `quickshell-theme` marker
+block. Spotify's Nix-built files remain immutable; a Home Manager user service
+serves the generated CSS and the bundled Spicetify extension refreshes it while
+Spotify is running.

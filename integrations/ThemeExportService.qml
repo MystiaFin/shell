@@ -14,6 +14,7 @@ Singleton {
             return;
         active = true;
         GtkThemeService.prepareThemeDirectories();
+        ApplicationThemeService.prepareThemeDirectory();
         scheduleThemeExport();
     }
 
@@ -25,11 +26,12 @@ Singleton {
     function exportExternalTheme(): void {
         TerminalThemeService.exportTerminalTheme();
         GtkThemeService.exportGtkTheme();
+        ApplicationThemeService.exportApplicationThemes();
     }
 
     Timer {
         id: exportTimer
-        interval: 100
+        interval: 300
         onTriggered: root.exportExternalTheme()
     }
 
@@ -44,12 +46,19 @@ Singleton {
         function onSecondaryTextColorChanged(): void { root.scheduleThemeExport(); }
         function onMutedTextColorChanged(): void { root.scheduleThemeExport(); }
         function onAccentColorChanged(): void { root.scheduleThemeExport(); }
+        function onAccentTextColorChanged(): void { root.scheduleThemeExport(); }
+        function onLightModeChanged(): void { root.scheduleThemeExport(); }
         function onSuccessColorChanged(): void { root.scheduleThemeExport(); }
         function onDangerColorChanged(): void { root.scheduleThemeExport(); }
     }
 
     Connections {
         target: GtkThemeService
+        function onPreparationCompleted(): void { root.scheduleThemeExport(); }
+    }
+
+    Connections {
+        target: ApplicationThemeService
         function onPreparationCompleted(): void { root.scheduleThemeExport(); }
     }
 }
