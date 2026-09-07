@@ -12,6 +12,7 @@ PanelWindow {
     readonly property var targetScreen: modelData
 
     property url displayedSource: ""
+    property url pendingSource: ""
     property url incomingSource: ""
     property bool transitionQueued: false
     property real revealCenterX: 0
@@ -26,10 +27,8 @@ PanelWindow {
         if (nextSource.toString() === displayedSource.toString())
             return;
 
-        incomingSource = nextSource;
-        transitionQueued = true;
-        if (incomingImage.status === Image.Ready)
-            startReveal();
+        pendingSource = nextSource;
+        revealDelay.restart();
     }
 
     function startReveal(): void {
@@ -129,6 +128,20 @@ PanelWindow {
             property real edgeSoftness: 3
 
             fragmentShader: Qt.resolvedUrl("../../shaders/wallpaper-reveal.frag.qsb")
+        }
+    }
+
+    Timer {
+        id: revealDelay
+
+        interval: 200
+        repeat: false
+        onTriggered: {
+            root.incomingSource = root.pendingSource;
+            root.revealRadius = 0;
+            root.transitionQueued = true;
+            if (incomingImage.status === Image.Ready)
+                root.startReveal();
         }
     }
 

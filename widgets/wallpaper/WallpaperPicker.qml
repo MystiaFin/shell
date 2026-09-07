@@ -121,7 +121,10 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 42
             hasPendingSelection: root.hasPendingSelection
-            onApplyRequested: WallpaperService.setWallpaper(root.selectedSource)
+            onApplyRequested: {
+                WallpaperService.setWallpaper(root.selectedSource);
+                OverlayState.hideWallpaperPicker();
+            }
         }
     }
 }
