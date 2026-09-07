@@ -17,13 +17,13 @@ Singleton {
     readonly property string footPath: quickshellConfigDirectory
         + "/terminal-colors-foot.ini"
 
-    function colorToHex(colorValue, includePrefix): string {
+    function colorToHex(colorValue: color, includePrefix: bool): string {
         const channel = value => Math.round(value * 255).toString(16).padStart(2, "0");
         return (includePrefix ? "#" : "") + channel(colorValue.r)
             + channel(colorValue.g) + channel(colorValue.b);
     }
 
-    function mixColors(first, second, amount): color {
+    function mixColors(first: color, second: color, amount: real): color {
         return Qt.rgba(
             first.r + (second.r - first.r) * amount,
             first.g + (second.g - first.g) * amount,
@@ -32,13 +32,14 @@ Singleton {
         );
     }
 
-    function toneColor(colorValue, lightness, minimumSaturation): color {
+    function toneColor(colorValue: color, lightness: real,
+            minimumSaturation: real): color {
         const hue = colorValue.hslHue >= 0 ? colorValue.hslHue : 0;
         return Qt.hsla(hue, Math.max(minimumSaturation,
             Math.min(0.82, colorValue.hslSaturation)), lightness, 1);
     }
 
-    function harmonizeColor(semanticColor, amount): color {
+    function harmonizeColor(semanticColor: color, amount: real): color {
         return toneColor(mixColors(semanticColor, Theme.accentColor, amount),
             0.70, 0.48);
     }
