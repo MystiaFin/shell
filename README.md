@@ -2,6 +2,10 @@
 
 My personal Quickshell desktop shell for the Niri compositor.
 
+## Preview
+
+https://github.com/user-attachments/assets/d3447ed8-9405-47df-9776-420c4a8a13fe
+
 ## Dependencies
 
 Required for the intended desktop:
