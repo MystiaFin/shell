@@ -123,12 +123,16 @@ Singleton {
         const colors = terminalColors();
         kittyFile.setText(renderKittyConfig(colors));
         footFile.setText(renderFootConfig(colors));
-        kittyReload.command = ["kitty", "@", "--to", "unix:@quickshell-kitty",
-            "set-colors", "--all", "--configured", kittyPath];
-        kittyReload.running = true;
         footThemeSwitch.command = ["pkill", Theme.lightMode ? "-USR2" : "-USR1",
             "-x", "foot"];
         footThemeSwitch.running = true;
+    }
+
+    function reloadKittyTheme(): void {
+        kittyReload.command = ["sh", "-c",
+            "for pid in $(pgrep -f '^kitty( |$)'); do kitty @ --to unix:@quickshell-kitty-$pid set-colors --all --configured \"$1\"; done",
+            "sh", kittyPath];
+        kittyReload.running = true;
     }
 
     FileView {
@@ -136,6 +140,7 @@ Singleton {
         path: root.kittyPath
         atomicWrites: true
         printErrors: true
+        onSaved: root.reloadKittyTheme()
     }
 
     FileView {
