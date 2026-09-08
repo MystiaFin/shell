@@ -1,5 +1,5 @@
-import Quickshell.Io
 import QtQuick
+import "../../components/state"
 import "../../components/theme"
 import "../../services"
 
@@ -23,21 +23,22 @@ Item {
         spacing: 10
 
         Item {
-            width: 18
+            width: 30
             height: 32
 
             Text {
                 anchors.centerIn: parent
-                text: Icons.power
-                color: Theme.dangerColor
+                anchors.verticalCenterOffset: 1
+                text: Icons.nixos
+                color: Theme.accentColor
                 font.family: Typography.nerdIconFontFamily
-                font.pixelSize: 16
+                font.pixelSize: 28
             }
 
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
-                onClicked: logoutProcess.running = true
+                onClicked: OverlayState.togglePowerMenu()
             }
         }
 
@@ -61,10 +62,5 @@ Item {
             font.weight: Font.Medium
             verticalAlignment: Text.AlignVCenter
         }
-    }
-
-    Process {
-        id: logoutProcess
-        command: ["wlogout"]
     }
 }

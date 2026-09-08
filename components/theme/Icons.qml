@@ -4,6 +4,7 @@ import Quickshell
 
 Singleton {
     readonly property string power: "⏻"
+    readonly property string nixos: "󱄅"
     readonly property string notifications: "󰂚"
     readonly property string wifi: "󰖩"
     readonly property string bluetooth: "󰂯"
@@ -35,4 +36,7 @@ Singleton {
     readonly property string memory: "󰍛"
     readonly property string activeWorkspace: "󰫢"
     readonly property string inactiveWorkspace: ""
+    readonly property string restart: "󰜉"
+    readonly property string sleep: "󰒲"
+    readonly property string logout: "󰍃"
 }

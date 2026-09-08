@@ -25,7 +25,6 @@ Optional feature integrations:
 - `cava` for the media visualizer
 - `wpctl` with WirePlumber for output and microphone volume
 - `brightnessctl` for display brightness
-- `wlogout` for the power menu
 - kitty remote control for live terminal recoloring; kitty must listen on
   `unix:@quickshell-kitty` and permit remote control
 - `pkill` for switching running foot instances to the generated light or dark

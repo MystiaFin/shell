@@ -4,6 +4,7 @@ import "../../services"
 import "../../widgets/controlcenter"
 import "../../widgets/launcher"
 import "../../widgets/notifications"
+import "../../widgets/powermenu"
 import "../../widgets/utilitycenter"
 import "../state"
 import "../theme"
@@ -15,6 +16,25 @@ EdgeOverlayWindow {
     readonly property var targetScreen: modelData
 
     screen: targetScreen
+
+    EdgePanel {
+        id: powerMenuWidget
+
+        host: root
+        edge: EdgePanel.Left
+        edgeAlignment: EdgePanel.Start
+        alongEdgeOffset: -10
+        edgeOffset: ShellMetrics.panelScreenEdgeOverlap
+        shown: OverlayState.powerMenuVisible
+        closedWidthScale: 1
+        targetWidth: 250
+        targetHeight: 330
+        radius: ShellMetrics.panelRadius
+
+        PowerMenu {
+            anchors.fill: parent
+        }
+    }
 
     EdgePanel {
         id: utilityCenterWidget

@@ -10,6 +10,7 @@ Singleton {
     readonly property string utilityCenter: "utilityCenter"
     readonly property string launcher: "launcher"
     readonly property string wallpaperPicker: "wallpaperPicker"
+    readonly property string powerMenu: "powerMenu"
 
     property string activeOverlay: ""
     property string utilityPage: "notifications"
@@ -19,6 +20,7 @@ Singleton {
     readonly property bool utilityCenterVisible: activeOverlay === utilityCenter
     readonly property bool launcherVisible: activeOverlay === launcher
     readonly property bool wallpaperPickerVisible: activeOverlay === wallpaperPicker
+    readonly property bool powerMenuVisible: activeOverlay === powerMenu
 
     function toggle(overlay: string): void {
         activeOverlay = activeOverlay === overlay ? "" : overlay;
@@ -72,6 +74,14 @@ Singleton {
 
     function hideWallpaperPicker(): void {
         hide(wallpaperPicker);
+    }
+
+    function togglePowerMenu(): void {
+        toggle(powerMenu);
+    }
+
+    function hidePowerMenu(): void {
+        hide(powerMenu);
     }
 
     IpcHandler {
