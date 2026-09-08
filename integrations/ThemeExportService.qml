@@ -14,7 +14,9 @@ Singleton {
             return;
         active = true;
         GtkThemeService.prepareThemeDirectories();
-        ApplicationThemeService.prepareThemeDirectory();
+        SpotifyThemeService.prepareThemeDirectory();
+        BtopThemeService.prepareThemeDirectory();
+        CavaThemeService.prepareThemeDirectory();
         scheduleThemeExport();
     }
 
@@ -26,7 +28,10 @@ Singleton {
     function exportExternalTheme(): void {
         TerminalThemeService.exportTerminalTheme();
         GtkThemeService.exportGtkTheme();
-        ApplicationThemeService.exportApplicationThemes();
+        SpotifyThemeService.exportTheme();
+        VesktopThemeService.exportTheme();
+        BtopThemeService.exportTheme();
+        CavaThemeService.exportTheme();
     }
 
     Timer {
@@ -40,12 +45,14 @@ Singleton {
 
         function onShellBackgroundColorChanged(): void { root.scheduleThemeExport(); }
         function onPanelSurfaceColorChanged(): void { root.scheduleThemeExport(); }
+        function onHoverSurfaceColorChanged(): void { root.scheduleThemeExport(); }
         function onSurfaceBorderColorChanged(): void { root.scheduleThemeExport(); }
         function onSelectedSurfaceColorChanged(): void { root.scheduleThemeExport(); }
         function onPrimaryTextColorChanged(): void { root.scheduleThemeExport(); }
         function onSecondaryTextColorChanged(): void { root.scheduleThemeExport(); }
         function onMutedTextColorChanged(): void { root.scheduleThemeExport(); }
         function onAccentColorChanged(): void { root.scheduleThemeExport(); }
+        function onAccentHoverColorChanged(): void { root.scheduleThemeExport(); }
         function onAccentTextColorChanged(): void { root.scheduleThemeExport(); }
         function onLightModeChanged(): void { root.scheduleThemeExport(); }
         function onSuccessColorChanged(): void { root.scheduleThemeExport(); }
@@ -58,7 +65,17 @@ Singleton {
     }
 
     Connections {
-        target: ApplicationThemeService
+        target: SpotifyThemeService
+        function onPreparationCompleted(): void { root.scheduleThemeExport(); }
+    }
+
+    Connections {
+        target: BtopThemeService
+        function onPreparationCompleted(): void { root.scheduleThemeExport(); }
+    }
+
+    Connections {
+        target: CavaThemeService
         function onPreparationCompleted(): void { root.scheduleThemeExport(); }
     }
 }

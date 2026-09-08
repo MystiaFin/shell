@@ -1,0 +1,157 @@
+/* Discord token adapter. Colors are substituted by VesktopThemeService. */
+:root:root,
+.theme-light.theme-light,
+.theme-dark.theme-dark,
+.theme-darker.theme-darker,
+.theme-midnight.theme-midnight {
+  color-scheme: @COLOR_SCHEME@;
+
+  --background-primary: @BACKGROUND@;
+  --background-secondary: @SURFACE@;
+  --background-secondary-alt: @BACKGROUND@;
+  --background-tertiary: @BACKGROUND@;
+  --background-floating: @SURFACE@;
+  --background-base-lowest: @BACKGROUND@;
+  --background-base-lower: @BACKGROUND@;
+  --background-base-low: @SURFACE@;
+  --background-surface-high: @SELECTED@;
+  --background-surface-higher: @HOVER@;
+  --background-surface-highest: @BORDER@;
+  --bg-base-primary: @BACKGROUND@;
+  --bg-base-secondary: @SURFACE@;
+  --bg-base-tertiary: @SELECTED@;
+  --bg-mod-faint: @SURFACE@;
+  --bg-mod-subtle: @SELECTED@;
+  --bg-mod-strong: @BORDER@;
+  --bg-mod-muted: @SURFACE@;
+
+  --modal-background: @BACKGROUND@;
+  --modal-footer-background: @SURFACE@;
+  --channeltextarea-background: @SURFACE@;
+  --input-background: @SURFACE@;
+  --input-background-default: @SURFACE@;
+  --input-border-default: @BORDER@;
+  --chat-background-default: @SURFACE@;
+  --chat-text-muted: @MUTED@;
+  --card-primary-bg: @SURFACE@;
+  --card-secondary-bg: @SELECTED@;
+  --card-background-default: @SURFACE@;
+
+  --background-modifier-hover: @HOVER@;
+  --background-modifier-active: @BORDER@;
+  --background-modifier-selected: @SELECTED@;
+  --background-modifier-accent: @BORDER@;
+  --background-message-hover: @HOVER@;
+  --message-background-hover: @HOVER@;
+  --message-reacted-background: @SELECTED@;
+  --message-reacted-text: @ACCENT@;
+
+  --text-normal: @TEXT@;
+  --text-default: @TEXT@;
+  --text-primary: @TEXT@;
+  --text-strong: @TEXT@;
+  --text-brand: @ACCENT@;
+  --text-link: @ACCENT@;
+  --text-link-low-saturation: @ACCENT@;
+  --text-bright-accent: @ACCENT@;
+  --text-secondary: @SECONDARY@;
+  --text-muted: @MUTED@;
+  --text-subtle: @MUTED@;
+  --text-subdued: @SECONDARY@;
+  --text-feedback-critical: @DANGER@;
+  --header-primary: @TEXT@;
+  --header-secondary: @SECONDARY@;
+  --channels-default: @SECONDARY@;
+  --channel-icon: @MUTED@;
+  --channel-text-area-placeholder: @MUTED@;
+  --interactive-normal: @SECONDARY@;
+  --interactive-hover: @TEXT@;
+  --interactive-active: @TEXT@;
+  --interactive-muted: @MUTED@;
+
+  --border-subtle: @BORDER@;
+  --border-muted: @BORDER@;
+  --border-normal: @BORDER@;
+  --border-strong: @ACCENT@;
+  --border-focus: @ACCENT@;
+
+  --brand-500: @ACCENT@;
+  --brand-560: @ACCENT_HOVER@;
+  --brand-600: @ACCENT_HOVER@;
+  --brand-500-rgb: @ACCENT_RGB@;
+  --control-brand-foreground: @ACCENT@;
+  --control-brand-foreground-new: @ACCENT@;
+  --control-primary-background-default: @ACCENT@;
+  --control-primary-background-hover: @ACCENT_HOVER@;
+  --control-primary-border-default: @ACCENT@;
+  --control-primary-border-hover: @ACCENT_HOVER@;
+  --control-primary-text-default: @ON_ACCENT@;
+  --control-primary-text-hover: @ON_ACCENT@;
+  --control-secondary-background-default: @SURFACE@;
+  --control-secondary-background-hover: @HOVER@;
+  --control-secondary-border-default: @BORDER@;
+  --control-secondary-border-hover: @ACCENT@;
+  --control-secondary-text-default: @TEXT@;
+  --control-secondary-text-hover: @TEXT@;
+  --control-icon-only-background-hover: @HOVER@;
+  --control-icon-only-background-active: @BORDER@;
+  --control-icon-only-border-hover: @BORDER@;
+  --control-icon-only-border-active: @ACCENT@;
+  --control-icon-only-icon-default: @SECONDARY@;
+  --control-icon-only-icon-hover: @TEXT@;
+
+  --control-connected-background-default: @SUCCESS@;
+  --control-connected-background-hover: @SUCCESS@;
+  --control-critical-primary-background-default: @DANGER@;
+  --control-critical-primary-background-hover: @DANGER@;
+  --control-critical-primary-border-default: @DANGER@;
+  --control-critical-primary-border-hover: @DANGER@;
+  --control-critical-primary-text-default: @ON_ACCENT@;
+  --control-critical-primary-text-hover: @ON_ACCENT@;
+  --control-critical-secondary-background-default: @SURFACE@;
+  --control-critical-secondary-background-hover: @HOVER@;
+  --control-critical-secondary-border-default: @DANGER@;
+  --control-critical-secondary-border-hover: @DANGER@;
+  --control-critical-secondary-text-default: @DANGER@;
+  --control-critical-secondary-text-hover: @DANGER@;
+
+  --background-feedback-critical: @DANGER@;
+  --background-feedback-positive: @SUCCESS@;
+  --background-feedback-info: @ACCENT@;
+  --background-feedback-warning: @ACCENT_HOVER@;
+  --icon-feedback-critical: @DANGER@;
+  --icon-feedback-positive: @SUCCESS@;
+  --icon-feedback-info: @ACCENT@;
+  --icon-feedback-warning: @ACCENT_HOVER@;
+  --icon-muted: @MUTED@;
+  --status-positive: @SUCCESS@;
+  --status-danger: @DANGER@;
+
+  --profile-gradient-primary-color: @SURFACE@;
+  --profile-gradient-secondary-color: @SELECTED@;
+  --profile-gradient-overlay-color: @BACKGROUND@;
+  --profile-gradient-modal-background-color: @BACKGROUND@;
+  --profile-gradient-button-color: @HOVER@;
+  --profile-body-background-color: @SURFACE@;
+  --profile-body-divider-color: @BORDER@;
+  --profile-role-pill-background-color: @SELECTED@;
+  --user-profile-background-hover: @HOVER@;
+  --user-profile-border: @BORDER@;
+}
+
+/* Profile themes are inline variables, so normal inherited tokens cannot win. */
+[style*="--profile-gradient-primary-color"] {
+  --profile-gradient-primary-color: @SURFACE@ !important;
+  --profile-gradient-secondary-color: @SELECTED@ !important;
+  --profile-gradient-overlay-color: @BACKGROUND@ !important;
+  --profile-gradient-modal-background-color: @BACKGROUND@ !important;
+  --profile-gradient-button-color: @HOVER@ !important;
+  --profile-body-background-color: @SURFACE@ !important;
+  --profile-body-divider-color: @BORDER@ !important;
+  --profile-role-pill-background-color: @SELECTED@ !important;
+}
+
+[class*="channelTextArea"] [class*="scrollableContainer"],
+[class*="channelTextArea"] [class*="themedBackground"] {
+  background: @SURFACE@ !important;
+}
