@@ -24,6 +24,8 @@ Optional feature integrations:
 - `wlogout` for the power menu
 - kitty remote control for live terminal recoloring; kitty must listen on
   `unix:@quickshell-kitty` and permit remote control
+- `pkill` for switching running foot instances to the generated light or dark
+  palette
 - `dconf` for selecting the generated GTK theme
 
 Developer validation requires `git`, `bash`, `cmp`, and Qt's `qsb`. The check
@@ -87,8 +89,8 @@ At startup and after relevant theme colors change, the shell generates:
 - `${XDG_CONFIG_HOME:-$HOME/.config}/cava/themes/quickshell`
 
 The terminal files are overwritten atomically. The shell then asks kitty at
-`unix:@quickshell-kitty` to reload the generated kitty palette. It does not
-invoke foot.
+`unix:@quickshell-kitty` to reload the generated kitty palette and signals
+running foot instances to select the generated light or dark palette.
 
 The GTK directories are created with `mkdir -p`. Every export rewrites both
 wallpaper-derived variants. Quickshell selects light or dark mode from the
