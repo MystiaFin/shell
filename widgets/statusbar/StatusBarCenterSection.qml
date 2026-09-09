@@ -30,7 +30,7 @@ Item {
         Rectangle {
             width: controls.width + 16
             height: 26
-            radius: 13
+            radius: height / 2
             color: Theme.panelSurfaceColor
 
             HoverHandler {
@@ -83,7 +83,7 @@ Item {
         Rectangle {
             width: mediaRow.width + 20
             height: 26
-            radius: 13
+            radius: height / 2
             color: Theme.panelSurfaceColor
 
             Row {

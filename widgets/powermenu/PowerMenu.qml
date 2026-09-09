@@ -43,7 +43,7 @@ Item {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                radius: 12
+                radius: ShellMetrics.radiusMedium
                 color: "transparent"
                 clip: true
 

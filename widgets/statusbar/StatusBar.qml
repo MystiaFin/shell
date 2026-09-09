@@ -71,8 +71,8 @@ PanelWindow {
         anchors.fill: parent
         color: Theme.shellBackgroundColor
         opacity: root.backgroundOpacity
-        topLeftRadius: 18
-        topRightRadius: 18
+        topLeftRadius: ShellMetrics.radiusLarge
+        topRightRadius: ShellMetrics.radiusLarge
 
         Item {
             id: statusContent

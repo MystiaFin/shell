@@ -26,7 +26,7 @@ RowLayout {
     Rectangle {
         Layout.preferredWidth: 108
         Layout.preferredHeight: 42
-        radius: 13
+        radius: ShellMetrics.radiusMedium
         color: root.hasPendingSelection
             ? applyHover.hovered
                 ? Theme.accentHoverColor

@@ -30,7 +30,7 @@ RowLayout {
 
             Layout.preferredWidth: 44
             Layout.preferredHeight: 38
-            radius: 13
+            radius: ShellMetrics.radiusMedium
             color: active
                 ? Theme.accentColor
                 : tabHover.hovered
@@ -63,7 +63,7 @@ RowLayout {
     Rectangle {
         Layout.preferredWidth: 42
         Layout.preferredHeight: 38
-        radius: 13
+        radius: ShellMetrics.radiusMedium
         color: wallpaperHover.hovered
             ? Theme.accentColor
             : Theme.selectedSurfaceColor

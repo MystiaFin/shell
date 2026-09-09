@@ -24,7 +24,7 @@ Rectangle {
     signal forgetRequested(var device)
 
     height: 54
-    radius: 12
+    radius: ShellMetrics.radiusMedium
     color: device.connected ? Theme.selectedSurfaceColor : Theme.panelSurfaceColor
 
     RowLayout {
@@ -37,7 +37,7 @@ Rectangle {
         Rectangle {
             Layout.preferredWidth: 34
             Layout.preferredHeight: 34
-            radius: 10
+            radius: ShellMetrics.radiusSmall
             color: Theme.selectedSurfaceColor
 
             Image {

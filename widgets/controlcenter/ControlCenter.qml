@@ -24,7 +24,7 @@ Item {
         Rectangle {
             Layout.preferredWidth: 120
             Layout.fillHeight: true
-            radius: 20
+            radius: ShellMetrics.radiusExtraLarge
             color: Theme.panelSurfaceColor
 
             RowLayout {

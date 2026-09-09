@@ -21,7 +21,7 @@ PanelWindow {
     property real revealRadius: 0
     property real maximumRevealRadius: 0
     property real margin: 0
-    property real cornerRadius: 28
+    property real cornerRadius: ShellMetrics.desktopFrameRadius
     property int imageFillMode: Image.PreserveAspectCrop
     property bool startupIntroStarted: false
 
@@ -167,7 +167,7 @@ PanelWindow {
             bottom: parent.bottom
             left: parent.left
         }
-        radius: 18
+        radius: ShellMetrics.radiusLarge
         color: "transparent"
 
         Rectangle {

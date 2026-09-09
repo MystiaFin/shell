@@ -20,7 +20,7 @@ RowLayout {
     Rectangle {
         Layout.preferredWidth: 46
         Layout.preferredHeight: 46
-        radius: 15
+        radius: ShellMetrics.radiusLarge
         color: Theme.accentColor
 
         Text {
@@ -58,7 +58,7 @@ RowLayout {
     Rectangle {
         Layout.preferredWidth: 38
         Layout.preferredHeight: 38
-        radius: 12
+        radius: ShellMetrics.radiusMedium
         color: closeHover.hovered
             ? Theme.dangerColor
             : Theme.panelSurfaceColor

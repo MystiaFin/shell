@@ -6,7 +6,7 @@ import "../../services"
 Rectangle {
     id: root
 
-    radius: 16
+    radius: ShellMetrics.radiusLarge
     color: Theme.panelSurfaceColor
     clip: true
 
@@ -44,7 +44,7 @@ Rectangle {
 
                     Layout.preferredWidth: 28
                     Layout.preferredHeight: 28
-                    radius: 9
+                    radius: ShellMetrics.radiusSmall
                     color: navHover.hovered
                         ? Theme.surfaceBorderColor
                         : Theme.selectedSurfaceColor
@@ -106,7 +106,7 @@ Rectangle {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    radius: 8
+                    radius: ShellMetrics.radiusSmall
                     color: today
                         ? Theme.accentColor
                         : dayHover.hovered && currentMonth

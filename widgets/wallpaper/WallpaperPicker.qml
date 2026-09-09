@@ -54,7 +54,7 @@ Item {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            radius: 18
+            radius: ShellMetrics.radiusLarge
             color: Theme.panelSurfaceColor
             clip: true
 

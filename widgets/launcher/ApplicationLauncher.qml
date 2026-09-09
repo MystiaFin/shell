@@ -72,7 +72,7 @@ Item {
             rightMargin: 14
         }
         height: 46
-        radius: 14
+        radius: ShellMetrics.radiusMedium
         color: Theme.panelSurfaceColor
 
         TextInput {
@@ -158,7 +158,7 @@ Item {
 
         highlightMoveDuration: 100
         highlight: Rectangle {
-            radius: 14
+            radius: ShellMetrics.radiusMedium
             color: Theme.selectedSurfaceColor
         }
 

@@ -14,7 +14,7 @@ Item {
             fill: parent
             margins: 5
         }
-        radius: 14
+        radius: ShellMetrics.radiusMedium
         color: cardHover.hovered
             ? Theme.surfaceBorderColor
             : Theme.selectedSurfaceColor
@@ -69,7 +69,7 @@ Item {
             }
             width: 25
             height: 25
-            radius: 9
+            radius: ShellMetrics.radiusSmall
             color: Theme.accentColor
 
             Text {

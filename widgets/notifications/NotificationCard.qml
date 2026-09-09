@@ -19,7 +19,7 @@ Rectangle {
 
     implicitHeight: Math.max(popup ? 98 : 76,
         content.implicitHeight + (popup ? 30 : 24))
-    radius: popup ? 12 : 14
+    radius: popup ? ShellMetrics.radiusMedium : ShellMetrics.radiusLarge
     color: Theme.panelSurfaceColor
     clip: popup
     transform: Translate { x: root.slideOffset }
@@ -54,7 +54,7 @@ Rectangle {
             Layout.preferredWidth: root.popup ? 52 : 38
             Layout.preferredHeight: root.popup ? 52 : 38
             Layout.alignment: root.popup ? Qt.AlignVCenter : Qt.AlignTop
-            radius: root.popup ? 16 : 10
+            radius: root.popup ? ShellMetrics.radiusLarge : ShellMetrics.radiusSmall
             color: Theme.selectedSurfaceColor
 
             IconImage {
@@ -133,7 +133,7 @@ Rectangle {
         }
         width: root.popup ? 25 : 15
         height: root.popup ? 25 : 15
-        radius: root.popup ? 9 : 0
+        radius: root.popup ? ShellMetrics.radiusSmall : 0
         color: root.popup && closeHover.hovered
             ? Theme.surfaceBorderColor
             : Qt.rgba(0, 0, 0, 0)

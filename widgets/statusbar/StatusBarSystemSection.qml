@@ -22,7 +22,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             width: 26
             height: 26
-            radius: 13
+            radius: height / 2
             color: modeHover.hovered
                 ? Theme.accentColor : Theme.selectedSurfaceColor
             border.width: 1
@@ -49,7 +49,7 @@ Item {
         Rectangle {
             width: trayIcons.width + 20
             height: 26
-            radius: 13
+            radius: height / 2
             color: Theme.accentColor
 
             HoverHandler {

@@ -36,7 +36,7 @@ Rectangle {
     signal passwordEditorClosed()
 
     height: passwordEditorExpanded && !network.connected ? 104 : 50
-    radius: 12
+    radius: ShellMetrics.radiusMedium
     color: network.connected ? Theme.selectedSurfaceColor : Theme.panelSurfaceColor
     clip: true
 
@@ -105,7 +105,7 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 34
-                radius: 9
+                radius: ShellMetrics.radiusSmall
                 color: Theme.selectedSurfaceColor
                 border.width: 1
                 border.color: passwordInput.activeFocus
@@ -156,7 +156,7 @@ Rectangle {
             Rectangle {
                 Layout.preferredWidth: 34
                 Layout.preferredHeight: 34
-                radius: 9
+                radius: ShellMetrics.radiusSmall
                 color: cancelHover.hovered
                     ? Theme.surfaceBorderColor
                     : Theme.selectedSurfaceColor
@@ -179,7 +179,7 @@ Rectangle {
             Rectangle {
                 Layout.preferredWidth: 34
                 Layout.preferredHeight: 34
-                radius: 9
+                radius: ShellMetrics.radiusSmall
                 color: connectHover.hovered
                     ? Theme.successColor
                     : Theme.selectedSurfaceColor

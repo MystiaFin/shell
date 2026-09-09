@@ -17,7 +17,7 @@ Rectangle {
 
     Layout.fillWidth: true
     Layout.preferredHeight: 58
-    radius: 14
+    radius: ShellMetrics.radiusLarge
     color: Theme.panelSurfaceColor
 
     RowLayout {
@@ -30,7 +30,7 @@ Rectangle {
         Rectangle {
             Layout.preferredWidth: 36
             Layout.preferredHeight: 36
-            radius: 12
+            radius: ShellMetrics.radiusMedium
             color: root.active ? Theme.accentColor : Theme.surfaceBorderColor
 
             Text {

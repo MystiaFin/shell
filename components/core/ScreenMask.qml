@@ -10,7 +10,7 @@ PanelWindow {
     required property var modelData
     readonly property var targetScreen: modelData
 
-    property real cornerRadius: 18
+    property real cornerRadius: ShellMetrics.radiusLarge
     property real topInset: 40
 
     screen: targetScreen

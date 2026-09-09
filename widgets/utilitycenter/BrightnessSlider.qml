@@ -9,7 +9,7 @@ Rectangle {
     property real displayValue: BrightnessService.brightness
 
     implicitHeight: 46
-    radius: 15
+    radius: ShellMetrics.radiusLarge
     color: Theme.panelSurfaceColor
 
     function setBrightnessFromX(pointerX: real): void {

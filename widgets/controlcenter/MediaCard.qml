@@ -13,7 +13,7 @@ Rectangle {
         return minutes + ":" + (remainder < 10 ? "0" : "") + remainder;
     }
 
-    radius: 22
+    radius: ShellMetrics.radiusExtraLarge
     color: Theme.panelSurfaceColor
 
     ColumnLayout {
@@ -31,7 +31,7 @@ Rectangle {
             ClippingRectangle {
                 Layout.preferredWidth: 112
                 Layout.preferredHeight: 112
-                radius: 14
+                radius: ShellMetrics.radiusLarge
                 color: Theme.surfaceBorderColor
 
                 Image {
