@@ -65,7 +65,7 @@ EdgeOverlayWindow {
         edgeOffset: ShellMetrics.panelScreenEdgeOverlap
         shown: OverlayState.controlCenterVisible
         targetWidth: Math.max(1, Math.min(780, root.width - 64))
-        targetHeight: 410
+        targetHeight: 360
         radius: ShellMetrics.panelRadius
 
         ControlCenter {

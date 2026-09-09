@@ -16,6 +16,11 @@ Rectangle {
         : buttonHover.hovered
             ? Theme.surfaceBorderColor
             : "transparent"
+    opacity: enabled ? 1 : 0.35
+
+    Behavior on opacity {
+        NumberAnimation { duration: ShellMetrics.fastAnimationMs }
+    }
 
     Text {
         anchors.centerIn: parent

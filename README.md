@@ -21,7 +21,6 @@ Required for the intended desktop:
 
 Optional feature integrations:
 
-- `playerctl` for MPRIS metadata and media controls
 - `cava` for the media visualizer
 - `wpctl` with WirePlumber for output and microphone volume
 - `brightnessctl` for display brightness
