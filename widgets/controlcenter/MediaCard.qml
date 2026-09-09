@@ -10,6 +10,8 @@ Rectangle {
     readonly property real artworkSize: Math.min(220,
         Math.max(112, width * 0.36))
     readonly property bool multiplePlayers: MediaService.playerCount > 1
+    property real switchOffset: 0
+    property real switchOpacity: 1
 
     function switchPlayer(direction: int): void {
         if (!multiplePlayers || playerSwitch.running)
@@ -39,8 +41,6 @@ Rectangle {
         clip: true
 
         RowLayout {
-            id: mediaContent
-
             width: contentViewport.width
             height: contentViewport.height
             spacing: 16
@@ -51,6 +51,8 @@ Rectangle {
             Layout.alignment: Qt.AlignVCenter
             radius: ShellMetrics.radiusLarge
             color: Theme.surfaceBorderColor
+            opacity: mediaCard.switchOpacity
+            transform: Translate { x: mediaCard.switchOffset }
 
             Image {
                 anchors.fill: parent
@@ -81,6 +83,8 @@ Rectangle {
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 3
+                opacity: mediaCard.switchOpacity
+                transform: Translate { x: mediaCard.switchOffset }
 
                 Text {
                     Layout.fillWidth: true
@@ -164,6 +168,8 @@ Rectangle {
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 8
+                opacity: mediaCard.switchOpacity
+                transform: Translate { x: mediaCard.switchOffset }
 
                 Text {
                     text: mediaCard.formatTime(MediaService.positionSeconds)
@@ -205,6 +211,8 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 44
                 spacing: 10
+                opacity: mediaCard.switchOpacity
+                transform: Translate { x: mediaCard.switchOffset }
 
                 Item { Layout.fillWidth: true }
 
@@ -296,15 +304,15 @@ Rectangle {
 
         ParallelAnimation {
             NumberAnimation {
-                target: mediaContent
-                property: "x"
+                target: mediaCard
+                property: "switchOffset"
                 to: -playerSwitch.direction * 28
                 duration: 110
                 easing.type: Easing.InCubic
             }
             NumberAnimation {
-                target: mediaContent
-                property: "opacity"
+                target: mediaCard
+                property: "switchOpacity"
                 to: 0
                 duration: 110
                 easing.type: Easing.InCubic
@@ -314,21 +322,21 @@ Rectangle {
             script: MediaService.selectRelative(playerSwitch.direction)
         }
         PropertyAction {
-            target: mediaContent
-            property: "x"
+            target: mediaCard
+            property: "switchOffset"
             value: playerSwitch.direction * 28
         }
         ParallelAnimation {
             NumberAnimation {
-                target: mediaContent
-                property: "x"
+                target: mediaCard
+                property: "switchOffset"
                 to: 0
                 duration: 170
                 easing.type: Easing.OutCubic
             }
             NumberAnimation {
-                target: mediaContent
-                property: "opacity"
+                target: mediaCard
+                property: "switchOpacity"
                 to: 1
                 duration: 170
                 easing.type: Easing.OutCubic
