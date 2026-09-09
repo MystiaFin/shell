@@ -46,16 +46,18 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             model: NotificationService.notificationModel
-            spacing: 20
+            spacing: 10
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
             add: Transition {
-                NumberAnimation { properties: "opacity,y"; duration: 220; easing.type: Easing.OutCubic }
-            }
-
-            displaced: Transition {
-                NumberAnimation { properties: "y"; duration: 220; easing.type: Easing.OutCubic }
+                NumberAnimation {
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                    duration: 180
+                    easing.type: Easing.OutCubic
+                }
             }
 
             delegate: Item {

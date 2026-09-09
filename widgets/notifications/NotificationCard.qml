@@ -17,8 +17,9 @@ Rectangle {
 
     signal closeRequested(int notificationId)
 
-    implicitHeight: Math.max(popup ? 98 : 76,
-        content.implicitHeight + (popup ? 30 : 24))
+    implicitHeight: popup
+        ? Math.max(98, content.implicitHeight + 30)
+        : content.implicitHeight + 20
     radius: popup ? ShellMetrics.radiusMedium : ShellMetrics.radiusLarge
     color: Theme.panelSurfaceColor
     clip: popup
@@ -43,9 +44,9 @@ Rectangle {
 
         anchors {
             fill: parent
-            topMargin: root.popup ? 14 : 12
+            topMargin: root.popup ? 14 : 10
             rightMargin: root.popup ? 42 : 36
-            bottomMargin: root.popup ? 14 : 12
+            bottomMargin: root.popup ? 14 : 10
             leftMargin: root.popup ? 14 : 12
         }
         spacing: root.popup ? 13 : 10
@@ -89,6 +90,7 @@ Rectangle {
                 font.weight: Font.DemiBold
                 font.letterSpacing: 0.4
                 elide: Text.ElideRight
+                maximumLineCount: 1
             }
 
             Text {
@@ -99,11 +101,12 @@ Rectangle {
                 font.pixelSize: root.popup ? 14 : 13
                 font.weight: Font.DemiBold
                 elide: Text.ElideRight
+                maximumLineCount: 1
             }
 
             Text {
                 Layout.fillWidth: true
-                visible: root.body !== ""
+                visible: root.body.trim().length > 0
                 text: root.body
                 textFormat: Text.PlainText
                 color: Theme.mutedTextColor
@@ -115,11 +118,14 @@ Rectangle {
             }
 
             Text {
+                Layout.fillWidth: true
                 visible: !root.popup
                 text: root.appName + "  •  " + Qt.formatTime(root.receivedAt, "hh:mm")
                 color: Theme.secondaryTextColor
                 font.family: Typography.bodyFontFamily
                 font.pixelSize: 9
+                elide: Text.ElideRight
+                maximumLineCount: 1
             }
         }
     }
