@@ -50,16 +50,6 @@ Item {
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
-            add: Transition {
-                NumberAnimation {
-                    property: "opacity"
-                    from: 0
-                    to: 1
-                    duration: 180
-                    easing.type: Easing.OutCubic
-                }
-            }
-
             delegate: Item {
                 id: delegateRoot
 
