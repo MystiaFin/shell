@@ -7,9 +7,9 @@ Item {
     id: root
 
     required property var application
-    required property bool selected
 
-    signal hoverRequested()
+    signal hoverEntered()
+    signal hoverExited()
     signal launchRequested()
 
     function launch(): void {
@@ -42,16 +42,24 @@ Item {
         color: Theme.primaryTextColor
         font.family: Typography.bodyFontFamily
         font.pixelSize: 15
-        font.weight: root.selected ? Font.DemiBold : Font.Normal
+        font.weight: Font.Normal
         elide: Text.ElideRight
         maximumLineCount: 1
     }
 
-    MouseArea {
-        anchors.fill: parent
-        hoverEnabled: true
+    HoverHandler {
+        id: resultHover
+
         cursorShape: Qt.PointingHandCursor
-        onEntered: root.hoverRequested()
-        onClicked: root.launchRequested()
+        onHoveredChanged: {
+            if (hovered)
+                root.hoverEntered();
+            else
+                root.hoverExited();
+        }
+    }
+
+    TapHandler {
+        onTapped: root.launchRequested()
     }
 }

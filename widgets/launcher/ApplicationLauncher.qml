@@ -91,22 +91,12 @@ Item {
             clip: true
 
             Keys.onDownPressed: {
-                if (applicationList.count > 0) {
+                if (applicationList.count > 0)
                     applicationList.incrementCurrentIndex();
-                    applicationList.positionViewAtIndex(
-                        applicationList.currentIndex,
-                        ListView.Contain
-                    );
-                }
             }
             Keys.onUpPressed: {
-                if (applicationList.count > 0) {
+                if (applicationList.count > 0)
                     applicationList.decrementCurrentIndex();
-                    applicationList.positionViewAtIndex(
-                        applicationList.currentIndex,
-                        ListView.Contain
-                    );
-                }
             }
             Keys.onReturnPressed: root.launchCurrentApplication()
             Keys.onEnterPressed: root.launchCurrentApplication()
@@ -114,6 +104,7 @@ Item {
 
             onTextChanged: {
                 root.previousResultCount = applicationList.count;
+                applicationList.hoveredIndex = -1;
                 Qt.callLater(() => {
                     applicationList.currentIndex = applicationList.count > 0 ? 0 : -1;
                     if (applicationList.currentIndex >= 0)
@@ -155,11 +146,54 @@ Item {
         reuseItems: true
         currentIndex: count > 0 ? 0 : -1
         keyNavigationWraps: true
+        property int hoveredIndex: -1
+        property real hoverHighlightY: 0
 
-        highlightMoveDuration: 100
+        highlightFollowsCurrentItem: false
         highlight: Rectangle {
+            width: applicationList.width
+            height: root.resultRowHeight
+            y: applicationList.currentItem
+                ? applicationList.currentItem.y
+                : 0
             radius: ShellMetrics.radiusMedium
             color: Theme.selectedSurfaceColor
+            opacity: applicationList.currentItem ? 1 : 0
+
+            Behavior on y {
+                NumberAnimation {
+                    duration: ShellMetrics.fastAnimationMs
+                    easing.type: Easing.InOutCubic
+                }
+            }
+        }
+
+        Rectangle {
+            parent: applicationList.contentItem
+            z: 0.5
+            width: applicationList.width
+            height: root.resultRowHeight
+            y: applicationList.hoverHighlightY
+            radius: ShellMetrics.radiusMedium
+            color: Theme.hoverSurfaceColor
+            opacity: applicationList.hoveredIndex >= 0
+                && applicationList.hoveredIndex !== applicationList.currentIndex
+                ? 1
+                : 0
+
+            Behavior on y {
+                NumberAnimation {
+                    duration: ShellMetrics.fastAnimationMs
+                    easing.type: Easing.InOutCubic
+                }
+            }
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: ShellMetrics.fastAnimationMs
+                    easing.type: Easing.InOutCubic
+                }
+            }
         }
 
         delegate: ApplicationResultDelegate {
@@ -171,8 +205,17 @@ Item {
             width: applicationList.width
             height: root.resultRowHeight
             application: applicationEntry
-            selected: ListView.isCurrentItem
-            onHoverRequested: applicationList.currentIndex = index
+            onHoverEntered: {
+                applicationList.hoverHighlightY = index * root.resultRowHeight;
+                applicationList.hoveredIndex = index;
+            }
+            onHoverExited: {
+                const exitedIndex = index;
+                Qt.callLater(() => {
+                    if (applicationList.hoveredIndex === exitedIndex)
+                        applicationList.hoveredIndex = -1;
+                });
+            }
             onLaunchRequested: {
                 applicationEntry.execute();
                 root.closeRequested();
@@ -192,6 +235,7 @@ Item {
     onShownChanged: {
         if (shown) {
             searchInput.clear();
+            applicationList.hoveredIndex = -1;
             applicationList.currentIndex = applicationList.count > 0 ? 0 : -1;
         }
     }
