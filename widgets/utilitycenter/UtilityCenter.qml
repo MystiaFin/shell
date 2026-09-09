@@ -32,9 +32,119 @@ Item {
             onWallpaperRequested: OverlayState.showWallpaperPicker()
         }
 
-        BrightnessSlider {
+        RowLayout {
             Layout.fillWidth: true
+            Layout.minimumHeight: 46
             Layout.preferredHeight: 46
+            Layout.maximumHeight: 46
+            spacing: 10
+
+            Rectangle {
+                Layout.preferredWidth: 42
+                Layout.preferredHeight: 38
+                Layout.alignment: Qt.AlignVCenter
+                radius: ShellMetrics.radiusMedium
+                color: modeHover.hovered
+                    ? Theme.accentColor : Theme.selectedSurfaceColor
+                border.width: 1
+                border.color: Theme.accentColor
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: 300
+                        easing.type: Easing.InOutCubic
+                    }
+                }
+
+                Item {
+                    anchors.centerIn: parent
+                    width: 22
+                    height: 22
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: Icons.darkMode
+                        color: modeHover.hovered
+                            ? Theme.accentTextColor : Theme.accentColor
+                        font.family: Typography.nerdIconFontFamily
+                        font.pixelSize: 19
+                        opacity: Theme.lightMode ? 1 : 0
+                        scale: Theme.lightMode ? 1 : 0.35
+                        rotation: Theme.lightMode ? 0 : -90
+
+                        Behavior on color {
+                            ColorAnimation { duration: 300 }
+                        }
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: 300
+                                easing.type: Easing.InOutCubic
+                            }
+                        }
+                        Behavior on scale {
+                            NumberAnimation {
+                                duration: 300
+                                easing.type: Easing.InOutCubic
+                            }
+                        }
+                        Behavior on rotation {
+                            NumberAnimation {
+                                duration: 300
+                                easing.type: Easing.InOutCubic
+                            }
+                        }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        anchors.horizontalCenterOffset: 0.5
+                        text: Icons.lightMode
+                        color: modeHover.hovered
+                            ? Theme.accentTextColor : Theme.accentColor
+                        font.family: Typography.nerdIconFontFamily
+                        font.pixelSize: 19
+                        opacity: Theme.lightMode ? 0 : 1
+                        scale: Theme.lightMode ? 0.35 : 1
+                        rotation: Theme.lightMode ? 90 : 0
+
+                        Behavior on color {
+                            ColorAnimation { duration: 300 }
+                        }
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: 300
+                                easing.type: Easing.InOutCubic
+                            }
+                        }
+                        Behavior on scale {
+                            NumberAnimation {
+                                duration: 300
+                                easing.type: Easing.OutBack
+                            }
+                        }
+                        Behavior on rotation {
+                            NumberAnimation {
+                                duration: 300
+                                easing.type: Easing.InOutCubic
+                            }
+                        }
+                    }
+                }
+
+                HoverHandler {
+                    id: modeHover
+                    cursorShape: Qt.PointingHandCursor
+                }
+
+                TapHandler { onTapped: Theme.toggleColorMode() }
+            }
+
+            BrightnessSlider {
+                Layout.fillWidth: true
+                Layout.minimumHeight: 46
+                Layout.preferredHeight: 46
+                Layout.maximumHeight: 46
+            }
         }
 
         Item {

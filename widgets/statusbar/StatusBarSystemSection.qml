@@ -19,34 +19,6 @@ Item {
         MemoryIndicator { anchors.verticalCenter: parent.verticalCenter }
 
         Rectangle {
-            anchors.verticalCenter: parent.verticalCenter
-            width: 26
-            height: 26
-            radius: height / 2
-            color: modeHover.hovered
-                ? Theme.accentColor : Theme.selectedSurfaceColor
-            border.width: 1
-            border.color: Theme.accentColor
-
-            Text {
-                anchors.centerIn: parent
-                anchors.horizontalCenterOffset: Theme.lightMode ? 0 : 0.5
-                text: Theme.lightMode ? Icons.darkMode : Icons.lightMode
-                color: modeHover.hovered
-                    ? Theme.accentTextColor : Theme.accentColor
-                font.family: Typography.nerdIconFontFamily
-                font.pixelSize: 15
-            }
-
-            HoverHandler {
-                id: modeHover
-                cursorShape: Qt.PointingHandCursor
-            }
-
-            TapHandler { onTapped: Theme.toggleColorMode() }
-        }
-
-        Rectangle {
             width: trayIcons.width + 20
             height: 26
             radius: height / 2

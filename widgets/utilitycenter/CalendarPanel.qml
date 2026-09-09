@@ -10,59 +10,73 @@ Rectangle {
     color: Theme.panelSurfaceColor
     clip: true
 
-    ColumnLayout {
-        anchors {
-            fill: parent
-            margins: 12
+    function snapshotCurrentMonth(): void {
+        outgoingDays.clear();
+        for (let index = 0; index < CalendarService.daysModel.count; index++) {
+            const day = CalendarService.daysModel.get(index);
+            outgoingDays.append({
+                dayNumber: day.dayNumber,
+                currentMonth: day.currentMonth,
+                today: day.today
+            });
         }
+    }
+
+    function navigate(direction: int, action: var): void {
+        if (monthSlide.running || pageViewport.width <= 0)
+            return;
+
+        snapshotCurrentMonth();
+        outgoingPage.monthTitle = CalendarService.monthYear;
+        outgoingPage.x = 0;
+        outgoingPage.visible = true;
+        livePage.x = direction * pageViewport.width;
+        action();
+        monthSlide.direction = direction;
+        monthSlide.start();
+    }
+
+    function resetMonth(): void {
+        const displayed = CalendarService.displayedMonth;
+        const today = CalendarService.today;
+        const displayedIndex = displayed.getFullYear() * 12 + displayed.getMonth();
+        const todayIndex = today.getFullYear() * 12 + today.getMonth();
+
+        if (displayedIndex === todayIndex)
+            return;
+        navigate(todayIndex > displayedIndex ? 1 : -1,
+            () => CalendarService.reset());
+    }
+
+    component MonthPage: ColumnLayout {
+        id: page
+
+        required property string monthTitle
+        required property var daysModel
+        property bool interactive: false
+
+        signal resetRequested()
+
         spacing: 7
 
-        RowLayout {
+        Text {
             Layout.fillWidth: true
             Layout.preferredHeight: 28
+            Layout.rightMargin: 68
+            text: page.monthTitle
+            color: Theme.primaryTextColor
+            font.family: Typography.bodyFontFamily
+            font.pixelSize: 15
+            font.weight: Font.DemiBold
+            verticalAlignment: Text.AlignVCenter
 
-            Text {
-                Layout.fillWidth: true
-                text: CalendarService.monthYear
-                color: Theme.primaryTextColor
-                font.family: Typography.bodyFontFamily
-                font.pixelSize: 15
-                font.weight: Font.DemiBold
-
-                HoverHandler { cursorShape: Qt.PointingHandCursor }
-                TapHandler { onTapped: CalendarService.reset() }
+            HoverHandler {
+                enabled: page.interactive
+                cursorShape: Qt.PointingHandCursor
             }
-
-            Repeater {
-                model: [
-                    { icon: Icons.previousMonth, action: () => CalendarService.previousMonth() },
-                    { icon: Icons.nextMonth, action: () => CalendarService.nextMonth() }
-                ]
-
-                Rectangle {
-                    required property var modelData
-
-                    Layout.preferredWidth: 28
-                    Layout.preferredHeight: 28
-                    radius: ShellMetrics.radiusSmall
-                    color: navHover.hovered
-                        ? Theme.surfaceBorderColor
-                        : Theme.selectedSurfaceColor
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: modelData.icon
-                        color: Theme.primaryTextColor
-                        font.family: Typography.nerdIconFontFamily
-                        font.pixelSize: 14
-                    }
-
-                    HoverHandler {
-                        id: navHover
-                        cursorShape: Qt.PointingHandCursor
-                    }
-                    TapHandler { onTapped: modelData.action() }
-                }
+            TapHandler {
+                enabled: page.interactive
+                onTapped: page.resetRequested()
             }
         }
 
@@ -97,7 +111,7 @@ Rectangle {
             rowSpacing: 2
 
             Repeater {
-                model: CalendarService.daysModel
+                model: page.daysModel
 
                 Rectangle {
                     required property int dayNumber
@@ -125,9 +139,125 @@ Rectangle {
                         font.weight: today ? Font.DemiBold : Font.Light
                     }
 
-                    HoverHandler { id: dayHover }
+                    HoverHandler {
+                        id: dayHover
+                        enabled: page.interactive
+                    }
                 }
             }
+        }
+    }
+
+    Item {
+        id: pageViewport
+
+        anchors {
+            fill: parent
+            margins: 12
+        }
+        clip: true
+
+        MonthPage {
+            id: outgoingPage
+
+            width: pageViewport.width
+            height: pageViewport.height
+            visible: false
+            monthTitle: ""
+            daysModel: outgoingDays
+        }
+
+        MonthPage {
+            id: livePage
+
+            width: pageViewport.width
+            height: pageViewport.height
+            monthTitle: CalendarService.monthYear
+            daysModel: CalendarService.daysModel
+            interactive: !monthSlide.running
+            onResetRequested: root.resetMonth()
+        }
+    }
+
+    Row {
+        anchors {
+            top: parent.top
+            right: parent.right
+            topMargin: 12
+            rightMargin: 12
+        }
+        spacing: 6
+
+        Repeater {
+            model: [
+                {
+                    icon: Icons.previousMonth,
+                    direction: -1,
+                    action: () => CalendarService.previousMonth()
+                },
+                {
+                    icon: Icons.nextMonth,
+                    direction: 1,
+                    action: () => CalendarService.nextMonth()
+                }
+            ]
+
+            Rectangle {
+                required property var modelData
+
+                width: 28
+                height: 28
+                radius: ShellMetrics.radiusSmall
+                color: navHover.hovered
+                    ? Theme.surfaceBorderColor
+                    : Theme.selectedSurfaceColor
+
+                Text {
+                    anchors.centerIn: parent
+                    text: modelData.icon
+                    color: Theme.primaryTextColor
+                    font.family: Typography.nerdIconFontFamily
+                    font.pixelSize: 14
+                }
+
+                HoverHandler {
+                    id: navHover
+                    enabled: !monthSlide.running
+                    cursorShape: Qt.PointingHandCursor
+                }
+                TapHandler {
+                    enabled: !monthSlide.running
+                    onTapped: root.navigate(modelData.direction, modelData.action)
+                }
+            }
+        }
+    }
+
+    ListModel { id: outgoingDays }
+
+    ParallelAnimation {
+        id: monthSlide
+
+        property int direction: 1
+
+        NumberAnimation {
+            target: outgoingPage
+            property: "x"
+            to: -monthSlide.direction * pageViewport.width
+            duration: ShellMetrics.pageTransitionDurationMs
+            easing.type: Easing.OutCubic
+        }
+        NumberAnimation {
+            target: livePage
+            property: "x"
+            to: 0
+            duration: ShellMetrics.pageTransitionDurationMs
+            easing.type: Easing.OutCubic
+        }
+
+        onFinished: {
+            outgoingPage.visible = false;
+            outgoingDays.clear();
         }
     }
 }
