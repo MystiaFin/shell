@@ -1,6 +1,6 @@
-# Quickshell Configuration
+# JAQC-shell. 
 
-My personal Quickshell desktop shell for the Niri compositor.
+Just Another Quickshell Config
 
 ## Preview
 
