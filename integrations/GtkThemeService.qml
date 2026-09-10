@@ -14,6 +14,9 @@ Singleton {
     readonly property string dataHome: Quickshell.env("XDG_DATA_HOME")
         || homeDirectory + "/.local/share"
     readonly property string themeRoot: dataHome + "/themes"
+    readonly property string iconRoot: dataHome + "/icons"
+    readonly property string iconSourceRoot: Qt.resolvedUrl("../icons")
+        .toString().replace(/^file:\/\//, "")
     readonly property string lightThemeName: "QuickshellDynamicLight"
     readonly property string darkThemeName: "QuickshellDynamicDark"
     readonly property string lightIconThemeName: "QuickshellSidebarLight"
@@ -231,7 +234,22 @@ Singleton {
             root.lightThemePath + "/gtk-4.0",
             root.darkThemePath + "/gtk-3.0",
             root.darkThemePath + "/gtk-4.0",
-            root.configHome + "/gtk-4.0"]
+            root.configHome + "/gtk-4.0",
+            root.iconRoot]
+        onExited: exitCode => {
+            if (exitCode !== 0)
+                return;
+            iconThemeInstallation.running = true;
+        }
+    }
+
+    Process {
+        id: iconThemeInstallation
+        command: ["ln", "-sfn",
+            root.iconSourceRoot + "/QuickshellSidebar",
+            root.iconSourceRoot + "/QuickshellSidebarLight",
+            root.iconSourceRoot + "/QuickshellSidebarDark",
+            root.iconRoot]
         onExited: exitCode => {
             if (exitCode !== 0)
                 return;
