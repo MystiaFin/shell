@@ -62,7 +62,8 @@ PanelWindow {
     }
 
     Rectangle {
-        anchors.fill: parent
+        width: parent.width
+        height: 36
         color: "#000000"
         opacity: root.backgroundOpacity
     }

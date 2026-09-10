@@ -13,6 +13,9 @@ Singleton {
     readonly property real radiusExtraLarge: 20
     readonly property real panelRadius: 30
     readonly property real desktopFrameRadius: 28
+    readonly property real shadowSize: 8
+    readonly property real shadowBlur: 0.6
+    readonly property real shadowVerticalOffset: 4
 
     readonly property int panelSlideDurationMs: 480
     readonly property real panelSlideOvershoot: 0.65

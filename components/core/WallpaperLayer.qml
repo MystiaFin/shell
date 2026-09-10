@@ -159,7 +159,7 @@ PanelWindow {
         }
     }
 
-    ClippingRectangle {
+    ShaderEffect {
         anchors {
             top: parent.top
             topMargin: ShellMetrics.statusBarHeight
@@ -167,22 +167,13 @@ PanelWindow {
             bottom: parent.bottom
             left: parent.left
         }
-        radius: ShellMetrics.radiusLarge
-        color: "transparent"
 
-        Rectangle {
-            anchors {
-                top: parent.top
-                right: parent.right
-                left: parent.left
-            }
-            height: 8
-            gradient: Gradient {
-                GradientStop { position: 0; color: "#30000000" }
-                GradientStop { position: 0.45; color: "#14000000" }
-                GradientStop { position: 1; color: "transparent" }
-            }
-        }
+        property vector2d surfaceSize: Qt.vector2d(width, height)
+        property real cornerRadius: ShellMetrics.radiusLarge
+        property real shadowSize: ShellMetrics.shadowSize
+        property color shadowColor: Theme.shellShadowColor
+
+        fragmentShader: Qt.resolvedUrl("../../shaders/inner-shadow.frag.qsb")
     }
 
     Timer {

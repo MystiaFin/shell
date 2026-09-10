@@ -21,6 +21,7 @@ Singleton {
     readonly property color wallpaperFallbackColor: activeTheme.wallpaperFallbackColor
 
     readonly property color shellBackgroundColor: activeTheme.foregroundColor
+    readonly property color shellShadowColor: "#50000000"
     readonly property color panelSurfaceColor: activeTheme.searchBackgroundColor
     readonly property color hoverSurfaceColor: activeTheme.itemHoverColor
     readonly property color surfaceBorderColor: activeTheme.searchBorderColor

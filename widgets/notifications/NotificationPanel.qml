@@ -50,6 +50,23 @@ Item {
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
+            remove: Transition {
+                NumberAnimation {
+                    property: "opacity"
+                    to: 0
+                    duration: ShellMetrics.fastAnimationMs
+                    easing.type: Easing.OutCubic
+                }
+            }
+
+            removeDisplaced: Transition {
+                NumberAnimation {
+                    property: "y"
+                    duration: 220
+                    easing.type: Easing.OutCubic
+                }
+            }
+
             delegate: Item {
                 id: delegateRoot
 

@@ -9,10 +9,10 @@ Item {
     property real edgeOffset: 2
     property real connectionRadius: 36
     property bool shadowEnabled: true
-    property color shadowColor: "#80000000"
-    property real shadowBlur: 0.6
+    property color shadowColor: Theme.shellShadowColor
+    property real shadowBlur: ShellMetrics.shadowBlur
     property real shadowHorizontalOffset: 0
-    property real shadowVerticalOffset: 4
+    property real shadowVerticalOffset: ShellMetrics.shadowVerticalOffset
     // The shader uniform layout has exactly eight shape/radius slots.
     readonly property int maximumShapeCount: 8
     property int shapeCount: 0
