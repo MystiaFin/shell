@@ -133,8 +133,7 @@ stacksidebar,
   background-color: @SURFACE@;
   color: @FOREGROUND@;
   border-right: 3px solid @BORDER@;
-  -gtk-icon-theme: "QuickshellSidebar";
-  -gtk-icon-style: symbolic;
+  -gtk-icon-style: regular;
 }
 
 .sidebar row,
@@ -157,6 +156,10 @@ stacksidebar row:selected,
 .thunar .sidebar .view {
   background-color: mix(@SURFACE@, @BACKGROUND@, 0.35);
   color: @FOREGROUND@;
+}
+
+.thunar .sidebar {
+  border-right: none;
 }
 
 .thunar .sidebar .view {
@@ -334,11 +337,12 @@ window.thunar toolbar .path-bar button {
   background-color: @path_bar_bg_color;
 }
 
-window.thunar paned > separator,
-window.thunar paned > separator:focus {
-  background-color: @BORDER@;
+.thunar paned > separator,
+.thunar paned > separator:focus {
+  background-color: transparent;
   background-image: none;
-  min-width: 3px;
+  border: none;
+  min-width: 6px;
 }
 
 spinner:not(:checked) {

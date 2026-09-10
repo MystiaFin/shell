@@ -16,6 +16,8 @@ Singleton {
     readonly property string themeRoot: dataHome + "/themes"
     readonly property string lightThemeName: "QuickshellDynamicLight"
     readonly property string darkThemeName: "QuickshellDynamicDark"
+    readonly property string lightIconThemeName: "QuickshellSidebarLight"
+    readonly property string darkIconThemeName: "QuickshellSidebarDark"
     readonly property string lightThemePath: themeRoot + "/" + lightThemeName
     readonly property string darkThemePath: themeRoot + "/" + darkThemeName
     readonly property string gtk4UserStylesheetPath: configHome + "/gtk-4.0/gtk.css"
@@ -23,6 +25,7 @@ Singleton {
     property bool directoriesPrepared: false
     property string pendingThemeName: ""
     property string pendingColorScheme: ""
+    property string pendingIconThemeName: ""
     signal preparationCompleted()
 
     function colorToHex(colorValue: color): string {
@@ -104,6 +107,8 @@ Singleton {
         // Changing away and back makes existing GTK3 clients reload rewritten CSS.
         pendingThemeName = activeTheme;
         pendingColorScheme = colorScheme;
+        pendingIconThemeName = Theme.lightMode
+            ? lightIconThemeName : darkIconThemeName;
         gtkReload.command = ["dconf", "write",
             "/org/gnome/desktop/interface/gtk-theme",
             "'" + inactiveTheme + "'"];
@@ -173,6 +178,10 @@ Singleton {
     Process {
         id: gtkActivate
         onExited: {
+            iconThemeActivate.command = ["dconf", "write",
+                "/org/gnome/desktop/interface/icon-theme",
+                "'" + root.pendingIconThemeName + "'"];
+            iconThemeActivate.running = true;
             colorSchemeActivate.command = ["dconf", "write",
                 "/org/gnome/desktop/interface/color-scheme",
                 "'" + root.pendingColorScheme + "'"];
@@ -180,6 +189,7 @@ Singleton {
         }
     }
 
+    Process { id: iconThemeActivate }
     Process { id: colorSchemeActivate }
 
     Timer {

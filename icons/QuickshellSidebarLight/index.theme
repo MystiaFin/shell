@@ -1,0 +1,12 @@
+[Icon Theme]
+Name=Quickshell Sidebar Light
+Comment=Light-mode sidebar icons with Quickshell symbolic fallback
+Inherits=QuickshellSidebar,Papirus-Dark
+Directories=scalable/status
+
+[scalable/status]
+Size=16
+Type=Scalable
+MinSize=12
+MaxSize=64
+Context=Status
