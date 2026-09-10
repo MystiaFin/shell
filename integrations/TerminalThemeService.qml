@@ -106,7 +106,7 @@ Singleton {
             + "initial-color-theme=" + (Theme.lightMode ? "light\n" : "dark\n");
         for (const section of ["dark", "light"]) {
             output += "[colors-" + section + "]\n";
-            output += "alpha=0.92\n";
+            output += "alpha=0.75\n";
             output += "background=" + colorToHex(colors.background, false) + "\n";
             output += "foreground=" + colorToHex(colors.foreground, false) + "\n";
             output += "selection-background=" + colorToHex(colors.selectionBackground, false) + "\n";
