@@ -28,6 +28,7 @@
 @define-color dialog_fg_color @FOREGROUND@;
 @define-color popover_bg_color @SURFACE@;
 @define-color popover_fg_color @FOREGROUND@;
+@define-color path_bar_bg_color @SELECTION@;
 
 * {
   -gtk-secondary-caret-color: @ACCENT@;
@@ -131,7 +132,9 @@ stacksidebar,
 .navigation-sidebar {
   background-color: @SURFACE@;
   color: @FOREGROUND@;
-  border-right: 1px solid @BORDER@;
+  border-right: 3px solid @BORDER@;
+  -gtk-icon-theme: "QuickshellSidebar";
+  -gtk-icon-style: symbolic;
 }
 
 .sidebar row,
@@ -148,6 +151,37 @@ stacksidebar row:focus,
 stacksidebar row:selected,
 .navigation-sidebar row:selected {
   color: @ON_ACCENT@;
+}
+
+.thunar .sidebar,
+.thunar .sidebar .view {
+  background-color: mix(@SURFACE@, @BACKGROUND@, 0.35);
+  color: @FOREGROUND@;
+}
+
+.thunar .sidebar .view {
+  padding: 8px 6px;
+  -GtkTreeView-horizontal-separator: 4;
+  -GtkTreeView-vertical-separator: 8;
+}
+
+.thunar .sidebar .view *:hover {
+  background-color: mix(@SURFACE@, @FOREGROUND@, 0.08);
+}
+
+.thunar .sidebar .view:selected,
+.thunar .sidebar .view:selected:focus {
+  border-left: 3px solid @ACCENT@;
+}
+
+.thunar .sidebar .view *:selected,
+.thunar .sidebar .view *:selected:focus {
+  background-color: @SELECTION@;
+  color: @FOREGROUND@;
+}
+
+.thunar .sidebar .view *:disabled {
+  color: @MUTED@;
 }
 
 .sidebar separator,
@@ -293,4 +327,24 @@ paned > separator:focus {
   min-width: 3px;
   min-height: 1px;
   margin: 0;
+}
+
+window.thunar toolbar entry,
+window.thunar toolbar .path-bar button {
+  background-color: @path_bar_bg_color;
+}
+
+window.thunar paned > separator,
+window.thunar paned > separator:focus {
+  background-color: @BORDER@;
+  background-image: none;
+  min-width: 3px;
+}
+
+spinner:not(:checked) {
+  opacity: 0;
+}
+
+spinner:checked {
+  opacity: 1;
 }

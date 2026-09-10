@@ -1,0 +1,33 @@
+[Icon Theme]
+Name=Quickshell Sidebar
+Comment=Consistent symbolic place icons with Papirus fallback
+Inherits=Papirus-Dark
+Directories=scalable/places,scalable/devices,scalable/actions,scalable/status
+
+[scalable/places]
+Size=16
+Type=Scalable
+MinSize=12
+MaxSize=64
+Context=Places
+
+[scalable/devices]
+Size=16
+Type=Scalable
+MinSize=12
+MaxSize=64
+Context=Devices
+
+[scalable/actions]
+Size=16
+Type=Scalable
+MinSize=12
+MaxSize=64
+Context=Actions
+
+[scalable/status]
+Size=16
+Type=Scalable
+MinSize=12
+MaxSize=64
+Context=Status
