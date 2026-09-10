@@ -12,36 +12,43 @@ Item {
     property int requestSerial: 0
     property real maximumHeight: 620
     property real resultRowHeight: 60
-    property real fixedContentHeight: 122
     property real bottomPadding: ShellMetrics.panelContentInsetFromEdge
-    property int previousResultCount: 0
     property var tmuxSessions: []
     property var pendingTmuxSessions: []
+    property int queryGeneration: 0
 
     readonly property bool tmuxMode: searchInput.text.startsWith("!")
-
-    readonly property real minimumHeight: fixedContentHeight + resultRowHeight
+    readonly property real fixedContentHeight: 12 + 8 + 46 + bottomPadding
+    readonly property int maximumVisibleRows: Math.max(
+        1,
+        Math.floor((maximumHeight - fixedContentHeight) / resultRowHeight)
+    )
+    readonly property int visibleResultRows: Math.max(
+        1,
+        Math.min(filteredResults.values.length, maximumVisibleRows)
+    )
     readonly property real desiredHeight: Math.min(
         maximumHeight,
-        Math.max(
-            minimumHeight,
-            fixedContentHeight
-                + filteredResults.values.length * resultRowHeight
-        )
+        fixedContentHeight + visibleResultRows * resultRowHeight
     )
-    readonly property int resizeDurationMs: Math.min(
-        700,
-        340 + Math.abs(
-            filteredResults.values.length - previousResultCount
-        ) * 24
-    )
+    readonly property int resizeDurationMs: ShellMetrics.fastAnimationMs
     property alias focusTarget: searchInput
 
     signal closeRequested()
 
     function launchCurrentResult(): void {
-        if (resultList.currentItem)
-            resultList.currentItem.launch();
+        const index = resultList.currentIndex;
+        if (index >= 0 && index < filteredResults.values.length)
+            launchResult(filteredResults.values[index]);
+    }
+
+    function launchResult(result): void {
+        if (result.tmuxSession) {
+            launchTmuxSession(result.name);
+        } else {
+            result.application.execute();
+            closeRequested();
+        }
     }
 
     function moveSelection(down: bool): void {
@@ -53,36 +60,32 @@ Item {
         else
             resultList.decrementCurrentIndex();
 
-        const itemTop = resultList.currentIndex * root.resultRowHeight;
-        const itemBottom = itemTop + root.resultRowHeight;
-        let targetY = resultList.contentY;
-
-        if (itemTop < resultList.contentY)
-            targetY = itemTop;
-        else if (itemBottom > resultList.contentY + resultList.height)
-            targetY = itemBottom - resultList.height;
-
-        targetY = Math.max(0, Math.min(
-            targetY,
-            Math.max(0, resultList.contentHeight - resultList.height)
-        ));
-
-        if (targetY !== resultList.contentY) {
-            resultScroll.stop();
-            resultScroll.from = resultList.contentY;
-            resultScroll.to = targetY;
-            resultScroll.start();
-        }
+        resultList.positionViewAtIndex(resultList.currentIndex, ListView.Contain);
     }
 
     function refreshTmuxSessions(): void {
+        if (tmuxSessionReader.running)
+            return;
+
         pendingTmuxSessions = [];
         tmuxSessionReader.running = true;
     }
 
+    function resetResults(): void {
+        const generation = ++queryGeneration;
+        Qt.callLater(() => {
+            if (generation !== queryGeneration)
+                return;
+
+            resultList.forceLayout();
+            resultList.currentIndex = resultList.count > 0 ? 0 : -1;
+            resultList.positionViewAtBeginning();
+        });
+    }
+
     function launchTmuxSession(sessionName: string): void {
         const terminal = Quickshell.env("TERMINAL");
-        if (terminal.length === 0) {
+        if (!terminal || terminal.length === 0) {
             console.error("Cannot launch tmux session: TERMINAL is not set");
             return;
         }
@@ -100,6 +103,7 @@ Item {
 
     ScriptModel {
         id: filteredResults
+        objectProp: "key"
 
         values: {
             if (root.tmuxMode) {
@@ -110,6 +114,7 @@ Item {
                         sessionName.toLowerCase().includes(query));
 
                 return matches.map(sessionName => ({
+                    key: "tmux:" + sessionName,
                     tmuxSession: true,
                     name: sessionName
                 }));
@@ -130,12 +135,17 @@ Item {
                     return searchable.includes(query);
                 });
 
-            return matches.sort((first, second) =>
-                first.name.localeCompare(second.name)).map(application => ({
-                    tmuxSession: false,
-                    application: application,
-                    name: application.name
-                }));
+            return matches.sort((first, second) => {
+                const nameComparison = first.name.localeCompare(second.name);
+                return nameComparison !== 0
+                    ? nameComparison
+                    : first.id.localeCompare(second.id);
+            }).map(application => ({
+                key: "app:" + application.id,
+                tmuxSession: false,
+                application: application,
+                name: application.name
+            }));
         }
     }
 
@@ -188,15 +198,7 @@ Item {
             Keys.onEnterPressed: root.launchCurrentResult()
             Keys.onEscapePressed: root.closeRequested()
 
-            onTextChanged: {
-                root.previousResultCount = resultList.count;
-                resultList.hoveredIndex = -1;
-                Qt.callLater(() => {
-                    resultList.currentIndex = resultList.count > 0 ? 0 : -1;
-                    if (resultList.currentIndex >= 0)
-                        resultList.positionViewAtBeginning();
-                });
-            }
+            onTextChanged: root.resetResults()
         }
 
         Text {
@@ -230,47 +232,14 @@ Item {
         clip: true
         boundsBehavior: Flickable.StopAtBounds
         reuseItems: true
-        currentIndex: count > 0 ? 0 : -1
+        currentIndex: -1
         keyNavigationWraps: true
-        property int hoveredIndex: -1
-        property real hoverHighlightY: 0
-
-        NumberAnimation {
-            id: resultScroll
-
-            target: resultList
-            property: "contentY"
-            duration: ShellMetrics.fastAnimationMs
-            easing.type: Easing.InOutCubic
-        }
-
-        add: Transition {
-            NumberAnimation {
-                property: "opacity"
-                from: 0
-                to: 1
-                duration: ShellMetrics.fastAnimationMs
-                easing.type: Easing.OutCubic
-            }
-        }
-
-        remove: Transition {
-            NumberAnimation {
-                property: "opacity"
-                from: 1
-                to: 0
-                duration: ShellMetrics.fastAnimationMs
-                easing.type: Easing.InCubic
-            }
-        }
-
         highlightFollowsCurrentItem: false
+
         highlight: Rectangle {
             width: resultList.width
             height: root.resultRowHeight
-            y: resultList.currentItem
-                ? resultList.currentItem.y
-                : 0
+            y: resultList.currentItem ? resultList.currentItem.y : 0
             radius: ShellMetrics.radiusMedium
             color: Theme.selectedSurfaceColor
             opacity: resultList.currentItem ? 1 : 0
@@ -283,51 +252,40 @@ Item {
             }
         }
 
-        Rectangle {
-            parent: resultList.contentItem
-            z: 0.5
-            width: resultList.width
-            height: root.resultRowHeight
-            y: resultList.hoverHighlightY
-            radius: ShellMetrics.radiusMedium
-            color: Theme.hoverSurfaceColor
-            opacity: resultList.hoveredIndex >= 0
-                && resultList.hoveredIndex !== resultList.currentIndex
-                ? 1
-                : 0
-
-            Behavior on y {
-                NumberAnimation {
-                    duration: ShellMetrics.fastAnimationMs
-                    easing.type: Easing.InOutCubic
-                }
-            }
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: ShellMetrics.fastAnimationMs
-                    easing.type: Easing.InOutCubic
-                }
-            }
+        onCountChanged: {
+            if (count === 0)
+                currentIndex = -1;
+            else if (currentIndex >= count)
+                currentIndex = 0;
         }
 
         delegate: Item {
+            id: resultDelegate
+
             required property var modelData
             required property int index
 
             readonly property var result: modelData
 
-            function launch(): void {
-                if (result.tmuxSession) {
-                    root.launchTmuxSession(result.name);
-                } else {
-                    result.application.execute();
-                    root.closeRequested();
-                }
-            }
-
             width: resultList.width
             height: root.resultRowHeight
+
+            Rectangle {
+                anchors.fill: parent
+                radius: ShellMetrics.radiusMedium
+                color: Theme.hoverSurfaceColor
+                opacity: resultHover.hovered
+                    && !resultDelegate.ListView.isCurrentItem
+                    ? 1
+                    : 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: ShellMetrics.fastAnimationMs
+                        easing.type: Easing.InOutCubic
+                    }
+                }
+            }
 
             IconImage {
                 id: resultIcon
@@ -371,22 +329,13 @@ Item {
                 id: resultHover
 
                 cursorShape: Qt.PointingHandCursor
-                onHoveredChanged: {
-                    if (hovered) {
-                        resultList.hoverHighlightY = index * root.resultRowHeight;
-                        resultList.hoveredIndex = index;
-                    } else {
-                        const exitedIndex = index;
-                        Qt.callLater(() => {
-                            if (resultList.hoveredIndex === exitedIndex)
-                                resultList.hoveredIndex = -1;
-                        });
-                    }
-                }
             }
 
             TapHandler {
-                onTapped: parent.launch()
+                onTapped: {
+                    resultList.currentIndex = resultDelegate.index;
+                    root.launchResult(resultDelegate.result);
+                }
             }
         }
     }
@@ -406,14 +355,15 @@ Item {
             searchInput.text = root.initialQuery;
             if (root.tmuxMode && wasTmuxMode)
                 root.refreshTmuxSessions();
-            resultList.hoveredIndex = -1;
-            resultList.currentIndex = resultList.count > 0 ? 0 : -1;
+            root.resetResults();
         }
     }
 
     onRequestSerialChanged: {
-        if (shown)
+        if (shown) {
             searchInput.text = root.initialQuery;
+            root.resetResults();
+        }
     }
 
     onTmuxModeChanged: {
