@@ -14,6 +14,8 @@ Singleton {
 
     property string activeOverlay: ""
     property string utilityPage: "notifications"
+    property string launcherInitialQuery: ""
+    property int launcherRequestSerial: 0
     property bool statusBarHovered: false
 
     readonly property bool controlCenterVisible: activeOverlay === controlCenter
@@ -57,10 +59,22 @@ Singleton {
     }
 
     function toggleLauncher(): void {
-        toggle(launcher);
+        if (launcherVisible) {
+            hideLauncher();
+        } else {
+            showLauncher();
+        }
     }
 
     function showLauncher(): void {
+        launcherInitialQuery = "";
+        launcherRequestSerial++;
+        show(launcher);
+    }
+
+    function showTmuxLauncher(): void {
+        launcherInitialQuery = "!";
+        launcherRequestSerial++;
         show(launcher);
     }
 
@@ -93,6 +107,10 @@ Singleton {
 
         function show(): void {
             root.showLauncher();
+        }
+
+        function showTmux(): void {
+            root.showTmuxLauncher();
         }
 
         function hide(): void {

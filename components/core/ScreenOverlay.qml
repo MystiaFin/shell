@@ -93,6 +93,8 @@ EdgeOverlayWindow {
             id: launcher
             anchors.fill: parent
             shown: launcherWidget.shown
+            initialQuery: OverlayState.launcherInitialQuery
+            requestSerial: OverlayState.launcherRequestSerial
             maximumHeight: Math.max(1, Math.min(620, root.height - 60))
             bottomPadding: ShellMetrics.panelContentInsetFromEdge
 
