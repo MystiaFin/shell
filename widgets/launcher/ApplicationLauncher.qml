@@ -31,7 +31,7 @@ Item {
         maximumHeight,
         fixedContentHeight + visibleResultRows * resultRowHeight
     )
-    readonly property int resizeDurationMs: ShellMetrics.fastAnimationMs
+    readonly property int resizeDurationMs: 360
     property alias focusTarget: searchInput
 
     signal closeRequested()
@@ -231,10 +231,20 @@ Item {
         model: filteredResults
         clip: true
         boundsBehavior: Flickable.StopAtBounds
-        reuseItems: true
+        reuseItems: false
         currentIndex: -1
         keyNavigationWraps: true
         highlightFollowsCurrentItem: false
+
+        remove: Transition {
+            NumberAnimation {
+                property: "opacity"
+                from: 1
+                to: 0
+                duration: ShellMetrics.fastAnimationMs
+                easing.type: Easing.OutCubic
+            }
+        }
 
         highlight: Rectangle {
             width: resultList.width

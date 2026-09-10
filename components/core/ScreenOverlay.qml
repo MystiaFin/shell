@@ -88,6 +88,7 @@ EdgeOverlayWindow {
         targetHeight: launcher.desiredHeight
         radius: ShellMetrics.panelRadius
         heightAnimationDurationMs: launcher.resizeDurationMs
+        resizeEasing: Easing.OutCubic
 
         ApplicationLauncher {
             id: launcher
