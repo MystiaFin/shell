@@ -21,9 +21,15 @@ Singleton {
     property real temperature: 0
     property real highTemperature: 0
     property real lowTemperature: 0
+    property real humidity: 0
+    property real uvIndex: 0
+    property bool environmentalAvailable: false
+    property real airQualityIndex: 0
+    property bool airQualityAvailable: false
     property int weatherCode: -1
     property date lastUpdated: new Date(0)
     property string responseData: ""
+    property string airQualityResponseData: ""
     property string loadedConfig: ""
     readonly property string conditionText: conditionForCode(weatherCode)
     readonly property string conditionIcon: iconForCode(weatherCode)
@@ -61,20 +67,27 @@ Singleton {
     }
 
     function refresh(): void {
-        if (!configured || weatherRequest.running)
+        if (!configured || weatherRequest.running || airQualityRequest.running)
             return;
 
         responseData = "";
+        airQualityResponseData = "";
         loading = true;
         const url = "https://api.open-meteo.com/v1/forecast"
             + "?latitude=" + latitude
             + "&longitude=" + longitude
-            + "&current=temperature_2m,weather_code"
-            + "&daily=temperature_2m_max,temperature_2m_min"
+            + "&current=temperature_2m,weather_code,relative_humidity_2m"
+            + "&daily=temperature_2m_max,temperature_2m_min,uv_index_max"
             + "&temperature_unit=celsius&forecast_days=1&timezone=auto";
+        const airQualityUrl = "https://air-quality-api.open-meteo.com/v1/air-quality"
+            + "?latitude=" + latitude + "&longitude=" + longitude
+            + "&current=us_aqi&timezone=auto";
         weatherRequest.command = ["curl", "--fail", "--silent", "--show-error",
             "--max-time", "15", url];
+        airQualityRequest.command = ["curl", "--fail", "--silent", "--show-error",
+            "--max-time", "15", airQualityUrl];
         weatherRequest.running = true;
+        airQualityRequest.running = true;
     }
 
     function applyResponse(): void {
@@ -85,12 +98,36 @@ Singleton {
             weatherCode = Number(response.current.weather_code);
             highTemperature = Number(response.daily.temperature_2m_max[0]);
             lowTemperature = Number(response.daily.temperature_2m_min[0]);
+            const humidityValue = response.current.relative_humidity_2m;
+            const uvValue = response.daily.uv_index_max[0];
+            humidity = Number(humidityValue);
+            uvIndex = Number(uvValue);
+            environmentalAvailable = humidityValue !== null && uvValue !== null
+                && Number.isFinite(humidity) && Number.isFinite(uvIndex);
             lastUpdated = new Date();
             available = true;
             errorMessage = "";
         } catch (error) {
             errorMessage = "Weather unavailable";
             console.warn("Could not parse Open-Meteo response:", error);
+        }
+    }
+
+    function applyAirQualityResponse(exitCode: int): void {
+        if (exitCode !== 0) {
+            airQualityAvailable = false;
+            return;
+        }
+        try {
+            const response = JSON.parse(airQualityResponseData);
+            const rawValue = response.current.us_aqi;
+            const value = Number(rawValue);
+            airQualityAvailable = rawValue !== null && Number.isFinite(value);
+            if (airQualityAvailable)
+                airQualityIndex = value;
+        } catch (error) {
+            airQualityAvailable = false;
+            console.warn("Could not parse Open-Meteo air-quality response:", error);
         }
     }
 
@@ -131,6 +168,14 @@ Singleton {
             onRead: data => root.responseData += data
         }
         onExited: root.applyResponse()
+    }
+
+    Process {
+        id: airQualityRequest
+        stdout: SplitParser {
+            onRead: data => root.airQualityResponseData += data
+        }
+        onExited: (exitCode, exitStatus) => root.applyAirQualityResponse(exitCode)
     }
 
     Timer {

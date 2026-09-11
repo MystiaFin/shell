@@ -7,6 +7,7 @@ Item {
     required property Item wallpaperSourceItem
     required property rect wallpaperRect
     required property string label
+    property string icon: ""
     required property string value
     required property string detail
     required property real progress
@@ -32,7 +33,7 @@ Item {
 
         Text {
             width: parent.width
-            text: root.label
+            text: (root.icon !== "" ? root.icon + "  " : "") + root.label
             color: Theme.secondaryTextColor
             font.family: Typography.bodyFontFamily
             font.pixelSize: 13

@@ -39,10 +39,19 @@ Item {
         }
     }
 
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        onTriggered: root.now = new Date()
+    function refreshTime(): void {
+        now = new Date();
+        const millisecondsIntoMinute = now.getSeconds() * 1000
+            + now.getMilliseconds();
+        minuteTimer.interval = Math.max(1000, 60000 - millisecondsIntoMinute);
+        minuteTimer.restart();
     }
+
+    Timer {
+        id: minuteTimer
+        repeat: false
+        onTriggered: root.refreshTime()
+    }
+
+    Component.onCompleted: refreshTime()
 }
