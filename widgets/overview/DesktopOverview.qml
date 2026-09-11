@@ -14,19 +14,31 @@ Item {
     property bool shown: false
     property var pendingPlacement: null
     property bool clockJoined: false
+    property string requestedFingerprint: ""
 
     readonly property size clockSize: Qt.size(300, 132)
     readonly property size weatherSize: Qt.size(220, 160)
     readonly property size calendarSize: Qt.size(280, 260)
+    readonly property color placementTextColor: Theme.primaryTextColor
 
     opacity: shown ? 1 : 0
 
     function requestPlacement(): void {
         if (!wallpaperSource.toString() || width <= 0 || height <= 0)
             return;
+        const fingerprint = [wallpaperSource.toString(), width, height,
+            usableArea.x, usableArea.y, usableArea.width, usableArea.height,
+            placementTextColor.toString()].join("|");
+        if (fingerprint === requestedFingerprint)
+            return;
+        requestedFingerprint = fingerprint;
         FloatingWidgetPlacementService.requestOverviewPlacement(
             screenName, wallpaperSource, width, height, usableArea,
-            Theme.primaryTextColor, clockSize, weatherSize, calendarSize);
+            placementTextColor, clockSize, weatherSize, calendarSize);
+    }
+
+    function schedulePlacement(): void {
+        placementRequestDelay.restart();
     }
 
     function applyPlacement(): void {
@@ -105,9 +117,9 @@ Item {
     }
 
     Timer {
-        id: placementApplyDelay
-        interval: 600
-        onTriggered: root.applyPlacement()
+        id: placementRequestDelay
+        interval: 50
+        onTriggered: root.requestPlacement()
     }
 
     Connections {
@@ -118,15 +130,17 @@ Item {
                     || source !== root.wallpaperSource.toString())
                 return;
             root.pendingPlacement = placement;
-            placementApplyDelay.restart();
+            root.applyPlacement();
         }
     }
 
     onWallpaperSourceChanged: {
-        placementApplyDelay.stop();
-        requestPlacement();
+        pendingPlacement = null;
+        schedulePlacement();
     }
-    onWidthChanged: requestPlacement()
-    onHeightChanged: requestPlacement()
-    Component.onCompleted: requestPlacement()
+    onUsableAreaChanged: schedulePlacement()
+    onPlacementTextColorChanged: schedulePlacement()
+    onWidthChanged: schedulePlacement()
+    onHeightChanged: schedulePlacement()
+    Component.onCompleted: schedulePlacement()
 }

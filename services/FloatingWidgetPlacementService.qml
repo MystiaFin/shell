@@ -9,12 +9,18 @@ Singleton {
 
     readonly property int sampleLongEdge: 120
     readonly property int cardGap: 12
+    readonly property int maximumCachedAnalyses: 6
     property var pendingRequests: []
+    property var retryRequests: []
     property var activeRequest: null
-    property var pixels: []
-    property int parsedPixelCount: 0
+    property var latestGenerations: ({})
+    property int nextGeneration: 0
     property bool requestTimedOut: false
-    property var pixelCache: ({})
+    property bool processExited: false
+    property bool outputFinished: false
+    property int processExitCode: -1
+    property var analysisCache: ({})
+    property var analysisCacheKeys: []
 
     signal overviewPlacementReady(string key, string source, var placement)
 
@@ -46,9 +52,14 @@ Singleton {
             calendarSize: calendarSize,
             sampleWidth: sampleWidth,
             sampleHeight: sampleHeight,
-            pixelCacheKey: sourceString + "|" + sampleWidth + "x" + sampleHeight
+            pixelCacheKey: sourceString + "|" + sampleWidth + "x" + sampleHeight,
+            generation: ++nextGeneration,
+            retryCount: 0
         };
 
+        const generations = Object.assign({}, latestGenerations);
+        generations[key] = request.generation;
+        latestGenerations = generations;
         pendingRequests = pendingRequests.filter(item => item.key !== key);
         pendingRequests = pendingRequests.concat(request);
         startNextRequest();
@@ -60,47 +71,75 @@ Singleton {
 
         activeRequest = pendingRequests[0];
         pendingRequests = pendingRequests.slice(1);
-        const cachedPixels = pixelCache[activeRequest.pixelCacheKey];
-        if (cachedPixels) {
-            pixels = cachedPixels;
-            Qt.callLater(finishRequest);
+        const cachedAnalysis = analysisCache[activeRequest.pixelCacheKey];
+        if (cachedAnalysis) {
+            Qt.callLater(() => finishRequest(true, cachedAnalysis));
             return;
         }
 
-        pixels = new Array(activeRequest.sampleWidth * activeRequest.sampleHeight);
-        parsedPixelCount = 0;
         requestTimedOut = false;
+        processExited = false;
+        outputFinished = false;
+        processExitCode = -1;
         const geometry = activeRequest.sampleWidth + "x" + activeRequest.sampleHeight;
         analyzer.command = ["magick", activeRequest.path, "-auto-orient",
             "-resize", geometry + "^", "-gravity", "center", "-extent", geometry,
-            "-colorspace", "sRGB", "-depth", "8", "txt:-"];
+            "-colorspace", "sRGB", "-depth", "8", "rgb:-"];
         analyzer.running = true;
         analysisTimeout.restart();
     }
 
-    function parsePixel(line: string): void {
-        if (!activeRequest)
-            return;
+    function buildAnalysis(data: var, request: var): var {
+        const bytes = new Uint8Array(data);
+        const pixelCount = request.sampleWidth * request.sampleHeight;
+        if (bytes.length !== pixelCount * 3)
+            return null;
 
-        const match = /^(\d+),(\d+):.*#([0-9A-Fa-f]{6})/.exec(line);
-        if (!match)
-            return;
+        const pixels = new Array(pixelCount);
+        for (let index = 0; index < pixelCount; ++index) {
+            const byteIndex = index * 3;
+            pixels[index] = (bytes[byteIndex] * 0.2126
+                + bytes[byteIndex + 1] * 0.7152
+                + bytes[byteIndex + 2] * 0.0722) / 255;
+        }
 
-        const x = Number(match[1]);
-        const y = Number(match[2]);
-        const rgb = match[3];
-        const red = parseInt(rgb.slice(0, 2), 16) / 255;
-        const green = parseInt(rgb.slice(2, 4), 16) / 255;
-        const blue = parseInt(rgb.slice(4, 6), 16) / 255;
-        const index = y * activeRequest.sampleWidth + x;
-        if (pixels[index] === undefined)
-            ++parsedPixelCount;
-        pixels[index] = red * 0.2126 + green * 0.7152 + blue * 0.0722;
+        const squared = new Array(pixelCount);
+        const detail = new Array(pixelCount);
+        for (let y = 0; y < request.sampleHeight; ++y) {
+            for (let x = 0; x < request.sampleWidth; ++x) {
+                const index = y * request.sampleWidth + x;
+                const value = pixels[index];
+                squared[index] = value * value;
+                detail[index] = (x > 0 ? Math.abs(value - pixels[index - 1]) : 0)
+                    + (y > 0 ? Math.abs(value
+                        - pixels[index - request.sampleWidth]) : 0);
+            }
+        }
+        return {
+            stride: request.sampleWidth + 1,
+            luminance: buildIntegral(pixels, request.sampleWidth,
+                request.sampleHeight),
+            squared: buildIntegral(squared, request.sampleWidth,
+                request.sampleHeight),
+            detail: buildIntegral(detail, request.sampleWidth,
+                request.sampleHeight)
+        };
     }
 
     function luminance(colorValue: color): real {
         return colorValue.r * 0.2126 + colorValue.g * 0.7152
             + colorValue.b * 0.0722;
+    }
+
+    function cacheAnalysis(key: string, integrals: var): void {
+        const nextCache = Object.assign({}, analysisCache);
+        let nextKeys = analysisCacheKeys.filter(cachedKey => cachedKey !== key);
+        nextCache[key] = integrals;
+        nextKeys.push(key);
+        while (nextKeys.length > maximumCachedAnalyses)
+            delete nextCache[nextKeys.shift()];
+        analysisCache = nextCache;
+        analysisCacheKeys = nextKeys;
     }
 
     function buildIntegral(values: var, width: int, height: int): var {
@@ -272,14 +311,22 @@ Singleton {
                         protectedRegion) / (layout.width * layout.height);
                     score -= overlapRatio * 5;
                 }
-                placements.push({ x: x, y: y, width: layout.width,
+                const placement = { x: x, y: y, width: layout.width,
                     height: layout.height, cards: cards,
-                    score: score });
+                    score: score };
+                let insertionIndex = placements.length;
+                while (insertionIndex > 0
+                        && placements[insertionIndex - 1].score < score)
+                    --insertionIndex;
+                if (insertionIndex < limit) {
+                    placements.splice(insertionIndex, 0, placement);
+                    if (placements.length > limit)
+                        placements.pop();
+                }
             }
         }
 
-        placements.sort((first, second) => second.score - first.score);
-        return placements.slice(0, limit);
+        return placements;
     }
 
     function overlaps(first: var, second: var, margin: int): bool {
@@ -309,35 +356,24 @@ Singleton {
             positions: positions };
     }
 
-    function calculatePlacement(request: var): var {
+    function calculatePlacement(request: var, integrals: var): var {
         const width = request.sampleWidth;
         const height = request.sampleHeight;
-        const squared = new Array(pixels.length);
-        const detail = new Array(pixels.length);
-        for (let y = 0; y < height; ++y) {
-            for (let x = 0; x < width; ++x) {
-                const index = y * width + x;
-                const value = pixels[index];
-                squared[index] = value * value;
-                detail[index] = (x > 0 ? Math.abs(value - pixels[index - 1]) : 0)
-                    + (y > 0 ? Math.abs(value - pixels[index - width]) : 0);
-            }
-        }
-        const integrals = {
-            stride: width + 1,
-            luminance: buildIntegral(pixels, width, height),
-            squared: buildIntegral(squared, width, height),
-            detail: buildIntegral(detail, width, height)
-        };
+        const boundsX = Math.max(0, Math.min(width, Math.round(
+            request.usableArea.x / request.screenWidth * width)));
+        const boundsY = Math.max(0, Math.min(height, Math.round(
+            request.usableArea.y / request.screenHeight * height)));
+        const boundsRight = Math.max(boundsX, Math.min(width, Math.round(
+            (request.usableArea.x + request.usableArea.width)
+                / request.screenWidth * width)));
+        const boundsBottom = Math.max(boundsY, Math.min(height, Math.round(
+            (request.usableArea.y + request.usableArea.height)
+                / request.screenHeight * height)));
         const bounds = {
-            x: Math.max(0, Math.round(request.usableArea.x
-                / request.screenWidth * width)),
-            y: Math.max(0, Math.round(request.usableArea.y
-                / request.screenHeight * height)),
-            width: Math.min(width, Math.round(request.usableArea.width
-                / request.screenWidth * width)),
-            height: Math.min(height, Math.round(request.usableArea.height
-                / request.screenHeight * height))
+            x: boundsX,
+            y: boundsY,
+            width: boundsRight - boundsX,
+            height: boundsBottom - boundsY
         };
         const gap = Math.max(1, Math.round(cardGap
             / request.screenWidth * width));
@@ -399,39 +435,58 @@ Singleton {
             best.group, best.clock, request) : null;
     }
 
-    function finishRequest(): void {
+    function finishRequest(success: bool, integrals: var): void {
         const request = activeRequest;
         if (!request)
             return;
 
-        const cached = pixelCache[request.pixelCacheKey] === pixels;
         analysisTimeout.stop();
-        const complete = !requestTimedOut && (cached || parsedPixelCount
-            === request.sampleWidth * request.sampleHeight);
-        if (complete) {
-            if (!cached) {
-                const nextCache = Object.assign({}, pixelCache);
-                nextCache[request.pixelCacheKey] = pixels;
-                pixelCache = nextCache;
+        if (success) {
+            if (!analysisCache[request.pixelCacheKey])
+                cacheAnalysis(request.pixelCacheKey, integrals);
+            if (latestGenerations[request.key] === request.generation) {
+                const result = calculatePlacement(request, integrals);
+                if (result)
+                    overviewPlacementReady(request.key, request.source, result);
             }
-            const result = calculatePlacement(request);
-            if (result)
-                overviewPlacementReady(request.key, request.source, result);
         } else {
             console.warn("Could not analyze wallpaper for Desktop Overview:",
-                request.source);
+                request.source, analyzerError.text.trim());
+            if (request.retryCount < 2
+                    && latestGenerations[request.key] === request.generation) {
+                request.retryCount++;
+                retryRequests = retryRequests.concat(request);
+                retryDelay.restart();
+            }
         }
 
         activeRequest = null;
-        pixels = [];
-        parsedPixelCount = 0;
         Qt.callLater(startNextRequest);
+    }
+
+    function tryFinishProcess(): void {
+        if (!activeRequest || !processExited || !outputFinished)
+            return;
+        const integrals = !requestTimedOut && processExitCode === 0
+            ? buildAnalysis(analyzerOutput.data, activeRequest) : null;
+        finishRequest(integrals !== null, integrals);
     }
 
     Process {
         id: analyzer
-        stdout: SplitParser { onRead: data => root.parsePixel(data) }
-        onExited: root.finishRequest()
+        stdout: StdioCollector {
+            id: analyzerOutput
+            onStreamFinished: {
+                root.outputFinished = true;
+                root.tryFinishProcess();
+            }
+        }
+        stderr: StdioCollector { id: analyzerError }
+        onExited: (exitCode, exitStatus) => {
+            root.processExitCode = exitCode;
+            root.processExited = true;
+            root.tryFinishProcess();
+        }
     }
 
     Timer {
@@ -440,6 +495,18 @@ Singleton {
         onTriggered: {
             root.requestTimedOut = true;
             analyzer.running = false;
+        }
+    }
+
+    Timer {
+        id: retryDelay
+        interval: 300
+        onTriggered: {
+            const retries = root.retryRequests.filter(request =>
+                root.latestGenerations[request.key] === request.generation);
+            root.retryRequests = [];
+            root.pendingRequests = root.pendingRequests.concat(retries);
+            root.startNextRequest();
         }
     }
 }
