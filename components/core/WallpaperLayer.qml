@@ -38,6 +38,7 @@ PanelWindow {
         if (nextSource.toString() === displayedSource.toString())
             return;
 
+        DisplayedWallpaperState.setTransitioning(targetScreen.name, true);
         pendingSource = nextSource;
         revealDelay.restart();
     }
@@ -233,6 +234,8 @@ PanelWindow {
             root.transitionQueued = false;
             DisplayedWallpaperState.setSource(root.targetScreen.name,
                 root.displayedSource);
+            DisplayedWallpaperState.setTransitioning(root.targetScreen.name,
+                false);
         }
     }
 }

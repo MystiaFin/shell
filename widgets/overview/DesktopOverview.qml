@@ -14,6 +14,8 @@ Item {
     property bool shown: false
     property var pendingPlacement: null
     property string requestedFingerprint: ""
+    readonly property bool wallpaperTransitioning:
+        DisplayedWallpaperState.isTransitioning(screenName)
 
     readonly property size clockSize: Qt.size(300, 132)
     readonly property size weatherSize: Qt.size(220, 160)
@@ -26,7 +28,8 @@ Item {
     opacity: shown ? 1 : 0
 
     function requestPlacement(): void {
-        if (!wallpaperSource.toString() || width <= 0 || height <= 0)
+        if (wallpaperTransitioning || !wallpaperSource.toString()
+                || width <= 0 || height <= 0)
             return;
         const fingerprint = [wallpaperSource.toString(), width, height,
             usableArea.x, usableArea.y, usableArea.width, usableArea.height,
@@ -269,7 +272,7 @@ Item {
         target: FloatingWidgetPlacementService
 
         function onOverviewPlacementReady(key, source, placement): void {
-            if (key !== root.screenName
+            if (root.wallpaperTransitioning || key !== root.screenName
                     || source !== root.wallpaperSource.toString())
                 return;
             root.pendingPlacement = placement;
@@ -280,6 +283,10 @@ Item {
     onWallpaperSourceChanged: {
         pendingPlacement = null;
         schedulePlacement();
+    }
+    onWallpaperTransitioningChanged: {
+        if (!wallpaperTransitioning)
+            schedulePlacement();
     }
     onUsableAreaChanged: schedulePlacement()
     onPlacementTextColorChanged: schedulePlacement()

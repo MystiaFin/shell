@@ -8,7 +8,7 @@ Item {
 
     required property Item wallpaperSourceItem
     required property rect wallpaperRect
-    readonly property real blurMargin: 24
+    readonly property real blurMargin: 48
     readonly property real cropX: Math.max(0,
         wallpaperRect.x - blurMargin)
     readonly property real cropY: Math.max(0,
@@ -37,21 +37,22 @@ Item {
             textureSize: Qt.size(width, height)
             live: true
             smooth: true
-            visible: false
         }
 
         MultiEffect {
             anchors.fill: wallpaperCrop
             source: wallpaperCrop
+            autoPaddingEnabled: false
             blurEnabled: true
             blur: 1
-            blurMax: 100
+            blurMax: 64
+            blurMultiplier: 1.5
         }
 
         Rectangle {
             anchors.fill: parent
             color: Theme.panelSurfaceColor
-            opacity: 0.58
+            opacity: 0.32
         }
     }
 }
