@@ -27,7 +27,8 @@ Singleton {
     function requestOverviewPlacement(key: string, source: url,
             screenWidth: real, screenHeight: real, usableArea: rect,
             textColor: color, clockSize: size, weatherSize: size,
-            calendarSize: size): void {
+            calendarSize: size, resourceSize: size,
+            gpuAvailable: bool): void {
         const sourceString = source.toString();
         if (!sourceString || !sourceString.startsWith("file://")
                 || screenWidth <= 0 || screenHeight <= 0)
@@ -50,6 +51,8 @@ Singleton {
             clockSize: clockSize,
             weatherSize: weatherSize,
             calendarSize: calendarSize,
+            resourceSize: resourceSize,
+            gpuAvailable: gpuAvailable,
             sampleWidth: sampleWidth,
             sampleHeight: sampleHeight,
             pixelCacheKey: sourceString + "|" + sampleWidth + "x" + sampleHeight,
@@ -337,7 +340,8 @@ Singleton {
     }
 
     function placementResult(orientation: string, joined: bool,
-            groupPlacement: var, clockPlacement: var, request: var): var {
+            groupPlacement: var, clockPlacement: var, request: var,
+            resourcePlacement: var): var {
         const positions = {};
         for (let index = 0; index < groupPlacement.cards.length; ++index) {
             const card = groupPlacement.cards[index];
@@ -350,6 +354,13 @@ Singleton {
             positions.clock = {
                 xRatio: clockPlacement.cards[0].x / request.sampleWidth,
                 yRatio: clockPlacement.cards[0].y / request.sampleHeight
+            };
+        }
+        for (let index = 0; index < resourcePlacement.cards.length; ++index) {
+            const card = resourcePlacement.cards[index];
+            positions[card.name] = {
+                xRatio: card.x / request.sampleWidth,
+                yRatio: card.y / request.sampleHeight
             };
         }
         return { orientation: orientation, clockJoined: joined,
@@ -383,6 +394,14 @@ Singleton {
         const clock = Object.assign({ name: "clock" }, clockSize);
         const weather = Object.assign({ name: "weather" }, weatherSize);
         const calendar = Object.assign({ name: "calendar" }, calendarSize);
+        const resourceSize = sampleSize(request.resourceSize, request);
+        const resourceCards = [
+            Object.assign({ name: "cpuTemperature" }, resourceSize),
+            Object.assign({ name: "cpuUsage" }, resourceSize)
+        ];
+        if (request.gpuAvailable)
+            resourceCards.push(Object.assign({ name: "gpuTemperature" },
+                resourceSize));
         const joinedLayouts = [
             { orientation: "horizontal",
                 layout: horizontalLayout([clock, weather, calendar], gap) },
@@ -431,8 +450,43 @@ Singleton {
             }
         }
 
-        return best ? placementResult(best.orientation, best.joined,
-            best.group, best.clock, request) : null;
+        if (!best)
+            return null;
+
+        const resourceLayouts = [
+            horizontalLayout(resourceCards, gap),
+            verticalLayout(resourceCards, gap)
+        ];
+        const occupied = [best.group];
+        if (best.clock)
+            occupied.push(best.clock);
+        let resourcePlacement = null;
+        let resourceScore = -Infinity;
+        for (let index = 0; index < resourceLayouts.length; ++index) {
+            const candidates = bestPlacements(resourceLayouts[index], bounds,
+                request, integrals, 64, false, true);
+            for (let candidateIndex = 0; candidateIndex < candidates.length;
+                    ++candidateIndex) {
+                const candidate = candidates[candidateIndex];
+                let overlapPenalty = 0;
+                for (let occupiedIndex = 0; occupiedIndex < occupied.length;
+                        ++occupiedIndex) {
+                    overlapPenalty += intersectionArea(candidate,
+                        occupied[occupiedIndex])
+                        / (candidate.width * candidate.height) * 20;
+                    if (overlaps(candidate, occupied[occupiedIndex], gap * 2))
+                        overlapPenalty += 2;
+                }
+                const score = candidate.score - overlapPenalty;
+                if (score > resourceScore) {
+                    resourceScore = score;
+                    resourcePlacement = candidate;
+                }
+            }
+        }
+
+        return resourcePlacement ? placementResult(best.orientation, best.joined,
+            best.group, best.clock, request, resourcePlacement) : null;
     }
 
     function finishRequest(success: bool, integrals: var): void {

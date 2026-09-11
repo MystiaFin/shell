@@ -19,6 +19,7 @@ Item {
     readonly property size clockSize: Qt.size(300, 132)
     readonly property size weatherSize: Qt.size(220, 160)
     readonly property size calendarSize: Qt.size(280, 260)
+    readonly property size resourceSize: Qt.size(190, 125)
     readonly property color placementTextColor: Theme.primaryTextColor
 
     opacity: shown ? 1 : 0
@@ -28,13 +29,14 @@ Item {
             return;
         const fingerprint = [wallpaperSource.toString(), width, height,
             usableArea.x, usableArea.y, usableArea.width, usableArea.height,
-            placementTextColor.toString()].join("|");
+            placementTextColor.toString(), CpuService.gpuAvailable].join("|");
         if (fingerprint === requestedFingerprint)
             return;
         requestedFingerprint = fingerprint;
         FloatingWidgetPlacementService.requestOverviewPlacement(
             screenName, wallpaperSource, width, height, usableArea,
-            placementTextColor, clockSize, weatherSize, calendarSize);
+            placementTextColor, clockSize, weatherSize, calendarSize,
+            resourceSize, CpuService.gpuAvailable);
     }
 
     function schedulePlacement(): void {
@@ -53,6 +55,21 @@ Item {
         weatherCard.targetY = positions.weather.yRatio * height;
         calendarCard.targetX = positions.calendar.xRatio * width;
         calendarCard.targetY = positions.calendar.yRatio * height;
+        if (!positions.cpuTemperature || !positions.cpuUsage)
+            return;
+        cpuTemperatureCard.targetX = positions.cpuTemperature.xRatio * width;
+        cpuTemperatureCard.targetY = positions.cpuTemperature.yRatio * height;
+        cpuUsageCard.targetX = positions.cpuUsage.xRatio * width;
+        cpuUsageCard.targetY = positions.cpuUsage.yRatio * height;
+        if (positions.gpuTemperature) {
+            gpuTemperatureCard.targetX = positions.gpuTemperature.xRatio * width;
+            gpuTemperatureCard.targetY = positions.gpuTemperature.yRatio * height;
+        }
+    }
+
+    function temperatureColor(value: real): color {
+        return value < 70 ? Theme.successColor
+            : value < 85 ? Theme.accentColor : Theme.dangerColor;
     }
 
     Behavior on opacity {
@@ -111,6 +128,72 @@ Item {
         Behavior on targetY { OverviewMovement {} }
     }
 
+    OverviewResourceCard {
+        id: cpuTemperatureCard
+
+        property real targetX: root.usableArea.x + root.usableArea.width - width
+        property real targetY: root.usableArea.y
+        x: targetX
+        y: targetY
+        width: root.resourceSize.width
+        height: root.resourceSize.height
+        wallpaperSourceItem: root.wallpaperSourceItem
+        wallpaperRect: Qt.rect(x, y, width, height)
+        label: "CPU TEMPERATURE"
+        value: CpuService.temperatureAvailable
+            ? Math.round(CpuService.temperature) + "°C" : "--°C"
+        detail: ""
+        progress: CpuService.temperature / 100
+        accentColor: root.temperatureColor(CpuService.temperature)
+
+        Behavior on targetX { OverviewMovement {} }
+        Behavior on targetY { OverviewMovement {} }
+    }
+
+    OverviewResourceCard {
+        id: cpuUsageCard
+
+        property real targetX: cpuTemperatureCard.targetX
+        property real targetY: cpuTemperatureCard.targetY + height + 12
+        x: targetX
+        y: targetY
+        width: root.resourceSize.width
+        height: root.resourceSize.height
+        wallpaperSourceItem: root.wallpaperSourceItem
+        wallpaperRect: Qt.rect(x, y, width, height)
+        label: "CPU USAGE"
+        value: CpuService.percent + "%"
+        detail: ""
+        progress: CpuService.usage
+        accentColor: CpuService.usage < 0.5 ? Theme.successColor
+            : CpuService.usage < 0.8 ? Theme.accentColor : Theme.dangerColor
+
+        Behavior on targetX { OverviewMovement {} }
+        Behavior on targetY { OverviewMovement {} }
+    }
+
+    OverviewResourceCard {
+        id: gpuTemperatureCard
+
+        property real targetX: cpuUsageCard.targetX
+        property real targetY: cpuUsageCard.targetY + height + 12
+        x: targetX
+        y: targetY
+        width: root.resourceSize.width
+        height: root.resourceSize.height
+        visible: CpuService.gpuAvailable
+        wallpaperSourceItem: root.wallpaperSourceItem
+        wallpaperRect: Qt.rect(x, y, width, height)
+        label: "GPU TEMPERATURE"
+        value: Math.round(CpuService.gpuTemperature) + "°C"
+        detail: CpuService.gpuName
+        progress: CpuService.gpuTemperature / 100
+        accentColor: root.temperatureColor(CpuService.gpuTemperature)
+
+        Behavior on targetX { OverviewMovement {} }
+        Behavior on targetY { OverviewMovement {} }
+    }
+
     component OverviewMovement: NumberAnimation {
         duration: 700
         easing.type: Easing.InOutCubic
@@ -140,6 +223,10 @@ Item {
     }
     onUsableAreaChanged: schedulePlacement()
     onPlacementTextColorChanged: schedulePlacement()
+    Connections {
+        target: CpuService
+        function onGpuAvailableChanged(): void { root.schedulePlacement(); }
+    }
     onWidthChanged: schedulePlacement()
     onHeightChanged: schedulePlacement()
     Component.onCompleted: schedulePlacement()

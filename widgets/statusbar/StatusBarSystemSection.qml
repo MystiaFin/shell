@@ -15,7 +15,6 @@ Item {
         spacing: 10
 
         BatteryIndicator { anchors.verticalCenter: parent.verticalCenter }
-        CpuIndicator { anchors.verticalCenter: parent.verticalCenter }
         MemoryIndicator { anchors.verticalCenter: parent.verticalCenter }
 
         Rectangle {
