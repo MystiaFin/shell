@@ -18,6 +18,8 @@ Required for the intended desktop:
 - JetBrains Mono Nerd Font for most icons
 - Material Design Icons, declared by the shared typography contract
 - Symbols Nerd Font for workspace symbols
+- ImageMagick 7 for wallpaper-aware Desktop Overview placement
+- `curl` for Open-Meteo weather requests
 
 Optional feature integrations:
 
@@ -70,6 +72,24 @@ Applying a wallpaper writes its file URL to
 loaded on the next start; an empty or missing file selects the default image.
 The wallpaper drives the dynamic shell palette and is revealed on every screen
 with the compiled wallpaper shader.
+
+## Desktop Overview Weather
+
+Desktop Overview reads weather coordinates from the local, ignored
+`weather-location.json` file. Use approximate city-center coordinates to avoid
+storing a precise home location:
+
+```json
+{
+  "latitude": 0.0,
+  "longitude": 0.0,
+  "locationName": "City"
+}
+```
+
+No IP geolocation service is used. Weather requests go directly to Open-Meteo,
+use Celsius, and refresh every 30 minutes. Null coordinates leave the weather
+card in its unconfigured state.
 
 ## Generated Themes And Side Effects
 

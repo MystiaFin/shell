@@ -11,8 +11,10 @@ Singleton {
     readonly property bool available: ready
     property bool ready: false
     property bool started: false
+    property bool windowsReady: false
     property var pendingWorkspaceId: null
     property var workspaces: []
+    property var windows: []
 
     function replaceWorkspace(workspace: var): void {
         const next = root.workspaces.slice();
@@ -22,6 +24,16 @@ Singleton {
         else
             next[index] = workspace;
         root.workspaces = next;
+    }
+
+    function replaceWindow(window: var): void {
+        const next = root.windows.slice();
+        const index = next.findIndex(item => item.id === window.id);
+        if (index === -1)
+            next.push(window);
+        else
+            next[index] = window;
+        root.windows = next;
     }
 
     function handleEvent(event: var): void {
@@ -61,6 +73,23 @@ Singleton {
             if (workspace)
                 root.replaceWorkspace(Object.assign({}, workspace,
                     { active_window_id: change.active_window_id }));
+            return;
+        }
+
+        if (event.WindowsChanged) {
+            root.windows = event.WindowsChanged.windows.slice();
+            root.windowsReady = true;
+            return;
+        }
+
+        if (event.WindowOpenedOrChanged) {
+            root.replaceWindow(event.WindowOpenedOrChanged.window);
+            return;
+        }
+
+        if (event.WindowClosed) {
+            const closedId = event.WindowClosed.id;
+            root.windows = root.windows.filter(window => window.id !== closedId);
         }
     }
 
@@ -115,7 +144,9 @@ Singleton {
                 flush();
             } else if (root.started && root.socketPath) {
                 root.ready = false;
+                root.windowsReady = false;
                 root.workspaces = [];
+                root.windows = [];
                 eventReconnectTimer.restart();
             }
         }

@@ -14,7 +14,6 @@ EdgeOverlayWindow {
 
     required property var modelData
     readonly property var targetScreen: modelData
-
     screen: targetScreen
 
     EdgePanel {

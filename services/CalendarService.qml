@@ -9,7 +9,9 @@ Singleton {
     property date displayedMonth: new Date()
     property date today: new Date()
     property alias daysModel: calendarDaysModel
+    property alias currentDaysModel: currentCalendarDaysModel
     readonly property string monthYear: Qt.formatDate(displayedMonth, "MMMM yyyy")
+    readonly property string currentMonthYear: Qt.formatDate(today, "MMMM yyyy")
 
     function previousMonth(): void {
         displayedMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() - 1, 1);
@@ -27,8 +29,16 @@ Singleton {
     }
 
     function rebuild(): void {
-        const year = displayedMonth.getFullYear();
-        const month = displayedMonth.getMonth();
+        populateMonth(calendarDaysModel, displayedMonth);
+    }
+
+    function rebuildCurrentMonth(): void {
+        populateMonth(currentCalendarDaysModel, today);
+    }
+
+    function populateMonth(model: ListModel, monthDate: date): void {
+        const year = monthDate.getFullYear();
+        const month = monthDate.getMonth();
         const firstWeekday = new Date(year, month, 1).getDay();
         const previousMonthDays = new Date(year, month, 0).getDate();
         const currentMonthDays = new Date(year, month + 1, 0).getDate();
@@ -36,7 +46,7 @@ Singleton {
         const todayMonth = today.getMonth();
         const todayYear = today.getFullYear();
 
-        calendarDaysModel.clear();
+        model.clear();
         for (let cellIndex = 0; cellIndex < 42; cellIndex++) {
             const dayOffset = cellIndex - firstWeekday + 1;
             let dayNumber = dayOffset;
@@ -49,7 +59,7 @@ Singleton {
                 relativeMonth = 1;
             }
 
-            calendarDaysModel.append({
+            model.append({
                 dayNumber: dayNumber,
                 currentMonth: relativeMonth === 0,
                 today: relativeMonth === 0
@@ -61,6 +71,7 @@ Singleton {
     }
 
     ListModel { id: calendarDaysModel }
+    ListModel { id: currentCalendarDaysModel }
 
     Timer {
         id: dayChangeTimer
@@ -69,12 +80,18 @@ Singleton {
         repeat: true
         onTriggered: {
             const now = new Date();
-            if (now.getDate() !== root.today.getDate()) {
+            if (now.getDate() !== root.today.getDate()
+                    || now.getMonth() !== root.today.getMonth()
+                    || now.getFullYear() !== root.today.getFullYear()) {
                 root.today = now;
                 root.rebuild();
+                root.rebuildCurrentMonth();
             }
         }
     }
 
-    Component.onCompleted: rebuild()
+    Component.onCompleted: {
+        rebuild();
+        rebuildCurrentMonth();
+    }
 }

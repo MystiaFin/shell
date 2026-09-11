@@ -211,7 +211,11 @@ PanelWindow {
             easing.type: Easing.OutCubic
         }
 
-        onFinished: StartupState.finishMaskReveal(root.targetScreen.name)
+        onFinished: {
+            StartupState.finishMaskReveal(root.targetScreen.name);
+            DisplayedWallpaperState.setSource(root.targetScreen.name,
+                root.displayedSource);
+        }
     }
 
     NumberAnimation {
@@ -227,6 +231,8 @@ PanelWindow {
         onFinished: {
             root.displayedSource = root.incomingSource;
             root.transitionQueued = false;
+            DisplayedWallpaperState.setSource(root.targetScreen.name,
+                root.displayedSource);
         }
     }
 }

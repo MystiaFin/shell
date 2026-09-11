@@ -35,6 +35,12 @@ ShellRoot {
     Variants {
         model: Quickshell.screens
 
+        FloatingWidgetLayer {}
+    }
+
+    Variants {
+        model: Quickshell.screens
+
         ScreenOverlay {}
     }
 
