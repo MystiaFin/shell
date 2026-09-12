@@ -24,16 +24,18 @@ Item {
         wallpaperRect: root.wallpaperRect
     }
 
-    Column {
+    Item {
         anchors {
             fill: parent
             margins: 18
         }
-        spacing: 4
 
         Text {
+            id: labelText
+
+            anchors.top: parent.top
             width: parent.width
-            text: (root.icon !== "" ? root.icon + "  " : "") + root.label
+            text: root.label
             color: Theme.secondaryTextColor
             font.family: Typography.bodyFontFamily
             font.pixelSize: 13
@@ -42,6 +44,12 @@ Item {
         }
 
         Text {
+            id: detailText
+
+            anchors {
+                top: labelText.bottom
+                topMargin: 2
+            }
             width: parent.width
             height: 14
             opacity: root.detail !== "" ? 1 : 0
@@ -54,17 +62,10 @@ Item {
             verticalAlignment: Text.AlignVCenter
         }
 
-        Text {
-            width: parent.width
-            text: root.value
-            color: Theme.primaryTextColor
-            font.family: Typography.bodyFontFamily
-            font.pixelSize: 34
-            font.weight: Font.Bold
-            horizontalAlignment: root.contentAlignment
-        }
-
         Rectangle {
+            id: progressBar
+
+            anchors.bottom: parent.bottom
             width: parent.width
             height: 5
             radius: height / 2
@@ -82,6 +83,55 @@ Item {
                         easing.type: Easing.OutCubic
                     }
                 }
+            }
+        }
+
+        Item {
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: progressBar.top
+                bottomMargin: 6
+            }
+            height: 38
+
+            Text {
+                id: iconText
+
+                anchors {
+                    left: root.contentAlignment === Text.AlignLeft
+                        ? parent.left : undefined
+                    right: root.contentAlignment === Text.AlignRight
+                        ? parent.right : undefined
+                    verticalCenter: parent.verticalCenter
+                }
+                visible: root.icon !== ""
+                text: root.icon
+                color: Theme.secondaryTextColor
+                font.family: Typography.nerdIconFontFamily
+                font.pixelSize: 28
+                horizontalAlignment: root.contentAlignment
+            }
+
+            Text {
+                anchors {
+                    left: root.contentAlignment === Text.AlignRight
+                        ? parent.left : iconText.right
+                    right: root.contentAlignment === Text.AlignLeft
+                        ? parent.right : iconText.left
+                    leftMargin: root.contentAlignment === Text.AlignLeft
+                        && iconText.visible ? 10 : 0
+                    rightMargin: root.contentAlignment === Text.AlignRight
+                        && iconText.visible ? 10 : 0
+                    verticalCenter: parent.verticalCenter
+                }
+                text: root.value
+                color: Theme.primaryTextColor
+                font.family: Typography.bodyFontFamily
+                font.pixelSize: 34
+                font.weight: Font.Bold
+                horizontalAlignment: root.contentAlignment === Text.AlignLeft
+                    ? Text.AlignRight : Text.AlignLeft
             }
         }
     }

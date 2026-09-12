@@ -132,27 +132,45 @@ Singleton {
     }
 
     function conditionForCode(code: int): string {
-        if (code === 0) return "Clear";
-        if (code === 1 || code === 2) return "Partly cloudy";
-        if (code === 3) return "Overcast";
-        if (code === 45 || code === 48) return "Fog";
-        if (code >= 51 && code <= 67) return "Rain";
-        if (code >= 71 && code <= 77) return "Snow";
-        if (code >= 80 && code <= 82) return "Showers";
-        if (code >= 85 && code <= 86) return "Snow showers";
-        if (code >= 95) return "Thunderstorm";
+        if (code === 0) return "Clear sky";
+        if (code === 1) return "Mainly clear";
+        if (code === 2) return "Partly cloudy";
+        if (code === 3) return "Cloudy";
+        if (code === 45) return "Fog";
+        if (code === 48) return "Rime fog";
+        if (code === 51) return "Light drizzle";
+        if (code === 53) return "Drizzle";
+        if (code === 55) return "Heavy drizzle";
+        if (code === 56 || code === 57) return "Freezing drizzle";
+        if (code === 61) return "Light rain";
+        if (code === 63) return "Rain";
+        if (code === 65) return "Heavy rain";
+        if (code === 66 || code === 67) return "Freezing rain";
+        if (code === 71) return "Light snow";
+        if (code === 73) return "Snow";
+        if (code === 75) return "Heavy snow";
+        if (code === 77) return "Snow grains";
+        if (code === 80) return "Light showers";
+        if (code === 81) return "Rain showers";
+        if (code === 82) return "Heavy showers";
+        if (code === 85 || code === 86) return "Snow showers";
+        if (code === 95) return "Thunderstorm";
+        if (code === 96 || code === 99) return "Thunderstorm with hail";
         return "Weather";
     }
 
     function iconForCode(code: int): string {
         if (code === 0) return "weather-sunny";
-        if (code <= 2) return "weather-partly-cloudy";
+        if (code === 1 || code === 2) return "weather-partly-cloudy";
         if (code === 3) return "weather-cloudy";
         if (code === 45 || code === 48) return "weather-fog";
+        if (code >= 51 && code <= 57) return "weather-pouring";
+        if (code >= 61 && code <= 67) return "weather-rainy";
         if (code >= 71 && code <= 77) return "weather-snowy";
+        if (code >= 80 && code <= 82) return "weather-pouring";
         if (code >= 85 && code <= 86) return "weather-snowy-heavy";
         if (code >= 95) return "weather-lightning-rainy";
-        return "weather-rainy";
+        return "weather-cloudy";
     }
 
     FileView {
