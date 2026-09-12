@@ -24,12 +24,16 @@ ShellRoot {
             && OverlayState.utilityPage === "bluetooth"
     }
 
-    WallpaperPickerWindow {}
-
     Variants {
         model: Quickshell.screens
 
         WallpaperLayer {}
+    }
+
+    Variants {
+        model: Quickshell.screens
+
+        WallpaperPickerWindow {}
     }
 
     Variants {

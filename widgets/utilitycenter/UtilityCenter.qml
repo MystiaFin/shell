@@ -29,7 +29,6 @@ Item {
             Layout.preferredHeight: 38
             currentPage: OverlayState.utilityPage
             onPageRequested: page => OverlayState.utilityPage = page
-            onWallpaperRequested: OverlayState.showWallpaperPicker()
         }
 
         RowLayout {

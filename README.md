@@ -73,6 +73,18 @@ loaded on the next start; an empty or missing file selects the default image.
 The wallpaper drives the dynamic shell palette and is revealed on every screen
 with the compiled wallpaper shader.
 
+The centered wallpaper carousel opens on the focused output. Use `h`/`l` or
+Left/Right to navigate, Enter to apply, and Escape to close without applying.
+It is also available through IPC:
+
+```sh
+quickshell ipc call wallpaper toggle
+quickshell ipc call wallpaper show
+quickshell ipc call wallpaper hide
+quickshell ipc call wallpaper setVisible true
+quickshell ipc call wallpaper getVisible
+```
+
 ## Desktop Overview Weather
 
 Desktop Overview reads weather coordinates from the local, ignored

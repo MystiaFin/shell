@@ -1,32 +1,26 @@
 import QtQuick
+import Quickshell.Widgets
 import "../../components/theme"
 
 Item {
     id: root
 
     required property url source
-    required property string name
-    required property bool selected
+    required property real prominence
     signal selectionRequested()
 
-    Rectangle {
-        anchors {
-            fill: parent
-            margins: 5
-        }
-        radius: ShellMetrics.radiusMedium
-        color: cardHover.hovered
-            ? Theme.surfaceBorderColor
-            : Theme.selectedSurfaceColor
-        border.width: root.selected ? 3 : 0
-        border.color: Theme.accentColor
-        clip: true
+    scale: 0.4 + prominence * 0.95
+    opacity: 0.55 + prominence * 0.45
+    z: Math.round(prominence * 10)
+
+    ClippingRectangle {
+        anchors.fill: parent
+        radius: ShellMetrics.radiusLarge
+        color: Theme.selectedSurfaceColor
+        contentUnderBorder: true
 
         Image {
-            anchors {
-                fill: parent
-                bottomMargin: 30
-            }
+            anchors.fill: parent
             source: root.source
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
@@ -36,49 +30,9 @@ Item {
         }
 
         Rectangle {
-            anchors {
-                right: parent.right
-                bottom: parent.bottom
-                left: parent.left
-            }
-            height: 30
-            color: Theme.selectedSurfaceColor
-
-            Text {
-                anchors {
-                    fill: parent
-                    rightMargin: 9
-                    leftMargin: 9
-                }
-                text: root.name
-                verticalAlignment: Text.AlignVCenter
-                color: Theme.primaryTextColor
-                font.family: Typography.bodyFontFamily
-                font.pixelSize: 10
-                font.weight: Font.DemiBold
-                elide: Text.ElideMiddle
-            }
-        }
-
-        Rectangle {
-            visible: root.selected
-            anchors {
-                top: parent.top
-                right: parent.right
-                margins: 9
-            }
-            width: 25
-            height: 25
-            radius: ShellMetrics.radiusSmall
-            color: Theme.accentColor
-
-            Text {
-                anchors.centerIn: parent
-                text: Icons.confirm
-                color: Theme.accentTextColor
-                font.family: Typography.nerdIconFontFamily
-                font.pixelSize: 13
-            }
+            anchors.fill: parent
+            color: "black"
+            opacity: (1 - root.prominence) * 0.78
         }
 
         HoverHandler {

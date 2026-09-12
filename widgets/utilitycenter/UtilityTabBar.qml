@@ -8,11 +8,9 @@ RowLayout {
     required property string currentPage
 
     signal pageRequested(string page)
-    signal wallpaperRequested()
 
     spacing: 8
 
-    Item { Layout.preferredWidth: 42 }
     Item { Layout.fillWidth: true }
 
     Repeater {
@@ -59,32 +57,4 @@ RowLayout {
     }
 
     Item { Layout.fillWidth: true }
-
-    Rectangle {
-        Layout.preferredWidth: 42
-        Layout.preferredHeight: 38
-        radius: ShellMetrics.radiusMedium
-        color: wallpaperHover.hovered
-            ? Theme.accentColor
-            : Theme.selectedSurfaceColor
-        border.width: 1
-        border.color: Theme.accentColor
-
-        Text {
-            anchors.centerIn: parent
-            text: Icons.wallpaper
-            color: wallpaperHover.hovered
-                ? Theme.accentTextColor
-                : Theme.accentColor
-            font.family: Typography.nerdIconFontFamily
-            font.pixelSize: 19
-        }
-
-        HoverHandler {
-            id: wallpaperHover
-            cursorShape: Qt.PointingHandCursor
-        }
-
-        TapHandler { onTapped: root.wallpaperRequested() }
-    }
 }

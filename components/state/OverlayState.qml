@@ -2,6 +2,7 @@ pragma Singleton
 
 import Quickshell
 import Quickshell.Io
+import "../../services"
 
 Singleton {
     id: root
@@ -16,6 +17,8 @@ Singleton {
     property string utilityPage: "notifications"
     property string launcherInitialQuery: ""
     property int launcherRequestSerial: 0
+    property string wallpaperOutputName: ""
+    property int wallpaperRequestSerial: 0
     property bool statusBarHovered: false
 
     readonly property bool controlCenterVisible: activeOverlay === controlCenter
@@ -82,7 +85,14 @@ Singleton {
         hide(launcher);
     }
 
+    function focusedOutputName(): string {
+        const workspace = NiriService.workspaces.find(item => item.is_focused);
+        return workspace && workspace.output ? workspace.output : "";
+    }
+
     function showWallpaperPicker(): void {
+        wallpaperOutputName = focusedOutputName();
+        wallpaperRequestSerial++;
         show(wallpaperPicker);
     }
 
@@ -126,6 +136,36 @@ Singleton {
 
         function getVisible(): bool {
             return root.launcherVisible;
+        }
+    }
+
+    IpcHandler {
+        target: "wallpaper"
+
+        function toggle(): void {
+            if (root.wallpaperPickerVisible)
+                root.hideWallpaperPicker();
+            else
+                root.showWallpaperPicker();
+        }
+
+        function show(): void {
+            root.showWallpaperPicker();
+        }
+
+        function hide(): void {
+            root.hideWallpaperPicker();
+        }
+
+        function setVisible(visible: bool): void {
+            if (visible)
+                root.showWallpaperPicker();
+            else
+                root.hideWallpaperPicker();
+        }
+
+        function getVisible(): bool {
+            return root.wallpaperPickerVisible;
         }
     }
 }
