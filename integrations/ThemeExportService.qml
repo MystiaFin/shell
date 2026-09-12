@@ -32,6 +32,7 @@ Singleton {
         VesktopThemeService.exportTheme();
         BtopThemeService.exportTheme();
         CavaThemeService.exportTheme();
+        TmuxThemeService.exportTheme();
     }
 
     Timer {

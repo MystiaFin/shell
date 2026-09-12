@@ -109,10 +109,15 @@ At startup and after relevant theme colors change, the shell generates:
   on `127.0.0.1:17384` for the Spicetify theme extension
 - `${XDG_CONFIG_HOME:-$HOME/.config}/btop/themes/quickshell.theme`
 - `${XDG_CONFIG_HOME:-$HOME/.config}/cava/themes/quickshell`
+- `${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/tmux-colors.conf`
 
 The terminal files are overwritten atomically. The shell then asks kitty at
 `unix:@quickshell-kitty` to reload the generated kitty palette and signals
 running foot instances to select the generated light or dark palette.
+Running tmux servers reload their generated status bar, window, message, copy
+mode, and pane-border colors. Add `source-file -q
+~/.config/quickshell/tmux-colors.conf` to `~/.tmux.conf` so newly started tmux
+servers load the most recently generated palette.
 
 The GTK directories are created with `mkdir -p`. Every export rewrites both
 wallpaper-derived variants. Quickshell selects light or dark mode from the
