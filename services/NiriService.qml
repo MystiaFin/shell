@@ -13,6 +13,7 @@ Singleton {
     property bool started: false
     property bool windowsReady: false
     property var pendingWorkspaceId: null
+    property var pendingWindowId: null
     property var workspaces: []
     property var windows: []
 
@@ -119,6 +120,30 @@ Singleton {
         requestSocket.flush();
     }
 
+    function focusWindow(id: int): void {
+        root.pendingWindowId = id;
+        if (!requestSocket.connected) {
+            requestSocket.connected = true;
+            return;
+        }
+
+        root.sendPendingWindow();
+    }
+
+    function sendPendingWindow(): void {
+        if (!requestSocket.connected || root.pendingWindowId === null)
+            return;
+
+        const id = root.pendingWindowId;
+        root.pendingWindowId = null;
+        requestSocket.write(JSON.stringify({
+            Action: {
+                FocusWindow: { id: id }
+            }
+        }) + "\n");
+        requestSocket.flush();
+    }
+
     Component.onCompleted: {
         root.started = true;
         if (!root.socketPath) {
@@ -189,6 +214,7 @@ Singleton {
             if (connected) {
                 requestReconnectTimer.stop();
                 root.sendPendingWorkspace();
+                root.sendPendingWindow();
             } else if (root.started && root.socketPath) {
                 requestReconnectTimer.restart();
             }
