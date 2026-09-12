@@ -4,7 +4,7 @@ Just Another Quickshell Config
 
 ## Preview
 
-https://github.com/user-attachments/assets/f7dedf5c-107b-4851-bfe0-5e00055d25b2
+https://github.com/user-attachments/assets/7d3009c8-16a1-4e49-a7e0-bc08de7df022
 
 ## Dependencies
 
