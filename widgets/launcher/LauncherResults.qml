@@ -1,5 +1,6 @@
 import Quickshell
 import QtQuick
+import "../../components/theme"
 
 ScriptModel {
     id: root
@@ -10,91 +11,64 @@ ScriptModel {
     property var commands: []
     property var tmuxSessions: []
 
-    readonly property bool tmuxMode:
-        query.startsWith("!")
+    readonly property bool tmuxMode: query.startsWith("!")
 
-    readonly property bool commandMode:
-        query.startsWith(">")
+    readonly property bool commandMode: query.startsWith(">")
+
+    readonly property bool colorSchemeMode: query.startsWith(">color ")
 
     values: {
-        if (root.commandMode) {
-            const search =
-                root.query
-                    .slice(1)
-                    .trim()
-                    .toLowerCase();
+        if (root.colorSchemeMode)
+            return colorSchemeResults();
 
-            return root.commands.filter(command =>
-                search.length === 0
-                || command.name
-                    .toLowerCase()
-                    .includes(search)
-            );
+        if (root.commandMode) {
+            const search = root.query.slice(1).trim().toLowerCase();
+
+            return root.commands.filter(command => search.length === 0 || command.name.toLowerCase().includes(search));
         }
 
         if (root.tmuxMode) {
-            const search =
-                root.query
-                    .slice(1)
-                    .trim()
-                    .toLowerCase();
+            const search = root.query.slice(1).trim().toLowerCase();
 
-            const matches =
-                search.length === 0
-                    ? root.tmuxSessions
-                    : root.tmuxSessions.filter(
-                        sessionName =>
-                            sessionName
-                                .toLowerCase()
-                                .includes(search)
-                    );
+            const matches = search.length === 0 ? root.tmuxSessions : root.tmuxSessions.filter(sessionName => sessionName.toLowerCase().includes(search));
 
             return matches.map(sessionName => ({
-                key: "tmux:" + sessionName,
-                type: "tmux",
-                name: sessionName
-            }));
+                        key: "tmux:" + sessionName,
+                        type: "tmux",
+                        name: sessionName
+                    }));
         }
 
-        const search =
-            root.query
-                .trim()
-                .toLowerCase();
+        const search = root.query.trim().toLowerCase();
 
-        const applications = [
-            ...DesktopEntries.applications.values
-        ];
+        const applications = [...DesktopEntries.applications.values];
 
-        const matches =
-            search.length === 0
-                ? applications
-                : applications.filter(application => {
-                    const searchable = [
-                        application.name,
-                        application.genericName,
-                        application.comment,
-                        ...application.keywords
-                    ]
-                        .join(" ")
-                        .toLowerCase();
+        const matches = search.length === 0 ? applications : applications.filter(application => {
+            const searchable = [application.name, application.genericName, application.comment, ...application.keywords].join(" ").toLowerCase();
 
-                    return searchable.includes(search);
-                });
+            return searchable.includes(search);
+        });
 
-        return matches
-            .sort((first, second) => {
-                const nameComparison =
-                    first.name.localeCompare(second.name);
+        return matches.sort((first, second) => {
+            const nameComparison = first.name.localeCompare(second.name);
 
-                return nameComparison !== 0
-                    ? nameComparison
-                    : first.id.localeCompare(second.id);
-            })
-            .map(application => ({
-                key: "app:" + application.id,
-                type: "application",
-                application: application,
-                name: application.name
-            }));
+            return nameComparison !== 0 ? nameComparison : first.id.localeCompare(second.id);
+        }).map(application => ({
+                    key: "app:" + application.id,
+                    type: "application",
+                    application: application,
+                    name: application.name
+                }));
+    }
+
+    function colorSchemeResults(): var {
+        const search = root.query.slice(">color ".length).trim().toLowerCase();
+
+        return Theme.availableThemes.filter(theme => search.length === 0 || theme.name.toLowerCase().includes(search)).map(theme => ({
+                    key: "theme:" + theme.id,
+                    type: "colorScheme",
+                    name: theme.name,
+                    themeId: theme.id
+                }));
     }
 }

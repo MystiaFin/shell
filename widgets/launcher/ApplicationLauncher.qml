@@ -59,6 +59,10 @@ Item {
         case "command":
             runCommand(result.command);
             break;
+        case "colorScheme":
+            Theme.currentTheme = result.themeId;
+            root.closeRequested();
+            break;
         }
     }
 
@@ -79,6 +83,7 @@ Item {
         case "settings":
             break;
         case "colorScheme":
+            searchField.text = ">color ";
             break;
         case "tmux":
             searchField.text = "!";

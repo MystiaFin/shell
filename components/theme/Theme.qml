@@ -10,10 +10,33 @@ Singleton {
     readonly property QtObject catppuccin: Catppuccin {}
     readonly property QtObject gruvbox: Gruvbox {}
     readonly property QtObject dynamic: Dynamic {}
+
+    readonly property var availableThemes: [
+        {
+            id: "dynamic",
+            name: "Dynamic"
+        },
+        {
+            id: "gruvbox",
+            name: "Gruvbox"
+        },
+        {
+            id: "catppuccin",
+            name: "Catppuccin"
+        }
+    ]
+
+    function setTheme(themeId: string): void {
+        const exists = availableThemes.some(theme => theme.id === themeId);
+
+        if (!exists)
+            return;
+
+        currentTheme = themeId;
+    }
+
     readonly property bool dynamicActive: currentTheme === "dynamic"
-    readonly property QtObject activeTheme: dynamicActive
-        ? dynamic
-        : currentTheme === "gruvbox" ? gruvbox : catppuccin
+    readonly property QtObject activeTheme: dynamicActive ? dynamic : currentTheme === "gruvbox" ? gruvbox : catppuccin
 
     readonly property color liquidColor: activeTheme.foregroundColor
     readonly property color windowColor: activeTheme.windowColor
