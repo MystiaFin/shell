@@ -30,13 +30,22 @@ Item {
     opacity: shown && placementReady ? 1 : 0
 
     function requestPlacement(): void {
+        if (!SettingsService.anyFloatingWidgetEnabled()) {
+            placementReady = true;
+            return;
+        }
         if (wallpaperTransitioning || !wallpaperSource.toString()
                 || width <= 0 || height <= 0)
             return;
         const fingerprint = [wallpaperSource.toString(), width, height,
             usableArea.x, usableArea.y, usableArea.width, usableArea.height,
             placementTextColor.toString(), CpuService.gpuAvailable,
-            WeatherService.airQualityAvailable].join("|");
+            WeatherService.airQualityAvailable,
+            SettingsService.clockWidget, SettingsService.weatherWidget,
+            SettingsService.calendarWidget, SettingsService.cpuTemperatureWidget,
+            SettingsService.cpuUsageWidget, SettingsService.gpuTemperatureWidget,
+            SettingsService.uvIndexWidget, SettingsService.humidityWidget,
+            SettingsService.airQualityWidget].join("|");
         if (fingerprint === requestedFingerprint)
             return;
         requestedFingerprint = fingerprint;
@@ -100,7 +109,7 @@ Item {
     }
 
     Behavior on opacity {
-        MotionAnimation { type: MotionAnimation.DefaultEffects }
+        MotionAnimation { group: "floatingWidget"; type: MotionAnimation.DefaultEffects }
     }
 
     FloatingClock {
@@ -113,6 +122,7 @@ Item {
         y: targetY
         width: root.clockSize.width
         height: root.clockSize.height
+        visible: SettingsService.clockWidget
         contentAlignment: x + width / 2 < root.width / 2
             ? Text.AlignLeft : Text.AlignRight
 
@@ -135,6 +145,7 @@ Item {
         y: targetY
         width: root.weatherSize.width
         height: root.weatherSize.height
+        visible: SettingsService.weatherWidget
         wallpaperSourceItem: root.wallpaperSourceItem
         wallpaperRect: Qt.rect(x, y, width, height)
 
@@ -157,6 +168,7 @@ Item {
         y: targetY
         width: root.calendarSize.width
         height: root.calendarSize.height
+        visible: SettingsService.calendarWidget
         wallpaperSourceItem: root.wallpaperSourceItem
         wallpaperRect: Qt.rect(x, y, width, height)
 
@@ -178,6 +190,7 @@ Item {
         targetX: root.usableArea.x + root.usableArea.width - width
         targetY: root.usableArea.y
         cardSize: root.resourceSize
+        visible: SettingsService.cpuTemperatureWidget
         label: "CPU TEMPERATURE"
         icon: Icons.temperature
         value: CpuService.temperatureAvailable
@@ -195,6 +208,7 @@ Item {
         targetX: cpuTemperatureCard.targetX
         targetY: cpuTemperatureCard.targetY + height + 12
         cardSize: root.resourceSize
+        visible: SettingsService.cpuUsageWidget
         label: "CPU USAGE"
         icon: Icons.cpu
         value: CpuService.percent + "%"
@@ -212,7 +226,7 @@ Item {
         targetX: cpuUsageCard.targetX
         targetY: cpuUsageCard.targetY + height + 12
         cardSize: root.resourceSize
-        visible: CpuService.gpuAvailable
+        visible: SettingsService.gpuTemperatureWidget && CpuService.gpuAvailable
         label: "GPU TEMPERATURE"
         icon: Icons.temperature
         value: Math.round(CpuService.gpuTemperature) + "°C"
@@ -229,6 +243,7 @@ Item {
         targetX: root.usableArea.x
         targetY: root.usableArea.y + root.usableArea.height - height
         cardSize: root.environmentSize
+        visible: SettingsService.uvIndexWidget
         label: "UV INDEX"
         icon: Icons.ultraviolet
         value: WeatherService.environmentalAvailable
@@ -246,6 +261,7 @@ Item {
         targetX: uvIndexCard.targetX + width + 12
         targetY: uvIndexCard.targetY
         cardSize: root.environmentSize
+        visible: SettingsService.humidityWidget
         label: "HUMIDITY"
         icon: Icons.humidity
         value: WeatherService.environmentalAvailable
@@ -264,7 +280,7 @@ Item {
         targetX: humidityCard.targetX + width + 12
         targetY: humidityCard.targetY
         cardSize: root.environmentSize
-        visible: WeatherService.airQualityAvailable
+        visible: SettingsService.airQualityWidget && WeatherService.airQualityAvailable
         label: "AQI"
         icon: Icons.airQuality
         value: Math.round(WeatherService.airQualityIndex).toString()
@@ -275,8 +291,8 @@ Item {
     }
 
     component OverviewMovement: MotionAnimation {
+        group: "floatingWidget"
         type: MotionAnimation.SlowSpatial
-        duration: ShellMetrics.floatingWidgetTransitionDurationMs
     }
 
     Timer {
@@ -324,6 +340,18 @@ Item {
         function onAirQualityAvailableChanged(): void {
             root.schedulePlacement();
         }
+    }
+    Connections {
+        target: SettingsService
+        function onClockWidgetChanged(): void { root.schedulePlacement(); }
+        function onWeatherWidgetChanged(): void { root.schedulePlacement(); }
+        function onCalendarWidgetChanged(): void { root.schedulePlacement(); }
+        function onCpuTemperatureWidgetChanged(): void { root.schedulePlacement(); }
+        function onCpuUsageWidgetChanged(): void { root.schedulePlacement(); }
+        function onGpuTemperatureWidgetChanged(): void { root.schedulePlacement(); }
+        function onUvIndexWidgetChanged(): void { root.schedulePlacement(); }
+        function onHumidityWidgetChanged(): void { root.schedulePlacement(); }
+        function onAirQualityWidgetChanged(): void { root.schedulePlacement(); }
     }
     onWidthChanged: schedulePlacement()
     onHeightChanged: schedulePlacement()

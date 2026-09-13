@@ -30,6 +30,7 @@ Item {
 
         remove: Transition {
             MotionAnimation {
+                group: "notification"
                 type: MotionAnimation.FastSpatial
                 property: "slideOffset"
                 from: 0
@@ -39,6 +40,7 @@ Item {
 
         displaced: Transition {
             MotionAnimation {
+                group: "notification"
                 property: "y"
             }
         }

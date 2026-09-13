@@ -14,6 +14,7 @@ Item {
     signal activated(var result)
 
     MotionAnimation {
+        group: "launcher"
         id: listScrollAnimation
 
         target: resultList
@@ -106,6 +107,7 @@ Item {
 
         remove: Transition {
             MotionAnimation {
+                group: "launcher"
                 type: MotionAnimation.FastEffects
                 property: "opacity"
 
@@ -127,6 +129,7 @@ Item {
 
             Behavior on y {
                 MotionAnimation {
+                    group: "launcher"
                     type: MotionAnimation.FastSpatial
                 }
             }

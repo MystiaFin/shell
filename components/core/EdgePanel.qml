@@ -1,6 +1,7 @@
 import QtQuick
 import "../common"
 import "../theme"
+import "../../services"
 
 Item {
     id: root
@@ -41,6 +42,8 @@ Item {
     property real closeMotionDamping: motionDamping
 
     readonly property bool animationsReady: host && host.animationsReady
+    readonly property bool panelMotionEnabled: SettingsService.panelAnimation !== "off"
+    readonly property real durationScale: 340 / Math.max(50, SettingsService.panelDuration)
     readonly property real motionProgress: revealMotion.value
     readonly property real restingX: {
         if (!host)
@@ -95,9 +98,9 @@ Item {
     SpringMotion {
         id: revealMotion
 
-        enabled: root.animationsReady
+        enabled: root.animationsReady && root.panelMotionEnabled
         target: root.shown ? 1 : 0
-        stiffness: root.motionStiffness
+        stiffness: root.motionStiffness * root.durationScale
         damping: root.shown ? root.motionDamping : root.closeMotionDamping
         positionEpsilon: 0.0005
         velocityEpsilon: 0.001
@@ -106,7 +109,8 @@ Item {
     SpringMotion {
         id: heightMotion
 
-        enabled: root.animationsReady
+        enabled: root.animationsReady && root.panelMotionEnabled
+        stiffness: 250 * root.durationScale
         target: root.targetHeight
         positionEpsilon: 0.1
         velocityEpsilon: 0.1

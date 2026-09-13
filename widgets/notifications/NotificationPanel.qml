@@ -53,6 +53,7 @@ Item {
 
             remove: Transition {
                 MotionAnimation {
+                    group: "notification"
                     type: MotionAnimation.FastEffects
                     property: "opacity"
                     to: 0
@@ -61,6 +62,7 @@ Item {
 
             removeDisplaced: Transition {
                 MotionAnimation {
+                    group: "notification"
                     property: "y"
                 }
             }

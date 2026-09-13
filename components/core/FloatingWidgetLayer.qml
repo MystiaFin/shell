@@ -22,7 +22,8 @@ PanelWindow {
         Math.max(1, width - 64),
         Math.max(1, height - ShellMetrics.statusBarHeight - 64))
     readonly property bool floatingWidgetsVisible:
-        StartupState.maskRevealFinished(targetScreen.name)
+        SettingsService.anyFloatingWidgetEnabled()
+        && StartupState.maskRevealFinished(targetScreen.name)
         && FloatingWidgetVisibilityService.visibleOnOutput(targetScreen.name)
 
     screen: targetScreen

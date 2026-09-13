@@ -8,7 +8,7 @@ import "services"
 import "widgets/statusbar"
 
 ShellRoot {
-    Component.onCompleted: ThemeExportService.activateExternalThemeIntegration()
+    Component.onCompleted: ThemeExportService.initialize()
 
     Binding {
         target: NetworkService
@@ -35,6 +35,8 @@ ShellRoot {
 
         WallpaperPickerWindow {}
     }
+
+    SettingsWindow {}
 
     Variants {
         model: Quickshell.screens

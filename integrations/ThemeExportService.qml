@@ -3,42 +3,81 @@ pragma Singleton
 import Quickshell
 import QtQuick
 import "../components/theme"
+import "../services"
 
 Singleton {
     id: root
 
-    property bool active: false
+    property bool initialized: false
 
-    function activateExternalThemeIntegration(): void {
-        if (active)
+    function initialize(): void {
+        if (initialized)
             return;
-        active = true;
-        GtkThemeService.prepareThemeDirectories();
-        SpotifyThemeService.prepareThemeDirectory();
-        BtopThemeService.prepareThemeDirectory();
-        CavaThemeService.prepareThemeDirectory();
+        initialized = true;
+        prepareEnabledIntegrations();
+        scheduleThemeExport();
+    }
+
+    function prepareEnabledIntegrations(): void {
+        if (SettingsService.gtkIntegration)
+            GtkThemeService.prepareThemeDirectories();
+        if (SettingsService.spotifyIntegration)
+            SpotifyThemeService.prepareThemeDirectory();
+        if (SettingsService.btopIntegration)
+            BtopThemeService.prepareThemeDirectory();
+        if (SettingsService.cavaIntegration)
+            CavaThemeService.prepareThemeDirectory();
+    }
+
+    function integrationEnabled(name: string): bool {
+        return SettingsService.integrationEnabled(name);
+    }
+
+    function integrationChanged(name: string, enabled: bool): void {
+        if (!initialized || !enabled)
+            return;
+        if (name === "gtk")
+            GtkThemeService.prepareThemeDirectories();
+        else if (name === "spotify")
+            SpotifyThemeService.prepareThemeDirectory();
+        else if (name === "btop")
+            BtopThemeService.prepareThemeDirectory();
+        else if (name === "cava")
+            CavaThemeService.prepareThemeDirectory();
         scheduleThemeExport();
     }
 
     function scheduleThemeExport(): void {
-        if (active)
+        if (initialized)
             exportTimer.restart();
     }
 
     function exportExternalTheme(): void {
-        TerminalThemeService.exportTerminalTheme();
-        GtkThemeService.exportGtkTheme();
-        SpotifyThemeService.exportTheme();
-        VesktopThemeService.exportTheme();
-        BtopThemeService.exportTheme();
-        CavaThemeService.exportTheme();
-        TmuxThemeService.exportTheme();
+        if (integrationEnabled("terminal")) TerminalThemeService.exportTerminalTheme();
+        if (integrationEnabled("gtk")) GtkThemeService.exportGtkTheme();
+        if (integrationEnabled("spotify")) SpotifyThemeService.exportTheme();
+        if (integrationEnabled("vesktop")) VesktopThemeService.exportTheme();
+        if (integrationEnabled("btop")) BtopThemeService.exportTheme();
+        if (integrationEnabled("cava")) CavaThemeService.exportTheme();
+        if (integrationEnabled("tmux")) TmuxThemeService.exportTheme();
     }
 
     Timer {
         id: exportTimer
         interval: 300
         onTriggered: root.exportExternalTheme()
+    }
+
+    Connections {
+        target: SettingsService
+
+        function onTerminalIntegrationChanged(): void { root.integrationChanged("terminal", SettingsService.terminalIntegration); }
+        function onGtkIntegrationChanged(): void { root.integrationChanged("gtk", SettingsService.gtkIntegration); }
+        function onSpotifyIntegrationChanged(): void { root.integrationChanged("spotify", SettingsService.spotifyIntegration); }
+        function onVesktopIntegrationChanged(): void { root.integrationChanged("vesktop", SettingsService.vesktopIntegration); }
+        function onBtopIntegrationChanged(): void { root.integrationChanged("btop", SettingsService.btopIntegration); }
+        function onCavaIntegrationChanged(): void { root.integrationChanged("cava", SettingsService.cavaIntegration); }
+        function onTmuxIntegrationChanged(): void { root.integrationChanged("tmux", SettingsService.tmuxIntegration); }
     }
 
     Connections {

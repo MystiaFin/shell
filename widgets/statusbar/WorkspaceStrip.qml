@@ -52,12 +52,12 @@ Item {
             rotation: root.starRotation
 
             Behavior on rotation {
-                MotionAnimation { type: MotionAnimation.SlowSpatial }
+                MotionAnimation { group: "statusBar"; type: MotionAnimation.SlowSpatial }
             }
         }
 
         Behavior on x {
-            MotionAnimation { type: MotionAnimation.FastSpatial }
+            MotionAnimation { group: "statusBar"; type: MotionAnimation.FastSpatial }
         }
 
     }
@@ -102,6 +102,6 @@ Item {
     }
 
     Behavior on implicitWidth {
-        MotionAnimation { type: MotionAnimation.FastSpatial }
+        MotionAnimation { group: "statusBar"; type: MotionAnimation.FastSpatial }
     }
 }

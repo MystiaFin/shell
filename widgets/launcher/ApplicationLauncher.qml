@@ -81,6 +81,7 @@ Item {
     function runCommand(command: string): void {
         switch (command) {
         case "settings":
+            OverlayState.showSettings();
             break;
         case "colorScheme":
             searchField.text = ">color ";

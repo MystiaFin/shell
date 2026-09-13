@@ -12,6 +12,7 @@ Singleton {
     readonly property string launcher: "launcher"
     readonly property string wallpaperPicker: "wallpaperPicker"
     readonly property string powerMenu: "powerMenu"
+    readonly property string settings: "settings"
 
     property string activeOverlay: ""
     property string utilityPage: "notifications"
@@ -19,6 +20,8 @@ Singleton {
     property int launcherRequestSerial: 0
     property string wallpaperOutputName: ""
     property int wallpaperRequestSerial: 0
+    property string settingsOutputName: ""
+    property int settingsRequestSerial: 0
     property bool statusBarHovered: false
 
     readonly property bool controlCenterVisible: activeOverlay === controlCenter
@@ -26,6 +29,7 @@ Singleton {
     readonly property bool launcherVisible: activeOverlay === launcher
     readonly property bool wallpaperPickerVisible: activeOverlay === wallpaperPicker
     readonly property bool powerMenuVisible: activeOverlay === powerMenu
+    readonly property bool settingsVisible: activeOverlay === settings
 
     function toggle(overlay: string): void {
         activeOverlay = activeOverlay === overlay ? "" : overlay;
@@ -93,6 +97,16 @@ Singleton {
 
     function hideWallpaperPicker(): void {
         hide(wallpaperPicker);
+    }
+
+    function showSettings(): void {
+        settingsOutputName = focusedOutputName();
+        settingsRequestSerial++;
+        show(settings);
+    }
+
+    function hideSettings(): void {
+        hide(settings);
     }
 
     function togglePowerMenu(): void {

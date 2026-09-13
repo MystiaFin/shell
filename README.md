@@ -105,7 +105,12 @@ card in its unconfigured state.
 
 ## Generated Themes And Side Effects
 
-At startup and after relevant theme colors change, the shell generates:
+External color integrations are disabled by default. Open **Settings** from the
+command palette, review the warning for an integration, and explicitly enable
+it before Quickshell writes files or updates running applications. Preferences
+are stored in `${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/settings.json`.
+
+Depending on which integrations you enable, the shell generates:
 
 - `${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/terminal-colors-kitty.conf`
 - `${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/terminal-colors-foot.ini`
@@ -123,15 +128,16 @@ At startup and after relevant theme colors change, the shell generates:
 - `${XDG_CONFIG_HOME:-$HOME/.config}/cava/themes/quickshell`
 - `${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/tmux-colors.conf`
 
-The terminal files are overwritten atomically. The shell then asks kitty at
+When terminal integration is enabled, its files are overwritten atomically.
+The shell then asks kitty at
 `unix:@quickshell-kitty` to reload the generated kitty palette and signals
 running foot instances to select the generated light or dark palette.
-Running tmux servers reload their generated status bar, window, message, copy
+When tmux integration is enabled, running tmux servers reload their generated status bar, window, message, copy
 mode, and pane-border colors. Add `source-file -q
 ~/.config/quickshell/tmux-colors.conf` to `~/.tmux.conf` so newly started tmux
 servers load the most recently generated palette.
 
-The GTK directories are created with `mkdir -p`. Every export rewrites both
+When GTK integration is enabled, its directories are created with `mkdir -p`. Every export rewrites both
 wallpaper-derived variants. Quickshell selects light or dark mode from the
 wallpaper palette's average luminance, activates the corresponding GTK theme,
 and synchronizes the desktop color-scheme preference. The GNOME portal backend

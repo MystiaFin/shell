@@ -109,22 +109,22 @@ PanelWindow {
 
     MotionAnimation {
         id: backgroundFade
+        group: "statusBar"
         type: MotionAnimation.DefaultEffects
 
         target: root
         property: "backgroundOpacity"
         from: 0
         to: 1
-        duration: ShellMetrics.startupBlockFadeDurationMs
     }
 
     MotionAnimation {
         id: statusIntro
+        group: "statusBar"
 
         target: statusContent
         property: "y"
         to: 0
-        duration: ShellMetrics.startupStatusBarDurationMs
     }
 
     Timer {

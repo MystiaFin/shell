@@ -20,6 +20,7 @@ Item {
 
         Behavior on opacity {
             MotionAnimation {
+                group: "launcher"
                 type: MotionAnimation.FastEffects
             }
         }

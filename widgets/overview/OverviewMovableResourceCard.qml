@@ -20,16 +20,16 @@ OverviewResourceCard {
     Behavior on targetX {
         enabled: root.overview.placementReady
         MotionAnimation {
+            group: "floatingWidget"
             type: MotionAnimation.SlowSpatial
-            duration: ShellMetrics.floatingWidgetTransitionDurationMs
         }
     }
 
     Behavior on targetY {
         enabled: root.overview.placementReady
         MotionAnimation {
+            group: "floatingWidget"
             type: MotionAnimation.SlowSpatial
-            duration: ShellMetrics.floatingWidgetTransitionDurationMs
         }
     }
 }

@@ -194,20 +194,20 @@ PanelWindow {
         id: startupIntro
 
         MotionAnimation {
+            group: "wallpaper"
             type: MotionAnimation.DefaultEffects
             target: solidBlock
             property: "opacity"
             from: 0
             to: 1
-            duration: ShellMetrics.startupBlockFadeDurationMs
         }
 
         MotionAnimation {
+            group: "wallpaper"
             target: wallpaperFrame
             property: "y"
             from: root.height
             to: root.margin
-            duration: ShellMetrics.startupMaskRevealDurationMs
         }
 
         onFinished: {
@@ -218,6 +218,7 @@ PanelWindow {
     }
 
     MotionAnimation {
+        group: "wallpaper"
         id: revealAnimation
         type: MotionAnimation.SlowSpatial
 
@@ -225,7 +226,6 @@ PanelWindow {
         property: "revealRadius"
         from: 0
         to: root.maximumRevealRadius
-        duration: ShellMetrics.wallpaperRevealDurationMs
 
         onFinished: {
             root.displayedSource = root.incomingSource;

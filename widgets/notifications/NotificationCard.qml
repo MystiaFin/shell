@@ -32,6 +32,7 @@ Rectangle {
     }
 
     MotionAnimation {
+        group: "notification"
         id: enterAnimation
         type: MotionAnimation.DefaultSpatial
         target: root
