@@ -9,8 +9,8 @@ Rectangle {
     property bool danger: false
     signal clicked
 
-    width: actionLabel.implicitWidth + 26
-    height: 36
+    width: actionLabel.implicitWidth + 28
+    height: 40
     radius: ShellMetrics.radiusMedium
     color: danger ? Theme.dangerColor : Theme.selectedSurfaceColor
 
@@ -21,7 +21,7 @@ Rectangle {
         text: root.label
         color: root.danger ? Theme.accentTextColor : Theme.primaryTextColor
         font.family: Typography.bodyFontFamily
-        font.pixelSize: 11
+        font.pixelSize: 12
         font.weight: Font.DemiBold
     }
 

@@ -10,8 +10,8 @@ Rectangle {
     property bool transparent: false
     signal clicked
 
-    width: 34
-    height: 34
+    width: 38
+    height: 38
     radius: ShellMetrics.radiusMedium
     color: transparent ? "transparent" : Theme.selectedSurfaceColor
 
@@ -20,7 +20,7 @@ Rectangle {
         text: root.label
         color: root.emphasized ? Theme.accentColor : Theme.primaryTextColor
         font.family: Typography.bodyFontFamily
-        font.pixelSize: 11
+        font.pixelSize: 12
         font.weight: root.emphasized ? Font.DemiBold : Font.Normal
         font.capitalization: Font.Capitalize
     }

@@ -17,19 +17,19 @@ NumberAnimation {
     readonly property int configuredDuration: SettingsService[group + "Duration"]
 
     duration: {
-        if (configuredStyle === "off")
+        if (SettingsService.reduceMotion || configuredStyle === "off")
             return 0;
         if (configuredDuration !== undefined)
-            return configuredDuration;
+            return Math.round(configuredDuration / Math.max(0.1, SettingsService.globalAnimationSpeed));
         if (type === MotionAnimation.FastEffects)
-            return ShellMetrics.fastEffectsDurationMs;
+            return Math.round(ShellMetrics.fastEffectsDurationMs / Math.max(0.1, SettingsService.globalAnimationSpeed));
         if (type === MotionAnimation.DefaultEffects)
-            return ShellMetrics.defaultEffectsDurationMs;
+            return Math.round(ShellMetrics.defaultEffectsDurationMs / Math.max(0.1, SettingsService.globalAnimationSpeed));
         if (type === MotionAnimation.FastSpatial)
-            return ShellMetrics.fastSpatialDurationMs;
+            return Math.round(ShellMetrics.fastSpatialDurationMs / Math.max(0.1, SettingsService.globalAnimationSpeed));
         if (type === MotionAnimation.SlowSpatial)
-            return ShellMetrics.slowSpatialDurationMs;
-        return ShellMetrics.defaultSpatialDurationMs;
+            return Math.round(ShellMetrics.slowSpatialDurationMs / Math.max(0.1, SettingsService.globalAnimationSpeed));
+        return Math.round(ShellMetrics.defaultSpatialDurationMs / Math.max(0.1, SettingsService.globalAnimationSpeed));
     }
     easing.type: Easing.BezierSpline
     easing.bezierCurve: configuredStyle === "fade"

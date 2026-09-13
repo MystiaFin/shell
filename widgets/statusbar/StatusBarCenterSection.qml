@@ -8,9 +8,15 @@ Item {
     id: root
 
     required property date currentTime
+    readonly property string timePattern: SettingsService.clock24Hour
+        ? (SettingsService.clockShowSeconds ? "HH:mm:ss" : "HH:mm")
+        : (SettingsService.clockShowSeconds ? "hh:mm:ss AP" : "hh:mm AP")
 
     implicitWidth: content.width
     implicitHeight: 26
+    visible: SettingsService.statusBarShowAudio
+        || SettingsService.statusBarShowMedia
+        || SettingsService.statusBarShowClock
 
     component BarText: Text {
         height: 26
@@ -23,20 +29,17 @@ Item {
 
     Row {
         id: content
-
         height: parent.height
         spacing: 2
 
         Rectangle {
-            width: controls.width + 16
+            visible: SettingsService.statusBarShowAudio
+            width: visible ? controls.width + 16 : 0
             height: 26
             radius: height / 2
             color: Theme.panelSurfaceColor
 
-            HoverHandler {
-                cursorShape: Qt.PointingHandCursor
-            }
-
+            HoverHandler { cursorShape: Qt.PointingHandCursor }
             MouseArea {
                 anchors.fill: parent
                 z: -1
@@ -46,7 +49,6 @@ Item {
 
             Row {
                 id: controls
-
                 height: parent.height
                 anchors.centerIn: parent
                 spacing: 8
@@ -57,9 +59,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     value: AudioService.volume
                     ringWidth: 4
-                    ringColor: AudioService.muted
-                        ? Theme.mutedTextColor
-                        : Theme.accentColor
+                    ringColor: AudioService.muted ? Theme.mutedTextColor : Theme.accentColor
                     onClicked: OverlayState.toggleControlCenter()
                     onScrolled: delta => AudioService.setVolume(AudioService.volume + delta)
                 }
@@ -70,9 +70,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     value: AudioService.microphoneVolume
                     ringWidth: 4
-                    ringColor: AudioService.microphoneMuted
-                        ? Theme.mutedTextColor
-                        : Theme.accentColor
+                    ringColor: AudioService.microphoneMuted ? Theme.mutedTextColor : Theme.accentColor
                     onClicked: OverlayState.toggleControlCenter()
                     onScrolled: delta => AudioService.setMicrophoneVolume(
                         AudioService.microphoneVolume + delta)
@@ -81,14 +79,14 @@ Item {
         }
 
         Rectangle {
-            width: mediaRow.width + 20
+            visible: SettingsService.statusBarShowMedia
+            width: visible ? mediaRow.width + 20 : 0
             height: 26
             radius: height / 2
             color: Theme.panelSurfaceColor
 
             Row {
                 id: mediaRow
-
                 height: parent.height
                 anchors.centerIn: parent
                 spacing: 7
@@ -115,9 +113,10 @@ Item {
         }
 
         BarText {
+            visible: SettingsService.statusBarShowClock
             anchors.verticalCenter: parent.verticalCenter
             leftPadding: 8
-            text: Qt.formatTime(root.currentTime, "hh:mm AP") + "  •  "
+            text: Qt.formatTime(root.currentTime, root.timePattern) + "  •  "
                 + Qt.formatDate(root.currentTime, "dddd, dd MMM yyyy")
             font.pixelSize: 15
         }

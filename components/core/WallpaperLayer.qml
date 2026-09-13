@@ -12,6 +12,9 @@ PanelWindow {
 
     required property var modelData
     readonly property var targetScreen: modelData
+    readonly property bool barOnTop: SettingsService.statusBarPosition === "top"
+    readonly property real reservedBarHeight: SettingsService.statusBarAutoHide
+        ? 0 : ShellMetrics.statusBarHeight
 
     property url displayedSource: ""
     property url pendingSource: ""
@@ -20,6 +23,7 @@ PanelWindow {
     property real revealCenterX: 0
     property real revealCenterY: 0
     property real revealRadius: 0
+    property real fadeProgress: 0
     property real maximumRevealRadius: 0
     property real margin: 0
     property real cornerRadius: ShellMetrics.desktopFrameRadius
@@ -39,9 +43,37 @@ PanelWindow {
         if (nextSource.toString() === displayedSource.toString())
             return;
 
+        if (SettingsService.wallpaperTransitionType === "instant") {
+            displayedSource = nextSource;
+            incomingSource = "";
+            transitionQueued = false;
+            DisplayedWallpaperState.setSource(targetScreen.name, displayedSource);
+            DisplayedWallpaperState.setTransitioning(targetScreen.name, false);
+            return;
+        }
+
         DisplayedWallpaperState.setTransitioning(targetScreen.name, true);
         pendingSource = nextSource;
         revealDelay.restart();
+    }
+
+    function finishTransition(): void {
+        displayedSource = incomingSource;
+        transitionQueued = false;
+        fadeProgress = 0;
+        DisplayedWallpaperState.setSource(targetScreen.name, displayedSource);
+        DisplayedWallpaperState.setTransitioning(targetScreen.name, false);
+    }
+
+    function startTransition(): void {
+        if (!transitionQueued)
+            return;
+        if (SettingsService.wallpaperTransitionType === "fade") {
+            fadeProgress = 0;
+            fadeAnimation.restart();
+        } else {
+            startReveal();
+        }
     }
 
     function startReveal(): void {
@@ -122,6 +154,8 @@ PanelWindow {
 
             anchors.fill: parent
             source: root.incomingSource
+            opacity: SettingsService.wallpaperTransitionType === "fade"
+                ? root.fadeProgress : 1
             fillMode: root.imageFillMode
             asynchronous: true
             cache: true
@@ -130,7 +164,7 @@ PanelWindow {
 
             onStatusChanged: {
                 if (status === Image.Ready && root.transitionQueued)
-                    root.startReveal();
+                    root.startTransition();
             }
         }
 
@@ -139,7 +173,7 @@ PanelWindow {
             anchors.fill: parent
             visible: false
             sourceItem: incomingImage
-            hideSource: true
+            hideSource: SettingsService.wallpaperTransitionType === "circle"
             live: true
             smooth: true
         }
@@ -147,6 +181,7 @@ PanelWindow {
         ShaderEffect {
             anchors.fill: parent
             visible: root.transitionQueued
+                && SettingsService.wallpaperTransitionType === "circle"
 
             property var source: incomingTexture
             property vector2d surfaceSize: Qt.vector2d(width, height)
@@ -162,9 +197,10 @@ PanelWindow {
     ShaderEffect {
         anchors {
             top: parent.top
-            topMargin: ShellMetrics.statusBarHeight
+            topMargin: root.barOnTop ? root.reservedBarHeight : 0
             right: parent.right
             bottom: parent.bottom
+            bottomMargin: root.barOnTop ? 0 : root.reservedBarHeight
             left: parent.left
         }
 
@@ -186,7 +222,7 @@ PanelWindow {
             root.revealRadius = 0;
             root.transitionQueued = true;
             if (incomingImage.status === Image.Ready)
-                root.startReveal();
+                root.startTransition();
         }
     }
 
@@ -218,6 +254,17 @@ PanelWindow {
     }
 
     MotionAnimation {
+        id: fadeAnimation
+        group: "wallpaper"
+        type: MotionAnimation.DefaultEffects
+        target: root
+        property: "fadeProgress"
+        from: 0
+        to: 1
+        onFinished: root.finishTransition()
+    }
+
+    MotionAnimation {
         group: "wallpaper"
         id: revealAnimation
         type: MotionAnimation.SlowSpatial
@@ -227,13 +274,6 @@ PanelWindow {
         from: 0
         to: root.maximumRevealRadius
 
-        onFinished: {
-            root.displayedSource = root.incomingSource;
-            root.transitionQueued = false;
-            DisplayedWallpaperState.setSource(root.targetScreen.name,
-                root.displayedSource);
-            DisplayedWallpaperState.setTransitioning(root.targetScreen.name,
-                false);
-        }
+        onFinished: root.finishTransition()
     }
 }

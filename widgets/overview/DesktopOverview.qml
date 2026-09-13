@@ -19,17 +19,20 @@ Item {
     readonly property bool wallpaperTransitioning:
         DisplayedWallpaperState.isTransitioning(screenName)
 
-    readonly property size clockSize: Qt.size(300, 132)
-    readonly property size weatherSize: Qt.size(220, 160)
-    readonly property size calendarSize: Qt.size(280, 260)
-    readonly property size resourceSize: Qt.size(190, 125)
-    readonly property size environmentSize: Qt.size(190, 125)
+    readonly property real widgetScale: SettingsService.floatingWidgetScale
+    readonly property size clockSize: Qt.size(300 * widgetScale, 132 * widgetScale)
+    readonly property size weatherSize: Qt.size(220 * widgetScale, 160 * widgetScale)
+    readonly property size calendarSize: Qt.size(280 * widgetScale, 260 * widgetScale)
+    readonly property size resourceSize: Qt.size(190 * widgetScale, 125 * widgetScale)
+    readonly property size environmentSize: Qt.size(190 * widgetScale, 125 * widgetScale)
     readonly property color placementTextColor: Theme.primaryTextColor
 
     visible: (shown && placementReady) || opacity > 0
-    opacity: shown && placementReady ? 1 : 0
+    opacity: shown && placementReady ? SettingsService.floatingWidgetOpacity : 0
 
     function requestPlacement(): void {
+        if (SettingsService.floatingWidgetLockPlacement && placementReady)
+            return;
         if (!SettingsService.anyFloatingWidgetEnabled()) {
             placementReady = true;
             return;
@@ -41,6 +44,7 @@ Item {
             usableArea.x, usableArea.y, usableArea.width, usableArea.height,
             placementTextColor.toString(), CpuService.gpuAvailable,
             WeatherService.airQualityAvailable,
+            SettingsService.floatingWidgetScale,
             SettingsService.clockWidget, SettingsService.weatherWidget,
             SettingsService.calendarWidget, SettingsService.cpuTemperatureWidget,
             SettingsService.cpuUsageWidget, SettingsService.gpuTemperatureWidget,
@@ -352,6 +356,11 @@ Item {
         function onUvIndexWidgetChanged(): void { root.schedulePlacement(); }
         function onHumidityWidgetChanged(): void { root.schedulePlacement(); }
         function onAirQualityWidgetChanged(): void { root.schedulePlacement(); }
+        function onFloatingWidgetScaleChanged(): void { root.schedulePlacement(); }
+        function onFloatingWidgetLockPlacementChanged(): void {
+            if (!SettingsService.floatingWidgetLockPlacement)
+                root.schedulePlacement();
+        }
     }
     onWidthChanged: schedulePlacement()
     onHeightChanged: schedulePlacement()

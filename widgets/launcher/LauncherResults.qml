@@ -1,6 +1,7 @@
 import Quickshell
 import QtQuick
 import "../../components/theme"
+import "../../services"
 
 ScriptModel {
     id: root
@@ -13,9 +14,11 @@ ScriptModel {
 
     readonly property bool tmuxMode: query.startsWith("!")
 
-    readonly property bool commandMode: query.startsWith(">")
+    readonly property bool commandMode: SettingsService.launcherCommandMode
+        && query.startsWith(">")
 
-    readonly property bool colorSchemeMode: query.startsWith(">color ")
+    readonly property bool colorSchemeMode: commandMode
+        && query.startsWith(">color ")
 
     values: {
         if (root.colorSchemeMode)
@@ -35,7 +38,8 @@ ScriptModel {
             return matches.map(sessionName => ({
                         key: "tmux:" + sessionName,
                         type: "tmux",
-                        name: sessionName
+                        name: sessionName,
+                        detail: "tmux session"
                     }));
         }
 
@@ -57,7 +61,8 @@ ScriptModel {
                     key: "app:" + application.id,
                     type: "application",
                     application: application,
-                    name: application.name
+                    name: application.name,
+                    detail: application.genericName || application.comment || "Application"
                 }));
     }
 
@@ -68,6 +73,7 @@ ScriptModel {
                     key: "theme:" + theme.id,
                     type: "colorScheme",
                     name: theme.name,
+                    detail: theme.id === "dynamic" ? "Wallpaper-derived palette" : "Built-in palette",
                     themeId: theme.id
                 }));
     }

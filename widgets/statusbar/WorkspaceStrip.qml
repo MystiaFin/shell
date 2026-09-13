@@ -8,6 +8,7 @@ Item {
 
     required property string outputName
 
+    readonly property string style: SettingsService.workspaceIndicatorStyle
     readonly property var workspaces: NiriService.workspaces
         .filter(workspace => workspace.output === outputName)
         .sort((left, right) => left.idx - right.idx)
@@ -15,10 +16,11 @@ Item {
         const position = workspaces.findIndex(workspace => workspace.is_active);
         return Math.max(0, position);
     }
+    readonly property real itemWidth: style === "dots" ? 18 : 26
     property int previousActivePosition: activePosition
     property real starRotation: 0
 
-    implicitWidth: workspaceRow.width + 8
+    implicitWidth: workspaceRow.width + (style === "pill" ? 8 : 0)
     implicitHeight: 32
 
     onActivePositionChanged: {
@@ -31,14 +33,15 @@ Item {
         anchors.fill: parent
         radius: height / 2
         color: Theme.selectedSurfaceColor
+        visible: root.style === "pill"
     }
 
     Rectangle {
         id: highlight
-
-        x: workspaceRow.x + root.activePosition * (26 + workspaceRow.spacing)
+        visible: root.style === "pill" && root.workspaces.length > 0
+        x: workspaceRow.x + root.activePosition * (root.itemWidth + workspaceRow.spacing)
         anchors.verticalCenter: parent.verticalCenter
-        width: 26
+        width: root.itemWidth
         height: 26
         radius: height / 2
         color: Theme.accentHoverColor
@@ -59,37 +62,64 @@ Item {
         Behavior on x {
             MotionAnimation { group: "statusBar"; type: MotionAnimation.FastSpatial }
         }
-
     }
 
     Row {
         id: workspaceRow
-        x: 4
+        x: root.style === "pill" ? 4 : 0
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 4
+        spacing: root.style === "dots" ? 2 : 4
 
         Repeater {
             model: root.workspaces
 
             Item {
                 id: delegate
-
                 required property var modelData
-
-                width: 26
+                width: root.itemWidth
                 height: 26
 
                 Text {
                     anchors.centerIn: parent
-                    visible: !delegate.modelData.is_active
+                    visible: root.style === "pill" && !delegate.modelData.is_active
                     text: Icons.inactiveWorkspace
-                    color: delegate.modelData.is_urgent
-                            ? Theme.dangerColor
-                            : Theme.mutedTextColor
+                    color: delegate.modelData.is_urgent ? Theme.dangerColor : Theme.mutedTextColor
                     font.family: Typography.symbolIconFontFamily
                     font.pixelSize: 18
                     scale: 0.6
+                }
 
+                Rectangle {
+                    anchors.centerIn: parent
+                    visible: root.style === "dots"
+                    width: delegate.modelData.is_active ? 10 : 6
+                    height: width
+                    radius: width / 2
+                    color: delegate.modelData.is_urgent
+                        ? Theme.dangerColor
+                        : delegate.modelData.is_active ? Theme.accentColor : Theme.mutedTextColor
+
+                    Behavior on width { MotionAnimation { group: "statusBar"; type: MotionAnimation.FastSpatial } }
+                }
+
+                Rectangle {
+                    anchors.centerIn: parent
+                    visible: root.style === "numbers"
+                    width: 24
+                    height: 24
+                    radius: ShellMetrics.radiusSmall
+                    color: delegate.modelData.is_active ? Theme.selectedSurfaceColor : "transparent"
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: delegate.modelData.idx
+                        color: delegate.modelData.is_urgent
+                            ? Theme.dangerColor
+                            : delegate.modelData.is_active ? Theme.accentColor : Theme.mutedTextColor
+                        font.family: Typography.bodyFontFamily
+                        font.pixelSize: 11
+                        font.weight: delegate.modelData.is_active ? Font.DemiBold : Font.Normal
+                    }
                 }
 
                 MouseArea {

@@ -2,6 +2,7 @@ import Quickshell
 import QtQuick
 import "../../components/theme"
 import "../../components/state"
+import "../../services"
 
 Item {
     id: root
@@ -16,7 +17,9 @@ Item {
 
     readonly property real fixedContentHeight: 12 + 8 + 46 + bottomPadding
 
-    readonly property int maximumVisibleRows: Math.max(1, Math.floor((maximumHeight - fixedContentHeight) / resultRowHeight))
+    readonly property int maximumVisibleRows: Math.max(1, Math.min(
+        SettingsService.launcherVisibleRows,
+        Math.floor((maximumHeight - fixedContentHeight) / resultRowHeight)))
 
     readonly property int visibleResultRows: Math.max(1, Math.min(launcherResults.values.length, maximumVisibleRows))
 
@@ -60,22 +63,25 @@ Item {
             runCommand(result.command);
             break;
         case "colorScheme":
-            Theme.currentTheme = result.themeId;
-            root.closeRequested();
+            Theme.setTheme(result.themeId);
+            if (SettingsService.launcherCloseOnLaunch)
+                root.closeRequested();
             break;
         }
     }
 
     function launchApplication(result): void {
         result.application.execute();
-        root.closeRequested();
+        if (SettingsService.launcherCloseOnLaunch)
+            root.closeRequested();
     }
 
     function launchTmux(result): void {
         if (!tmux.launchSession(result.name))
             return;
 
-        root.closeRequested();
+        if (SettingsService.launcherCloseOnLaunch)
+            root.closeRequested();
     }
 
     function runCommand(command: string): void {
@@ -146,7 +152,8 @@ Item {
         if (!shown)
             return;
 
-        searchField.text = root.initialQuery;
+        if (!SettingsService.launcherRememberQuery || root.initialQuery !== "")
+            searchField.text = root.initialQuery;
 
         if (root.tmuxMode)
             tmux.refresh();
@@ -158,7 +165,8 @@ Item {
         if (!shown)
             return;
 
-        searchField.text = root.initialQuery;
+        if (!SettingsService.launcherRememberQuery || root.initialQuery !== "")
+            searchField.text = root.initialQuery;
 
         resultList.resetSelection();
     }

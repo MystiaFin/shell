@@ -15,15 +15,18 @@ Item {
 
     implicitWidth: content.width
     implicitHeight: 32
+    visible: SettingsService.statusBarShowLogo
+        || SettingsService.statusBarShowWorkspaces
+        || SettingsService.statusBarShowWorkspaceName
 
     Row {
         id: content
-
         height: parent.height
         spacing: 10
 
         Item {
-            width: 30
+            visible: SettingsService.statusBarShowLogo
+            width: visible ? 30 : 0
             height: 32
 
             Text {
@@ -43,11 +46,13 @@ Item {
         }
 
         WorkspaceStrip {
+            visible: SettingsService.statusBarShowWorkspaces
             outputName: root.outputName
             anchors.verticalCenter: parent.verticalCenter
         }
 
         Text {
+            visible: SettingsService.statusBarShowWorkspaceName
             height: 26
             anchors.verticalCenter: parent.verticalCenter
             text: root.activeWorkspace

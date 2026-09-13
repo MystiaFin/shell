@@ -42,8 +42,10 @@ Item {
     property real closeMotionDamping: motionDamping
 
     readonly property bool animationsReady: host && host.animationsReady
-    readonly property bool panelMotionEnabled: SettingsService.panelAnimation !== "off"
-    readonly property real durationScale: 340 / Math.max(50, SettingsService.panelDuration)
+    readonly property bool panelMotionEnabled: !SettingsService.reduceMotion
+        && SettingsService.panelAnimation !== "off"
+    readonly property real durationScale: (340 / Math.max(50, SettingsService.panelDuration))
+        * Math.max(0.1, SettingsService.globalAnimationSpeed)
     readonly property real motionProgress: revealMotion.value
     readonly property real restingX: {
         if (!host)

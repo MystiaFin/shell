@@ -3,6 +3,7 @@ import Quickshell.Widgets
 import QtQuick
 import "../../components/common"
 import "../../components/theme"
+import "../../services"
 
 Item {
     id: root
@@ -36,16 +37,11 @@ Item {
         }
 
         implicitSize: 38
-
-        visible: root.result.type === "application"
-
-        source: root.result.type === "application"
-            ? Quickshell.iconPath(
-                root.result.application.icon,
-                "application-x-executable"
-            )
-            : ""
-
+        visible: SettingsService.launcherShowIcons
+            && root.result.type === "application"
+        source: visible
+            ? Quickshell.iconPath(root.result.application.icon,
+                "application-x-executable") : ""
         asynchronous: true
     }
 
@@ -59,41 +55,50 @@ Item {
         }
 
         width: 38
-
-        visible: root.result.type === "command"
+        visible: SettingsService.launcherShowIcons
+            && root.result.type === "command"
         text: visible ? root.result.icon : ""
-
         color: Theme.primaryTextColor
         font.family: Typography.nerdIconFontFamily
         font.pixelSize: 24
         horizontalAlignment: Text.AlignHCenter
     }
 
-    Text {
+    Column {
         anchors {
-            left: {
-                if (root.result.type === "application")
-                    return applicationIcon.right;
-
-                if (root.result.type === "command")
-                    return commandIcon.right;
-
-                return parent.left;
-            }
-
+            left: parent.left
             right: parent.right
             verticalCenter: parent.verticalCenter
-            leftMargin: 12
+            leftMargin: SettingsService.launcherShowIcons
+                && (root.result.type === "application"
+                    || root.result.type === "command") ? 62 : 12
             rightMargin: 12
         }
+        spacing: SettingsService.launcherShowDescriptions ? 1 : 0
 
-        text: root.result.name
-        color: Theme.primaryTextColor
-        font.family: Typography.bodyFontFamily
-        font.pixelSize: 15
-        font.weight: Font.Normal
-        elide: Text.ElideRight
-        maximumLineCount: 1
+        Text {
+            width: parent.width
+            text: root.result.name
+            color: Theme.primaryTextColor
+            font.family: Typography.bodyFontFamily
+            font.pixelSize: 15
+            font.weight: Font.Normal
+            elide: Text.ElideRight
+            maximumLineCount: 1
+        }
+
+        Text {
+            width: parent.width
+            visible: SettingsService.launcherShowDescriptions
+                && root.result.detail !== undefined
+                && root.result.detail !== ""
+            text: visible ? root.result.detail : ""
+            color: Theme.mutedTextColor
+            font.family: Typography.bodyFontFamily
+            font.pixelSize: 10
+            elide: Text.ElideRight
+            maximumLineCount: 1
+        }
     }
 
     HoverHandler {
@@ -101,7 +106,5 @@ Item {
         cursorShape: Qt.PointingHandCursor
     }
 
-    TapHandler {
-        onTapped: root.activated()
-    }
+    TapHandler { onTapped: root.activated() }
 }

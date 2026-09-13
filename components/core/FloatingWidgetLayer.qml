@@ -16,11 +16,15 @@ PanelWindow {
     readonly property url displayedWallpaper:
         publishedWallpaper.toString() !== ""
             ? publishedWallpaper : WallpaperService.source
+    readonly property real widgetInset: 32 * SettingsService.uiScale
+    readonly property bool barOnTop: SettingsService.statusBarPosition === "top"
+    readonly property real reservedBarHeight: SettingsService.statusBarAutoHide
+        ? 0 : ShellMetrics.statusBarHeight
     readonly property rect usableArea: Qt.rect(
-        32,
-        ShellMetrics.statusBarHeight + 32,
-        Math.max(1, width - 64),
-        Math.max(1, height - ShellMetrics.statusBarHeight - 64))
+        widgetInset,
+        widgetInset + (barOnTop ? reservedBarHeight : 0),
+        Math.max(1, width - widgetInset * 2),
+        Math.max(1, height - widgetInset * 2 - reservedBarHeight))
     readonly property bool floatingWidgetsVisible:
         SettingsService.anyFloatingWidgetEnabled()
         && StartupState.maskRevealFinished(targetScreen.name)

@@ -84,7 +84,9 @@ EdgeOverlayWindow {
         wantsKeyboardFocus: true
         focusTarget: launcher.focusTarget
 
-        targetWidth: Math.max(1, Math.min(620, root.width - 80))
+        targetWidth: Math.max(1, Math.min(
+            SettingsService.launcherWidth * SettingsService.uiScale,
+            root.width - 80))
         targetHeight: launcher.desiredHeight
         radius: ShellMetrics.panelRadius
         motionStiffness: ShellMetrics.fastPanelSpringStiffness

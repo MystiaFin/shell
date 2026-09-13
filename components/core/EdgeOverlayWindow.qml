@@ -3,6 +3,8 @@ import Quickshell.Wayland
 import QtQuick
 import "../effects"
 import "../theme"
+import "../state"
+import "../../services"
 
 PanelWindow {
     id: root
@@ -63,6 +65,8 @@ PanelWindow {
     }
 
     mask: Region {
+        Region { item: SettingsService.clickOutsideDismiss
+            && OverlayState.activeOverlay !== "" ? dismissLayer : null }
         Region { item: root.shapeContributorAt(0) }
         Region { item: root.shapeContributorAt(1) }
         Region { item: root.shapeContributorAt(2) }
@@ -71,6 +75,19 @@ PanelWindow {
         Region { item: root.shapeContributorAt(5) }
         Region { item: root.shapeContributorAt(6) }
         Region { item: root.shapeContributorAt(7) }
+    }
+
+
+    Item {
+        id: dismissLayer
+        anchors.fill: parent
+        visible: SettingsService.clickOutsideDismiss
+            && OverlayState.activeOverlay !== ""
+        z: -1
+
+        TapHandler {
+            onTapped: OverlayState.activeOverlay = ""
+        }
     }
 
     SdfLiquidSurface {

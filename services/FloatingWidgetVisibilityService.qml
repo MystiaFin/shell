@@ -12,6 +12,11 @@ Singleton {
     }
 
     function visibleOnOutput(outputName: string): bool {
+        if (SettingsService.floatingWidgetVisibilityMode === "hidden")
+            return false;
+        if (SettingsService.floatingWidgetVisibilityMode === "always")
+            return true;
+
         const workspace = activeWorkspace(outputName);
         if (!workspace)
             return false;

@@ -3,6 +3,7 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Effects
 import "../theme"
+import "../../services"
 
 PanelWindow {
     id: root
@@ -11,7 +12,10 @@ PanelWindow {
     readonly property var targetScreen: modelData
 
     property real cornerRadius: ShellMetrics.radiusLarge
-    property real topInset: 40
+    property real topInset: SettingsService.statusBarPosition === "top"
+        && !SettingsService.statusBarAutoHide ? ShellMetrics.statusBarHeight : 0
+    property real bottomInset: SettingsService.statusBarPosition === "bottom"
+        && !SettingsService.statusBarAutoHide ? ShellMetrics.statusBarHeight : 0
 
     screen: targetScreen
     color: "transparent"
@@ -43,6 +47,7 @@ PanelWindow {
                 topMargin: root.topInset
                 right: parent.right
                 bottom: parent.bottom
+                bottomMargin: root.bottomInset
                 left: parent.left
             }
             color: Theme.shellBackgroundColor
@@ -64,6 +69,7 @@ PanelWindow {
                 topMargin: root.topInset
                 right: parent.right
                 bottom: parent.bottom
+                bottomMargin: root.bottomInset
                 left: parent.left
             }
             layer.enabled: true

@@ -12,7 +12,7 @@ FloatingWindow {
     color: Theme.shellBackgroundColor
     implicitWidth: 980
     implicitHeight: 680
-    minimumSize: Qt.size(720, 520)
+    minimumSize: Qt.size(760, 620)
     maximumSize: Qt.size(1280, 900)
 
     onClosed: OverlayState.hideSettings()

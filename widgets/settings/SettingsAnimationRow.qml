@@ -14,24 +14,24 @@ Item {
     readonly property string styleKey: groupKey + "Animation"
     readonly property string durationKey: groupKey + "Duration"
 
-    height: 78
+    height: 104
 
     Column {
         anchors {
             left: parent.left
             right: controls.left
             verticalCenter: parent.verticalCenter
-            leftMargin: 18
-            rightMargin: 18
+            leftMargin: 20
+            rightMargin: 20
         }
-        spacing: 2
+        spacing: 3
 
         Text {
             width: parent.width
             text: root.title
             color: Theme.primaryTextColor
             font.family: Typography.bodyFontFamily
-            font.pixelSize: 13
+            font.pixelSize: 16
             font.weight: Font.DemiBold
             elide: Text.ElideRight
         }
@@ -41,7 +41,7 @@ Item {
             text: root.detail
             color: Theme.mutedTextColor
             font.family: Typography.bodyFontFamily
-            font.pixelSize: 10
+            font.pixelSize: 12
             elide: Text.ElideRight
         }
     }
@@ -51,13 +51,13 @@ Item {
 
         anchors {
             right: parent.right
-            rightMargin: 16
+            rightMargin: 20
             verticalCenter: parent.verticalCenter
         }
         spacing: 8
 
         SettingsSmallButton {
-            width: 84
+            width: 96
             label: SettingsService[root.styleKey]
             emphasized: true
             onClicked: {
@@ -70,8 +70,8 @@ Item {
         }
 
         Rectangle {
-            width: 136
-            height: 34
+            width: 150
+            height: 36
             radius: ShellMetrics.radiusMedium
             color: Theme.selectedSurfaceColor
 
@@ -81,8 +81,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                     leftMargin: 2
                 }
-                width: 32
-                height: 30
+                width: 36
+                height: 36
                 label: "−"
                 transparent: true
                 onClicked: SettingsService.setValue(
@@ -92,11 +92,11 @@ Item {
 
             Text {
                 anchors.centerIn: parent
-                width: 68
+                width: 78
                 text: SettingsService[root.durationKey] + " ms"
                 color: Theme.secondaryTextColor
                 font.family: Typography.bodyFontFamily
-                font.pixelSize: 10
+                font.pixelSize: 12
                 horizontalAlignment: Text.AlignHCenter
             }
 
@@ -106,8 +106,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                     rightMargin: 2
                 }
-                width: 32
-                height: 30
+                width: 36
+                height: 36
                 label: "+"
                 transparent: true
                 onClicked: SettingsService.setValue(
@@ -123,8 +123,8 @@ Item {
             left: parent.left
             right: parent.right
             bottom: parent.bottom
-            leftMargin: 18
-            rightMargin: 18
+            leftMargin: 20
+            rightMargin: 20
         }
         height: 1
         color: Theme.surfaceBorderColor

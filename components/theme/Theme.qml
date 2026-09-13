@@ -2,41 +2,38 @@ pragma Singleton
 
 import Quickshell
 import QtQuick
+import "../../services"
 import "palettes"
 
 Singleton {
-    property string currentTheme: "dynamic"
+    readonly property string currentTheme: SettingsService.theme
 
     readonly property QtObject catppuccin: Catppuccin {}
     readonly property QtObject gruvbox: Gruvbox {}
     readonly property QtObject dynamic: Dynamic {}
 
     readonly property var availableThemes: [
-        {
-            id: "dynamic",
-            name: "Dynamic"
-        },
-        {
-            id: "gruvbox",
-            name: "Gruvbox"
-        },
-        {
-            id: "catppuccin",
-            name: "Catppuccin"
-        }
+        { id: "dynamic", name: "Dynamic" },
+        { id: "gruvbox", name: "Gruvbox" },
+        { id: "catppuccin", name: "Catppuccin" }
     ]
 
     function setTheme(themeId: string): void {
         const exists = availableThemes.some(theme => theme.id === themeId);
+        if (exists)
+            SettingsService.setValue("theme", themeId);
+    }
 
-        if (!exists)
-            return;
-
-        currentTheme = themeId;
+    function withOpacity(colorValue: color, opacityValue: real): color {
+        return Qt.rgba(colorValue.r, colorValue.g, colorValue.b,
+            Math.max(0, Math.min(1, opacityValue)));
     }
 
     readonly property bool dynamicActive: currentTheme === "dynamic"
-    readonly property QtObject activeTheme: dynamicActive ? dynamic : currentTheme === "gruvbox" ? gruvbox : catppuccin
+    readonly property QtObject activeTheme: dynamicActive
+        ? dynamic : currentTheme === "gruvbox" ? gruvbox : catppuccin
+    readonly property real surfaceOpacity: SettingsService.reduceTransparency
+        ? 1 : SettingsService.surfaceOpacity
 
     readonly property color liquidColor: activeTheme.foregroundColor
     readonly property color windowColor: activeTheme.windowColor
@@ -45,7 +42,8 @@ Singleton {
 
     readonly property color shellBackgroundColor: activeTheme.foregroundColor
     readonly property color shellShadowColor: "#50000000"
-    readonly property color panelSurfaceColor: activeTheme.searchBackgroundColor
+    readonly property color panelSurfaceColor: withOpacity(
+        activeTheme.searchBackgroundColor, surfaceOpacity)
     readonly property color hoverSurfaceColor: activeTheme.itemHoverColor
     readonly property color surfaceBorderColor: activeTheme.searchBorderColor
     readonly property color selectedSurfaceColor: activeTheme.highlightColor
@@ -60,7 +58,10 @@ Singleton {
     readonly property bool lightMode: dynamicActive && dynamic.lightMode
 
     function toggleColorMode(): void {
-        if (dynamicActive)
-            dynamic.toggleMode();
+        if (!dynamicActive)
+            return;
+
+        const next = dynamic.lightMode ? "dark" : "light";
+        SettingsService.setValue("colorMode", next);
     }
 }

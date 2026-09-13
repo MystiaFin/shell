@@ -13,14 +13,17 @@ QtObject {
     readonly property int quantizerDepth: 4
     readonly property int quantizerRescaleSize: 64
 
+    property url paletteSource: WallpaperService.source
     readonly property var palette: quantizer.colors
     readonly property color baseColor: darkestColor(palette)
-    readonly property color accentSeed: mostVibrantColor(palette)
+    readonly property color wallpaperAccentSeed: mostVibrantColor(palette)
+    readonly property color accentSeed: SettingsService.manualAccentEnabled
+        ? SettingsService.manualAccentColor : wallpaperAccentSeed
     readonly property real wallpaperBrightness: averageLuminance(palette)
     readonly property bool automaticLightMode: wallpaperBrightness >= lightModeThreshold
-    readonly property bool lightMode: modeOverride >= 0
-        ? modeOverride === 1 : automaticLightMode
-    property int modeOverride: -1
+    readonly property bool lightMode: SettingsService.colorMode === "light"
+        ? true : SettingsService.colorMode === "dark"
+            ? false : automaticLightMode
     readonly property var lightPalette: buildPalette(true)
     readonly property var darkPalette: buildPalette(false)
     readonly property var activePalette: lightMode ? lightPalette : darkPalette
@@ -42,13 +45,20 @@ QtObject {
     readonly property color successColor: activePalette.success
     readonly property color dangerColor: activePalette.danger
 
-    function toggleMode(): void {
-        modeOverride = lightMode ? 0 : 1;
-    }
-
     property Connections wallpaperConnections: Connections {
         target: WallpaperService
-        function onSourceChanged(): void { root.modeOverride = -1; }
+        function onSourceChanged(): void {
+            if (SettingsService.wallpaperUpdatesPalette)
+                root.paletteSource = WallpaperService.source;
+        }
+    }
+
+    property Connections settingsConnections: Connections {
+        target: SettingsService
+        function onWallpaperUpdatesPaletteChanged(): void {
+            if (SettingsService.wallpaperUpdatesPalette)
+                root.paletteSource = WallpaperService.source;
+        }
     }
 
     function luminance(colorValue: color): real {
@@ -111,8 +121,11 @@ QtObject {
             minimumSaturation: real): color {
         const hue = colorValue.hslHue >= 0 ? colorValue.hslHue : 0;
         const nextSaturation = Math.max(minimumSaturation,
-            Math.min(maximumToneSaturation, colorValue.hslSaturation));
-        return Qt.hsla(hue, nextSaturation, lightness, 1);
+            Math.min(maximumToneSaturation,
+                colorValue.hslSaturation * SettingsService.dynamicSaturation));
+        const contrastedLightness = Math.max(0.02, Math.min(0.98,
+            0.5 + (lightness - 0.5) * SettingsService.dynamicContrast));
+        return Qt.hsla(hue, nextSaturation, contrastedLightness, 1);
     }
 
     function mix(first: color, second: color, amount: real): color {
@@ -162,7 +175,7 @@ QtObject {
     }
 
     property ColorQuantizer quantizer: ColorQuantizer {
-        source: WallpaperService.source
+        source: root.paletteSource
         depth: root.quantizerDepth
         rescaleSize: root.quantizerRescaleSize
     }

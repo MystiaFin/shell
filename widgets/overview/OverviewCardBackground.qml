@@ -43,16 +43,17 @@ Item {
             anchors.fill: wallpaperCrop
             source: wallpaperCrop
             autoPaddingEnabled: false
-            blurEnabled: true
-            blur: 1
+            blurEnabled: !SettingsService.reduceTransparency
+                && SettingsService.blurStrength > 0
+            blur: SettingsService.blurStrength
             blurMax: 64
-            blurMultiplier: 1.5
+            blurMultiplier: 1.5 * Math.max(0.25, SettingsService.blurStrength)
         }
 
         Rectangle {
             anchors.fill: parent
             color: Theme.panelSurfaceColor
-            opacity: 0.32
+            opacity: SettingsService.reduceTransparency ? 0.72 : 0.32
         }
     }
 }
