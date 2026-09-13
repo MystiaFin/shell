@@ -1,6 +1,7 @@
 import Quickshell
 import QtQuick
 import "../../components/theme"
+import "../../components/state"
 
 Item {
     id: root
@@ -75,8 +76,15 @@ Item {
 
     function runCommand(command: string): void {
         switch (command) {
+        case "settings":
+            break;
+        case "colorScheme":
+            break;
         case "tmux":
             searchField.text = "!";
+            break;
+        case "wallpapers":
+            OverlayState.showWallpaperPicker();
             break;
         }
     }
