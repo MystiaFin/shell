@@ -19,22 +19,42 @@ Item {
     property int queryGeneration: 0
 
     readonly property bool tmuxMode: searchInput.text.startsWith("!")
+    readonly property bool commandMode: searchInput.text.startsWith(">")
     readonly property real fixedContentHeight: 12 + 8 + 46 + bottomPadding
-    readonly property int maximumVisibleRows: Math.max(
-        1,
-        Math.floor((maximumHeight - fixedContentHeight) / resultRowHeight)
-    )
-    readonly property int visibleResultRows: Math.max(
-        1,
-        Math.min(filteredResults.values.length, maximumVisibleRows)
-    )
-    readonly property real desiredHeight: Math.min(
-        maximumHeight,
-        fixedContentHeight + visibleResultRows * resultRowHeight
-    )
+    readonly property int maximumVisibleRows: Math.max(1, Math.floor((maximumHeight - fixedContentHeight) / resultRowHeight))
+    readonly property int visibleResultRows: Math.max(1, Math.min(filteredResults.values.length, maximumVisibleRows))
+    readonly property real desiredHeight: Math.min(maximumHeight, fixedContentHeight + visibleResultRows * resultRowHeight)
+
+    readonly property var commands: [
+        {
+            key: "command:settings",
+            type: "command",
+            name: "Settings",
+            command: "settings"
+        },
+        {
+            key: "command:color-scheme",
+            type: "command",
+            name: "Color scheme",
+            command: "colorScheme"
+        },
+        {
+            key: "command:tmux",
+            type: "command",
+            name: "Tmux sessions",
+            command: "tmux"
+        },
+        {
+            key: "command:wallpapers",
+            type: "command",
+            name: "Wallpapers",
+            command: "wallpapers"
+        }
+    ]
+
     property alias focusTarget: searchInput
 
-    signal closeRequested()
+    signal closeRequested
 
     function launchCurrentResult(): void {
         const index = resultList.currentIndex;
@@ -43,11 +63,17 @@ Item {
     }
 
     function launchResult(result): void {
-        if (result.tmuxSession) {
+        switch (result.type) {
+        case "tmux":
             launchTmuxSession(result.name);
-        } else {
+            break;
+        case "command":
+            runCommand(result.command);
+            break;
+        case "application":
             result.application.execute();
-            closeRequested();
+            root.closeRequested();
+            break;
         }
     }
 
@@ -90,14 +116,7 @@ Item {
             return;
         }
 
-        Quickshell.execDetached([
-            terminal,
-            "--",
-            "tmux",
-            "attach-session",
-            "-t",
-            sessionName
-        ]);
+        Quickshell.execDetached([terminal, "--", "tmux", "attach-session", "-t", sessionName]);
         root.closeRequested();
     }
 
@@ -106,46 +125,41 @@ Item {
         objectProp: "key"
 
         values: {
+            if (root.commandMode) {
+                const query = searchInput.text.slice(1).trim().toLowerCase();
+
+                return root.commands.filter(command => query.length === 0 || command.name.toLowerCase().includes(query));
+            }
             if (root.tmuxMode) {
                 const query = searchInput.text.slice(1).trim().toLowerCase();
-                const matches = query.length === 0
-                    ? root.tmuxSessions
-                    : root.tmuxSessions.filter(sessionName =>
-                        sessionName.toLowerCase().includes(query));
+                const matches = query.length === 0 ? root.tmuxSessions : root.tmuxSessions.filter(sessionName => sessionName.toLowerCase().includes(query));
 
                 return matches.map(sessionName => ({
-                    key: "tmux:" + sessionName,
-                    tmuxSession: true,
-                    name: sessionName
-                }));
+                            key: "tmux:" + sessionName,
+                            type: "tmux",
+                            tmuxSession: true,
+                            name: sessionName
+                        }));
             }
 
             const query = searchInput.text.trim().toLowerCase();
             const applications = [...DesktopEntries.applications.values];
-            const matches = query.length === 0
-                ? applications
-                : applications.filter(application => {
-                    const searchable = [
-                        application.name,
-                        application.genericName,
-                        application.comment,
-                        ...application.keywords
-                    ].join(" ").toLowerCase();
+            const matches = query.length === 0 ? applications : applications.filter(application => {
+                const searchable = [application.name, application.genericName, application.comment, ...application.keywords].join(" ").toLowerCase();
 
-                    return searchable.includes(query);
-                });
+                return searchable.includes(query);
+            });
 
             return matches.sort((first, second) => {
                 const nameComparison = first.name.localeCompare(second.name);
-                return nameComparison !== 0
-                    ? nameComparison
-                    : first.id.localeCompare(second.id);
+                return nameComparison !== 0 ? nameComparison : first.id.localeCompare(second.id);
             }).map(application => ({
-                key: "app:" + application.id,
-                tmuxSession: false,
-                application: application,
-                name: application.name
-            }));
+                        key: "app:" + application.id,
+                        type: "application",
+                        tmuxSession: false,
+                        application: application,
+                        name: application.name
+                    }));
         }
     }
 
@@ -254,7 +268,9 @@ Item {
             opacity: resultList.currentItem ? 1 : 0
 
             Behavior on y {
-                MotionAnimation { type: MotionAnimation.FastSpatial }
+                MotionAnimation {
+                    type: MotionAnimation.FastSpatial
+                }
             }
         }
 
@@ -280,13 +296,12 @@ Item {
                 anchors.fill: parent
                 radius: ShellMetrics.radiusMedium
                 color: Theme.hoverSurfaceColor
-                opacity: resultHover.hovered
-                    && !resultDelegate.ListView.isCurrentItem
-                    ? 1
-                    : 0
+                opacity: resultHover.hovered && !resultDelegate.ListView.isCurrentItem ? 1 : 0
 
                 Behavior on opacity {
-                    MotionAnimation { type: MotionAnimation.FastEffects }
+                    MotionAnimation {
+                        type: MotionAnimation.FastEffects
+                    }
                 }
             }
 
@@ -300,20 +315,13 @@ Item {
                 }
                 implicitSize: 38
                 visible: !parent.result.tmuxSession
-                source: Quickshell.iconPath(
-                    parent.result.tmuxSession
-                        ? ""
-                        : parent.result.application.icon,
-                    "application-x-executable"
-                )
+                source: Quickshell.iconPath(parent.result.tmuxSession ? "" : parent.result.application.icon, "application-x-executable")
                 asynchronous: true
             }
 
             Text {
                 anchors {
-                    left: parent.result.tmuxSession
-                        ? parent.left
-                        : resultIcon.right
+                    left: parent.result.tmuxSession ? parent.left : resultIcon.right
                     right: parent.right
                     verticalCenter: parent.verticalCenter
                     leftMargin: 12
