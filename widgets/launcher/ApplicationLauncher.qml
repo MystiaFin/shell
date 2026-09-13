@@ -11,45 +11,21 @@ Item {
 
     property real maximumHeight: 620
     property real resultRowHeight: 60
-    property real bottomPadding:
-        ShellMetrics.panelContentInsetFromEdge
+    property real bottomPadding: ShellMetrics.panelContentInsetFromEdge
 
-    readonly property real fixedContentHeight:
-        12 + 8 + 46 + bottomPadding
+    readonly property real fixedContentHeight: 12 + 8 + 46 + bottomPadding
 
-    readonly property int maximumVisibleRows:
-        Math.max(
-            1,
-            Math.floor(
-                (maximumHeight - fixedContentHeight)
-                / resultRowHeight
-            )
-        )
+    readonly property int maximumVisibleRows: Math.max(1, Math.floor((maximumHeight - fixedContentHeight) / resultRowHeight))
 
-    readonly property int visibleResultRows:
-        Math.max(
-            1,
-            Math.min(
-                launcherResults.values.length,
-                maximumVisibleRows
-            )
-        )
+    readonly property int visibleResultRows: Math.max(1, Math.min(launcherResults.values.length, maximumVisibleRows))
 
-    readonly property real desiredHeight:
-        Math.min(
-            maximumHeight,
-            fixedContentHeight
-            + visibleResultRows * resultRowHeight
-        )
+    readonly property real desiredHeight: Math.min(maximumHeight, fixedContentHeight + visibleResultRows * resultRowHeight)
 
-    readonly property bool tmuxMode:
-        launcherResults.tmuxMode
+    readonly property bool tmuxMode: launcherResults.tmuxMode
 
-    readonly property bool commandMode:
-        launcherResults.commandMode
+    readonly property bool commandMode: launcherResults.commandMode
 
-    property alias focusTarget:
-        searchField.focusTarget
+    property alias focusTarget: searchField.focusTarget
 
     signal closeRequested
 
@@ -64,14 +40,11 @@ Item {
     LauncherResults {
         id: launcherResults
 
-        query:
-            searchField.text
+        query: searchField.text
 
-        commands:
-            launcherCommands.items
+        commands: launcherCommands.items
 
-        tmuxSessions:
-            tmux.sessions
+        tmuxSessions: tmux.sessions
     }
 
     function launchResult(result): void {
@@ -79,11 +52,9 @@ Item {
         case "application":
             launchApplication(result);
             break;
-
         case "tmux":
             launchTmux(result);
             break;
-
         case "command":
             runCommand(result.command);
             break;
@@ -103,10 +74,11 @@ Item {
     }
 
     function runCommand(command: string): void {
-        console.log(
-            "Command selected:",
-            command
-        );
+        switch (command) {
+        case "tmux":
+            searchField.text = "!";
+            break;
+        }
     }
 
     LauncherSearchField {
@@ -117,24 +89,19 @@ Item {
             left: parent.left
             right: parent.right
 
-            bottomMargin:
-                root.bottomPadding
+            bottomMargin: root.bottomPadding
 
             leftMargin: 14
             rightMargin: 14
         }
 
-        onMoveSelectionRequested: down =>
-            resultList.moveSelection(down)
+        onMoveSelectionRequested: down => resultList.moveSelection(down)
 
-        onAccepted:
-            resultList.activateCurrent()
+        onAccepted: resultList.activateCurrent()
 
-        onCloseRequested:
-            root.closeRequested()
+        onCloseRequested: root.closeRequested()
 
-        onTextChanged:
-            resultList.resetSelection()
+        onTextChanged: resultList.resetSelection()
     }
 
     LauncherResultList {
@@ -152,29 +119,20 @@ Item {
             bottomMargin: 8
         }
 
-        model:
-            launcherResults
+        model: launcherResults
 
-        rowHeight:
-            root.resultRowHeight
+        rowHeight: root.resultRowHeight
 
-        emptyText:
-            root.tmuxMode
-                ? "No tmux sessions found"
-                : root.commandMode
-                    ? "No commands found"
-                    : "No applications found"
+        emptyText: root.tmuxMode ? "No tmux sessions found" : root.commandMode ? "No commands found" : "No applications found"
 
-        onActivated: result =>
-            root.launchResult(result)
+        onActivated: result => root.launchResult(result)
     }
 
     onShownChanged: {
         if (!shown)
             return;
 
-        searchField.text =
-            root.initialQuery;
+        searchField.text = root.initialQuery;
 
         if (root.tmuxMode)
             tmux.refresh();
@@ -186,8 +144,7 @@ Item {
         if (!shown)
             return;
 
-        searchField.text =
-            root.initialQuery;
+        searchField.text = root.initialQuery;
 
         resultList.resetSelection();
     }
