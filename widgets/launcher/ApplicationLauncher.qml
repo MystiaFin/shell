@@ -25,32 +25,9 @@ Item {
     readonly property int visibleResultRows: Math.max(1, Math.min(filteredResults.values.length, maximumVisibleRows))
     readonly property real desiredHeight: Math.min(maximumHeight, fixedContentHeight + visibleResultRows * resultRowHeight)
 
-    readonly property var commands: [
-        {
-            key: "command:settings",
-            type: "command",
-            name: "Settings",
-            command: "settings"
-        },
-        {
-            key: "command:color-scheme",
-            type: "command",
-            name: "Color scheme",
-            command: "colorScheme"
-        },
-        {
-            key: "command:tmux",
-            type: "command",
-            name: "Tmux sessions",
-            command: "tmux"
-        },
-        {
-            key: "command:wallpapers",
-            type: "command",
-            name: "Wallpapers",
-            command: "wallpapers"
-        }
-    ]
+    LauncherCommands {
+        id: launcherCommands
+    }
 
     property alias focusTarget: searchInput
 
@@ -132,7 +109,7 @@ Item {
             if (root.commandMode) {
                 const query = searchInput.text.slice(1).trim().toLowerCase();
 
-                return root.commands.filter(command => query.length === 0 || command.name.toLowerCase().includes(query));
+                return launcherCommands.items.filter(command => query.length === 0 || command.name.toLowerCase().includes(query));
             }
             if (root.tmuxMode) {
                 const query = searchInput.text.slice(1).trim().toLowerCase();
@@ -325,8 +302,28 @@ Item {
             }
 
             Text {
+                id: commandIcon
+
                 anchors {
-                    left: parent.result.type === "application" ? resultIcon.right : parent.left
+                    left: parent.left
+                    verticalCenter: parent.verticalCenter
+                    leftMargin: 12
+                }
+
+                width: 38
+
+                visible: parent.result.type === "command"
+                text: parent.result.type === "command" ? parent.result.icon : ""
+
+                color: Theme.primaryTextColor
+                font.family: Typography.nerdIconFontFamily
+                font.pixelSize: 24
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            Text {
+                anchors {
+                    left: parent.result.type === "application" ? resultIcon.right : parent.result.type === "command" ? commandIcon.right : parent.left
                     right: parent.right
                     verticalCenter: parent.verticalCenter
                     leftMargin: 12

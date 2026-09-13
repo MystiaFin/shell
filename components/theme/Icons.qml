@@ -42,4 +42,7 @@ Singleton {
     readonly property string restart: "󰜉"
     readonly property string sleep: "󰒲"
     readonly property string logout: "󰍃"
+    readonly property string settings: "󰒓"
+    readonly property string colorScheme: "󰏘"
+    readonly property string terminal: "󰆍"
 }
