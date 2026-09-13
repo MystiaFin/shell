@@ -1,95 +1,215 @@
-# JAQC-shell. 
+<div align="center">
+  <h1>JAQC-shell</h1>
+  <p><strong>Just Another Quickshell Config.</strong><br>
+  An opinionated Wayland desktop shell built with Quickshell and QML for Niri.</p>
 
-Just Another Quickshell Config
+  <p>
+    <img alt="Quickshell 0.3" src="https://img.shields.io/badge/QUICKSHELL-0.3-89b4fa?style=flat-square&labelColor=181825">
+    <img alt="Niri" src="https://img.shields.io/badge/COMPOSITOR-NIRI-89b4fa?style=flat-square&labelColor=181825">
+    <img alt="QML" src="https://img.shields.io/badge/UI-QML-89b4fa?style=flat-square&labelColor=181825">
+  </p>
+</div>
 
 ## Preview
 
 https://github.com/user-attachments/assets/7d3009c8-16a1-4e49-a7e0-bc08de7df022
 
+## Overview
+
+JAQC-shell is my personal Quickshell configuration: a complete desktop shell rather than a collection of disconnected widgets.
+
+### Included
+
+- Status bar with workspaces, system information, clock, media, and connectivity
+- Application launcher with a `>` command mode
+- Control center and utility panels
+- Notification center
+- Wallpaper picker with animated transitions
+- Wallpaper-derived dynamic color palette
+- Desktop overview and floating widgets
+- Power menu
+- Built-in settings window
+- Optional theme integrations for GTK, terminals, tmux, Vesktop, Spotify, btop, and cava
+
+## Installation
+
+Clone the repository as your Quickshell config:
+
+```sh
+git clone https://github.com/MystiaFin/shell.git ~/.config/quickshell
+```
+
+Then launch it:
+
+```sh
+qs
+```
+
+> [!NOTE]
+> This config is built around Niri. Some components depend directly on Niri IPC and are not expected to work unchanged on other compositors.
+
 ## Dependencies
 
-Required for the intended desktop:
+### Required
 
-- Quickshell 0.3 with the Wayland, networking, Bluetooth, notifications, and I/O
-  modules used by the source
-- Niri, including the `NIRI_SOCKET` environment variable for workspace IPC
-- Linux `/proc` and `/sys` interfaces for CPU, memory, and battery data
-- Poppins for text
-- JetBrains Mono Nerd Font for most icons
-- Material Design Icons, declared by the shared typography contract
-- Symbols Nerd Font for workspace symbols
-- ImageMagick 7 for wallpaper-aware Desktop Overview placement
-- `curl` for Open-Meteo weather requests
+- **Quickshell 0.3** with the Wayland, networking, Bluetooth, notifications, and I/O modules used by the config
+- **Niri** with `NIRI_SOCKET` available
+- **Poppins**
+- **JetBrains Mono Nerd Font**
+- **Symbols Nerd Font**
+- **Material Design Icons**
+- **ImageMagick 7**
+- **curl**
 
-Optional feature integrations:
+### Optional
 
-- `cava` for the media visualizer
-- `wpctl` with WirePlumber for output and microphone volume
-- `brightnessctl` for display brightness
-- kitty remote control for live terminal recoloring; kitty must listen on
-  `unix:@quickshell-kitty` and permit remote control
-- `pkill` for switching running foot instances to the generated light or dark
-  palette
-- `dconf` for selecting the generated GTK theme
+These are only needed for their corresponding features:
 
-Developer validation requires `git`, `bash`, `cmp`, and Qt's `qsb`. The check
-script also uses `qmlformat` and `qmllint` when they are installed.
+| Package | Used for |
+| --- | --- |
+| `cava` | Media visualizer |
+| `wpctl` / WirePlumber | Volume and microphone control |
+| `brightnessctl` | Display brightness |
+| `kitty` remote control | Live kitty palette updates |
+| `dconf` | GTK theme switching |
+| `tmux` | Generated tmux palette integration |
 
-## Run
+## Launcher
 
-```sh
-quickshell -p "${XDG_CONFIG_HOME:-$HOME/.config}/quickshell"
-```
+The launcher handles normal application search and also acts as a small command palette.
 
-Do not use startup as a validation command: startup performs the theme export
-side effects described below.
+Type `>` to switch into command mode. Commands can expose things such as:
 
-## Launcher IPC
+- Settings
+- Wallpapers
+- Tmux sessions
+- Other shell actions
 
-The launcher exposes the `launcher` IPC target. For the default configuration:
+The available command entries can be enabled or disabled from **Settings → Launcher**.
 
-```sh
-quickshell ipc call launcher toggle
-quickshell ipc call launcher show
-quickshell ipc call launcher hide
-quickshell ipc call launcher setVisible true
-quickshell ipc call launcher getVisible
-```
-
-If the configuration was started from another path, select the same instance
-with `quickshell ipc -p /path/to/config call launcher toggle`.
-
-## Wallpapers
-
-The picker reads image files from `$XDG_PICTURES_DIR/Wallpapers`. If
-`XDG_PICTURES_DIR` is unset, it uses `$HOME/Pictures/Wallpapers`. Quoted values
-and literal `$HOME` or `${HOME}` segments in `XDG_PICTURES_DIR` are expanded.
-The directory is not created automatically. The picker accepts JPEG, PNG, and
-WebP files and defaults to `wallpaper_2.jpg` in that directory.
-
-Applying a wallpaper writes its file URL to
-`${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/wallpaper-selection`. That file is
-loaded on the next start; an empty or missing file selects the default image.
-The wallpaper drives the dynamic shell palette and is revealed on every screen
-with the compiled wallpaper shader.
-
-The centered wallpaper carousel opens on the focused output. Use `h`/`l` or
-Left/Right to navigate, Enter to apply, and Escape to close without applying.
-It is also available through IPC:
+<details>
+<summary><strong>Launcher IPC</strong></summary>
 
 ```sh
-quickshell ipc call wallpaper toggle
-quickshell ipc call wallpaper show
-quickshell ipc call wallpaper hide
-quickshell ipc call wallpaper setVisible true
-quickshell ipc call wallpaper getVisible
+qs ipc call launcher toggle
+qs ipc call launcher show
+qs ipc call launcher hide
+qs ipc call launcher setVisible true
+qs ipc call launcher getVisible
 ```
 
-## Desktop Overview Weather
+</details>
 
-Desktop Overview reads weather coordinates from the local, ignored
-`weather-location.json` file. Use approximate city-center coordinates to avoid
-storing a precise home location:
+## Wallpapers & colors
+
+By default the wallpaper picker reads images from:
+
+```text
+$XDG_PICTURES_DIR/Wallpapers
+```
+
+or, when `XDG_PICTURES_DIR` is not set:
+
+```text
+~/Pictures/Wallpapers
+```
+
+JPEG, PNG, and WebP files are supported.
+
+The selected wallpaper is persisted in:
+
+```text
+~/.config/quickshell/wallpaper-selection
+```
+
+The wallpaper can also drive the shell's dynamic palette. Wallpaper transitions, shuffle behavior, palette synchronization, and color preferences are configurable from the settings window.
+
+<details>
+<summary><strong>Wallpaper IPC</strong></summary>
+
+```sh
+qs ipc call wallpaper toggle
+qs ipc call wallpaper show
+qs ipc call wallpaper hide
+qs ipc call wallpaper setVisible true
+qs ipc call wallpaper getVisible
+```
+
+</details>
+
+## Settings
+
+The shell includes its own settings window instead of requiring QML edits for normal day-to-day preferences.
+
+Current sections include:
+
+- Appearance
+- Colors
+- Launcher
+- Wallpaper
+- Status bar
+- Behavior
+- Floating widgets
+- Animations
+- Integrations
+- About
+
+Settings are stored in:
+
+```text
+~/.config/quickshell/settings.json
+```
+
+## Theme integrations
+
+External theme integrations are **opt-in**. Enabling one may generate configuration files or update a running application, so the shell does not enable them automatically.
+
+Supported integrations currently include:
+
+- GTK 3 / GTK 4
+- kitty
+- foot
+- tmux
+- Vesktop
+- Spotify / Spicetify
+- btop
+- cava
+
+<details>
+<summary><strong>Generated files and side effects</strong></summary>
+
+Depending on which integrations are enabled, JAQC-shell may generate files under your Quickshell config, user theme directory, application config directories, or cache directory.
+
+Examples include:
+
+```text
+~/.config/quickshell/terminal-colors-kitty.conf
+~/.config/quickshell/terminal-colors-foot.ini
+~/.config/quickshell/tmux-colors.conf
+~/.config/btop/themes/quickshell.theme
+~/.config/cava/themes/quickshell
+~/.cache/quickshell-theme/spotify.css
+```
+
+GTK integration also generates light and dark wallpaper-derived themes under `~/.local/share/themes/` and updates the active color-scheme preference.
+
+For tmux, add this to `~/.tmux.conf` so new sessions load the generated palette:
+
+```tmux
+source-file -q ~/.config/quickshell/tmux-colors.conf
+```
+
+</details>
+
+## Weather
+
+The desktop overview reads its location from the ignored local file:
+
+```text
+~/.config/quickshell/weather-location.json
+```
+
+Example:
 
 ```json
 {
@@ -99,53 +219,23 @@ storing a precise home location:
 }
 ```
 
-No IP geolocation service is used. Weather requests go directly to Open-Meteo,
-use Celsius, and refresh every 30 minutes. Null coordinates leave the weather
-card in its unconfigured state.
+Using approximate city-center coordinates is enough. Weather data is fetched directly from Open-Meteo; no IP geolocation service is used.
 
-## Generated Themes And Side Effects
+## Project structure
 
-External color integrations are disabled by default. Open **Settings** from the
-command palette, review the warning for an integration, and explicitly enable
-it before Quickshell writes files or updates running applications. Preferences
-are stored in `${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/settings.json`.
+```text
+components/      shared shell primitives, state, effects, and theme code
+services/        settings, wallpaper, and background services
+widgets/         launcher, bar, notifications, settings, overview, etc.
+integrations/    external theme/application integration logic
+shaders/         compiled visual effects and wallpaper transitions
+icons/           shell icon assets
+shell.qml        root configuration
+```
 
-Depending on which integrations you enable, the shell generates:
+## Notes
 
-- `${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/terminal-colors-kitty.conf`
-- `${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/terminal-colors-foot.ini`
-- `${XDG_DATA_HOME:-$HOME/.local/share}/themes/QuickshellDynamicLight/` with
-  `index.theme`, `gtk-3.0/gtk.css`, and `gtk-4.0/gtk.css`
-- `${XDG_DATA_HOME:-$HOME/.local/share}/themes/QuickshellDynamicDark/` with the
-  same GTK files
-- `${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0/gtk.css`, linked to the active
-  variant for libadwaita clients such as the GNOME portal file picker
-- `${XDG_CONFIG_HOME:-$HOME/.config}/vesktop/settings/quickCss.css`, with a
-  managed Quickshell block that Vencord reloads live
-- `${XDG_CACHE_HOME:-$HOME/.cache}/quickshell-theme/spotify.css`, served only
-  on `127.0.0.1:17384` for the Spicetify theme extension
-- `${XDG_CONFIG_HOME:-$HOME/.config}/btop/themes/quickshell.theme`
-- `${XDG_CONFIG_HOME:-$HOME/.config}/cava/themes/quickshell`
-- `${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/tmux-colors.conf`
+This is a personal config that I daily-drive and keep changing. Expect opinions, occasional breakage, and features that exist because I wanted them on my own desktop.
 
-When terminal integration is enabled, its files are overwritten atomically.
-The shell then asks kitty at
-`unix:@quickshell-kitty` to reload the generated kitty palette and signals
-running foot instances to select the generated light or dark palette.
-When tmux integration is enabled, running tmux servers reload their generated status bar, window, message, copy
-mode, and pane-border colors. Add `source-file -q
-~/.config/quickshell/tmux-colors.conf` to `~/.tmux.conf` so newly started tmux
-servers load the most recently generated palette.
+If you use it as a base for your own setup, reading and modifying the QML is very much part of the experience.
 
-When GTK integration is enabled, its directories are created with `mkdir -p`. Every export rewrites both
-wallpaper-derived variants. Quickshell selects light or dark mode from the
-wallpaper palette's average luminance, activates the corresponding GTK theme,
-and synchronizes the desktop color-scheme preference. The GNOME portal backend
-is restarted after the GTK4 user stylesheet changes because libadwaita does not
-load custom GTK theme names. Generated files and the wallpaper selection are
-intentionally ignored by Git.
-
-Vesktop keeps user-written Quick CSS outside the `quickshell-theme` marker
-block. Spotify's Nix-built files remain immutable; a Home Manager user service
-serves the generated CSS and the bundled Spicetify extension refreshes it while
-Spotify is running.
