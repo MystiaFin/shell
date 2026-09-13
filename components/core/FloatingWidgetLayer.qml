@@ -3,7 +3,6 @@ import Quickshell.Wayland
 import QtQuick
 import "../../services"
 import "../../widgets/overview"
-import "../../widgets/dock"
 import "../state"
 import "../theme"
 
@@ -17,14 +16,11 @@ PanelWindow {
     readonly property url displayedWallpaper:
         publishedWallpaper.toString() !== ""
             ? publishedWallpaper : WallpaperService.source
-    readonly property real dockReservation: applicationDock.hasApplications
-        ? applicationDock.height + 16 : 0
     readonly property rect usableArea: Qt.rect(
         32,
         ShellMetrics.statusBarHeight + 32,
         Math.max(1, width - 64),
-        Math.max(1, height - ShellMetrics.statusBarHeight - 64
-            - dockReservation))
+        Math.max(1, height - ShellMetrics.statusBarHeight - 64))
     readonly property bool floatingWidgetsVisible:
         StartupState.maskRevealFinished(targetScreen.name)
         && FloatingWidgetVisibilityService.visibleOnOutput(targetScreen.name)
@@ -40,10 +36,6 @@ PanelWindow {
         right: true
         bottom: true
         left: true
-    }
-
-    mask: Region {
-        Region { item: applicationDock }
     }
 
     Image {
@@ -65,20 +57,6 @@ PanelWindow {
         usableArea: root.usableArea
         wallpaperSource: root.displayedWallpaper
         wallpaperSourceItem: wallpaperTexture
-        shown: root.floatingWidgetsVisible
-    }
-
-    ApplicationDock {
-        id: applicationDock
-
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            bottom: parent.bottom
-            bottomMargin: 32
-        }
-        maximumWidth: root.usableArea.width
-        wallpaperSourceItem: wallpaperTexture
-        wallpaperRect: Qt.rect(x, y, width, height)
         shown: root.floatingWidgetsVisible
     }
 }
