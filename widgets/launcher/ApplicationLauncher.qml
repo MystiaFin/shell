@@ -62,6 +62,10 @@ Item {
             launchResult(filteredResults.values[index]);
     }
 
+    function runCommand(command: string): void {
+        console.log("Command selected:", command);
+    }
+
     function launchResult(result): void {
         switch (result.type) {
         case "tmux":
@@ -313,15 +317,16 @@ Item {
                     verticalCenter: parent.verticalCenter
                     leftMargin: 12
                 }
+
                 implicitSize: 38
-                visible: !parent.result.tmuxSession
-                source: Quickshell.iconPath(parent.result.tmuxSession ? "" : parent.result.application.icon, "application-x-executable")
+                visible: parent.result.type === "application"
+                source: parent.result.type === "application" ? Quickshell.iconPath(parent.result.application.icon, "application-x-executable") : ""
                 asynchronous: true
             }
 
             Text {
                 anchors {
-                    left: parent.result.tmuxSession ? parent.left : resultIcon.right
+                    left: parent.result.type === "application" ? resultIcon.right : parent.left
                     right: parent.right
                     verticalCenter: parent.verticalCenter
                     leftMargin: 12
