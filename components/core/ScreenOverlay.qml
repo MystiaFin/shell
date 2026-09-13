@@ -1,5 +1,3 @@
-import Quickshell
-import QtQuick
 import "../../services"
 import "../../widgets/controlcenter"
 import "../../widgets/launcher"
@@ -17,8 +15,6 @@ EdgeOverlayWindow {
     screen: targetScreen
 
     EdgePanel {
-        id: powerMenuWidget
-
         host: root
         edge: EdgePanel.Left
         edgeAlignment: EdgePanel.Start
@@ -29,6 +25,9 @@ EdgeOverlayWindow {
         targetWidth: 250
         targetHeight: 330
         radius: ShellMetrics.panelRadius
+        motionStiffness: ShellMetrics.fastPanelSpringStiffness
+        motionDamping: ShellMetrics.fastPanelSpringDamping
+        closeMotionDamping: ShellMetrics.fastPanelCloseSpringDamping
 
         PowerMenu {
             anchors.fill: parent
@@ -36,8 +35,6 @@ EdgeOverlayWindow {
     }
 
     EdgePanel {
-        id: utilityCenterWidget
-
         host: root
         edge: EdgePanel.Right
         edgeAlignment: EdgePanel.Start
@@ -49,6 +46,9 @@ EdgeOverlayWindow {
         targetWidth: 360
         targetHeight: Math.max(1, Math.min(800, root.height - 96))
         radius: ShellMetrics.panelRadius
+        motionStiffness: ShellMetrics.fastPanelSpringStiffness
+        motionDamping: ShellMetrics.fastPanelSpringDamping
+        closeMotionDamping: ShellMetrics.fastPanelCloseSpringDamping
 
         UtilityCenter {
             anchors.fill: parent
@@ -56,8 +56,6 @@ EdgeOverlayWindow {
     }
 
     EdgePanel {
-        id: controlCenterWidget
-
         host: root
         edge: EdgePanel.Top
         edgeAlignment: EdgePanel.Center
@@ -66,6 +64,9 @@ EdgeOverlayWindow {
         targetWidth: Math.max(1, Math.min(780, root.width - 64))
         targetHeight: 360
         radius: ShellMetrics.panelRadius
+        motionStiffness: ShellMetrics.fastPanelSpringStiffness
+        motionDamping: ShellMetrics.fastPanelSpringDamping
+        closeMotionDamping: ShellMetrics.fastPanelCloseSpringDamping
 
         ControlCenter {
             anchors.fill: parent
@@ -86,8 +87,9 @@ EdgeOverlayWindow {
         targetWidth: Math.max(1, Math.min(620, root.width - 80))
         targetHeight: launcher.desiredHeight
         radius: ShellMetrics.panelRadius
-        heightAnimationDurationMs: launcher.resizeDurationMs
-        resizeEasing: Easing.OutCubic
+        motionStiffness: ShellMetrics.fastPanelSpringStiffness
+        motionDamping: ShellMetrics.fastPanelSpringDamping
+        closeMotionDamping: ShellMetrics.fastPanelCloseSpringDamping
 
         ApplicationLauncher {
             id: launcher
@@ -103,8 +105,6 @@ EdgeOverlayWindow {
     }
 
     EdgePanel {
-        id: notificationWidget
-
         host: root
         edge: EdgePanel.Right
         edgeAlignment: EdgePanel.End
@@ -116,7 +116,6 @@ EdgeOverlayWindow {
         targetWidth: 380
         targetHeight: notificationStack.desiredHeight
         radius: ShellMetrics.panelRadius
-        heightAnimationDurationMs: 240
 
         NotificationStack {
             id: notificationStack

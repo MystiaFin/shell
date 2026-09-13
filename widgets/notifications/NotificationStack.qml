@@ -1,4 +1,5 @@
 import QtQuick
+import "../../components/common"
 import "../../components/theme"
 import "../../services"
 
@@ -28,20 +29,17 @@ Item {
         onCountChanged: if (count > 0) positionViewAtEnd()
 
         remove: Transition {
-            NumberAnimation {
+            MotionAnimation {
+                type: MotionAnimation.FastSpatial
                 property: "slideOffset"
                 from: 0
                 to: list.width
-                duration: 240
-                easing.type: Easing.InCubic
             }
         }
 
         displaced: Transition {
-            NumberAnimation {
+            MotionAnimation {
                 property: "y"
-                duration: 220
-                easing.type: Easing.OutCubic
             }
         }
 

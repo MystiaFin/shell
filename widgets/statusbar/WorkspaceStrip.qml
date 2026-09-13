@@ -1,4 +1,5 @@
 import QtQuick
+import "../../components/common"
 import "../../components/theme"
 import "../../services"
 
@@ -51,26 +52,14 @@ Item {
             rotation: root.starRotation
 
             Behavior on rotation {
-                NumberAnimation {
-                    duration: 700
-                    easing.type: Easing.OutCubic
-                }
+                MotionAnimation { type: MotionAnimation.SlowSpatial }
             }
         }
 
         Behavior on x {
-            NumberAnimation {
-                duration: 250
-                easing.type: Easing.OutCubic
-            }
+            MotionAnimation { type: MotionAnimation.FastSpatial }
         }
 
-        Behavior on width {
-            NumberAnimation {
-                duration: 200
-                easing.type: Easing.OutCubic
-            }
-        }
     }
 
     Row {
@@ -80,7 +69,6 @@ Item {
         spacing: 4
 
         Repeater {
-            id: workspaceRepeater
             model: root.workspaces
 
             Item {
@@ -102,12 +90,6 @@ Item {
                     font.pixelSize: 18
                     scale: 0.6
 
-                    Behavior on scale {
-                        NumberAnimation {
-                            duration: 150
-                            easing.type: Easing.OutCubic
-                        }
-                    }
                 }
 
                 MouseArea {
@@ -120,9 +102,6 @@ Item {
     }
 
     Behavior on implicitWidth {
-        NumberAnimation {
-            duration: 200
-            easing.type: Easing.OutCubic
-        }
+        MotionAnimation { type: MotionAnimation.FastSpatial }
     }
 }

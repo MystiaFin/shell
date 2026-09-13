@@ -3,6 +3,7 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import QtQuick
 import "../../services"
+import "../common"
 import "../state"
 import "../theme"
 
@@ -102,8 +103,6 @@ PanelWindow {
         contentUnderBorder: true
 
         Image {
-            id: displayedImage
-
             anchors.fill: parent
             source: root.displayedSource
             fillMode: root.imageFillMode
@@ -194,22 +193,21 @@ PanelWindow {
     SequentialAnimation {
         id: startupIntro
 
-        NumberAnimation {
+        MotionAnimation {
+            type: MotionAnimation.DefaultEffects
             target: solidBlock
             property: "opacity"
             from: 0
             to: 1
             duration: ShellMetrics.startupBlockFadeDurationMs
-            easing.type: Easing.OutCubic
         }
 
-        NumberAnimation {
+        MotionAnimation {
             target: wallpaperFrame
             property: "y"
             from: root.height
             to: root.margin
             duration: ShellMetrics.startupMaskRevealDurationMs
-            easing.type: Easing.OutCubic
         }
 
         onFinished: {
@@ -219,15 +217,15 @@ PanelWindow {
         }
     }
 
-    NumberAnimation {
+    MotionAnimation {
         id: revealAnimation
+        type: MotionAnimation.SlowSpatial
 
         target: root
         property: "revealRadius"
         from: 0
         to: root.maximumRevealRadius
-        duration: 1400
-        easing.type: Easing.InOutCubic
+        duration: ShellMetrics.wallpaperRevealDurationMs
 
         onFinished: {
             root.displayedSource = root.incomingSource;

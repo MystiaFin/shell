@@ -1,5 +1,6 @@
-import Quickshell
 import QtQuick
+import "../../components/common"
+import "../../components/state"
 import "../../components/theme"
 import "../../services"
 import "../clock"
@@ -12,6 +13,7 @@ Item {
     required property url wallpaperSource
     required property Item wallpaperSourceItem
     property bool shown: false
+    property bool placementReady: false
     property var pendingPlacement: null
     property string requestedFingerprint: ""
     readonly property bool wallpaperTransitioning:
@@ -24,8 +26,8 @@ Item {
     readonly property size environmentSize: Qt.size(190, 125)
     readonly property color placementTextColor: Theme.primaryTextColor
 
-    visible: shown || opacity > 0
-    opacity: shown ? 1 : 0
+    visible: (shown && placementReady) || opacity > 0
+    opacity: shown && placementReady ? 1 : 0
 
     function requestPlacement(): void {
         if (wallpaperTransitioning || !wallpaperSource.toString()
@@ -98,10 +100,7 @@ Item {
     }
 
     Behavior on opacity {
-        NumberAnimation {
-            duration: ShellMetrics.fastAnimationMs
-            easing.type: Easing.InOutCubic
-        }
+        MotionAnimation { type: MotionAnimation.DefaultEffects }
     }
 
     FloatingClock {
@@ -117,8 +116,14 @@ Item {
         contentAlignment: x + width / 2 < root.width / 2
             ? Text.AlignLeft : Text.AlignRight
 
-        Behavior on targetX { OverviewMovement {} }
-        Behavior on targetY { OverviewMovement {} }
+        Behavior on targetX {
+            enabled: root.placementReady
+            OverviewMovement {}
+        }
+        Behavior on targetY {
+            enabled: root.placementReady
+            OverviewMovement {}
+        }
     }
 
     OverviewWeather {
@@ -133,8 +138,14 @@ Item {
         wallpaperSourceItem: root.wallpaperSourceItem
         wallpaperRect: Qt.rect(x, y, width, height)
 
-        Behavior on targetX { OverviewMovement {} }
-        Behavior on targetY { OverviewMovement {} }
+        Behavior on targetX {
+            enabled: root.placementReady
+            OverviewMovement {}
+        }
+        Behavior on targetY {
+            enabled: root.placementReady
+            OverviewMovement {}
+        }
     }
 
     OverviewCalendar {
@@ -149,8 +160,14 @@ Item {
         wallpaperSourceItem: root.wallpaperSourceItem
         wallpaperRect: Qt.rect(x, y, width, height)
 
-        Behavior on targetX { OverviewMovement {} }
-        Behavior on targetY { OverviewMovement {} }
+        Behavior on targetX {
+            enabled: root.placementReady
+            OverviewMovement {}
+        }
+        Behavior on targetY {
+            enabled: root.placementReady
+            OverviewMovement {}
+        }
     }
 
     OverviewMovableResourceCard {
@@ -257,9 +274,9 @@ Item {
 
     }
 
-    component OverviewMovement: NumberAnimation {
-        duration: 700
-        easing.type: Easing.InOutCubic
+    component OverviewMovement: MotionAnimation {
+        type: MotionAnimation.SlowSpatial
+        duration: ShellMetrics.floatingWidgetTransitionDurationMs
     }
 
     Timer {
@@ -277,6 +294,14 @@ Item {
                 return;
             root.pendingPlacement = placement;
             root.applyPlacement();
+            root.placementReady = true;
+        }
+
+        function onOverviewPlacementFailed(key, source): void {
+            if (root.placementReady || key !== root.screenName
+                    || source !== root.wallpaperSource.toString())
+                return;
+            root.placementReady = true;
         }
     }
 

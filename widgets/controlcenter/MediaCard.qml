@@ -1,6 +1,7 @@
 import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
+import "../../components/common"
 import "../../components/theme"
 import "../../services"
 
@@ -154,9 +155,8 @@ Rectangle {
                                 color: Theme.accentColor
 
                                 Behavior on height {
-                                    NumberAnimation {
-                                        duration: 65
-                                        easing.type: Easing.OutCubic
+                                    SmoothedAnimation {
+                                        velocity: ShellMetrics.continuousMotionVelocity
                                     }
                                 }
                             }
@@ -194,7 +194,9 @@ Rectangle {
                         color: Theme.accentColor
 
                         Behavior on width {
-                            NumberAnimation { duration: 200 }
+                            SmoothedAnimation {
+                                velocity: ShellMetrics.continuousMotionVelocity
+                            }
                         }
                     }
                 }
@@ -303,19 +305,17 @@ Rectangle {
         property int direction: 1
 
         ParallelAnimation {
-            NumberAnimation {
+            MotionAnimation {
+                type: MotionAnimation.FastSpatial
                 target: mediaCard
                 property: "switchOffset"
                 to: -playerSwitch.direction * 28
-                duration: 110
-                easing.type: Easing.InCubic
             }
-            NumberAnimation {
+            MotionAnimation {
+                type: MotionAnimation.FastEffects
                 target: mediaCard
                 property: "switchOpacity"
                 to: 0
-                duration: 110
-                easing.type: Easing.InCubic
             }
         }
         ScriptAction {
@@ -327,19 +327,17 @@ Rectangle {
             value: playerSwitch.direction * 28
         }
         ParallelAnimation {
-            NumberAnimation {
+            MotionAnimation {
+                type: MotionAnimation.FastSpatial
                 target: mediaCard
                 property: "switchOffset"
                 to: 0
-                duration: 170
-                easing.type: Easing.OutCubic
             }
-            NumberAnimation {
+            MotionAnimation {
+                type: MotionAnimation.DefaultEffects
                 target: mediaCard
                 property: "switchOpacity"
                 to: 1
-                duration: 170
-                easing.type: Easing.OutCubic
             }
         }
     }

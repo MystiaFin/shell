@@ -1,6 +1,7 @@
 import Quickshell.Networking
 import QtQuick
 import QtQuick.Layouts
+import "../../components/common"
 import "../../components/theme"
 
 Rectangle {
@@ -41,7 +42,7 @@ Rectangle {
     clip: true
 
     Behavior on height {
-        NumberAnimation { duration: ShellMetrics.fastAnimationMs; easing.type: Easing.OutCubic }
+        MotionAnimation { type: MotionAnimation.FastSpatial }
     }
 
     ColumnLayout {
@@ -95,8 +96,6 @@ Rectangle {
 
         // Password editor
         RowLayout {
-            id: passwordEditor
-
             Layout.fillWidth: true
             Layout.preferredHeight: 34
             visible: root.passwordEditorExpanded && !root.network.connected

@@ -2,6 +2,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Widgets
 import QtQuick
+import "../../components/common"
 import "../../components/theme"
 
 Item {
@@ -31,7 +32,6 @@ Item {
         maximumHeight,
         fixedContentHeight + visibleResultRows * resultRowHeight
     )
-    readonly property int resizeDurationMs: 360
     property alias focusTarget: searchInput
 
     signal closeRequested()
@@ -237,12 +237,11 @@ Item {
         highlightFollowsCurrentItem: false
 
         remove: Transition {
-            NumberAnimation {
+            MotionAnimation {
+                type: MotionAnimation.FastEffects
                 property: "opacity"
                 from: 1
                 to: 0
-                duration: ShellMetrics.fastAnimationMs
-                easing.type: Easing.OutCubic
             }
         }
 
@@ -255,10 +254,7 @@ Item {
             opacity: resultList.currentItem ? 1 : 0
 
             Behavior on y {
-                NumberAnimation {
-                    duration: ShellMetrics.fastAnimationMs
-                    easing.type: Easing.InOutCubic
-                }
+                MotionAnimation { type: MotionAnimation.FastSpatial }
             }
         }
 
@@ -290,10 +286,7 @@ Item {
                     : 0
 
                 Behavior on opacity {
-                    NumberAnimation {
-                        duration: ShellMetrics.fastAnimationMs
-                        easing.type: Easing.InOutCubic
-                    }
+                    MotionAnimation { type: MotionAnimation.FastEffects }
                 }
             }
 

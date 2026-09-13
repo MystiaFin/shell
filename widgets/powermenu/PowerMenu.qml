@@ -60,10 +60,7 @@ Item {
                         : Theme.accentColor
 
                     Behavior on width {
-                        NumberAnimation {
-                            duration: ShellMetrics.pageTransitionDurationMs
-                            easing.type: Easing.OutCubic
-                        }
+                        MotionAnimation { type: MotionAnimation.FastSpatial }
                     }
                 }
 
@@ -91,10 +88,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
 
                         Behavior on color {
-                            ColorAnimation {
-                                duration: ShellMetrics.fastAnimationMs
-                                easing.type: Easing.InOutCubic
-                            }
+                            MotionColorAnimation { type: MotionAnimation.FastEffects }
                         }
                     }
 
@@ -111,10 +105,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
 
                         Behavior on color {
-                            ColorAnimation {
-                                duration: ShellMetrics.fastAnimationMs
-                                easing.type: Easing.InOutCubic
-                            }
+                            MotionColorAnimation { type: MotionAnimation.FastEffects }
                         }
                     }
                 }
@@ -134,10 +125,7 @@ Item {
                     opacity: actionHover.hovered ? 0 : 1
 
                     Behavior on opacity {
-                        NumberAnimation {
-                            duration: ShellMetrics.fastAnimationMs
-                            easing.type: Easing.InOutCubic
-                        }
+                        MotionAnimation { type: MotionAnimation.FastEffects }
                     }
                 }
 

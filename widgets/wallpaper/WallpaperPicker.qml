@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell.Widgets
 import Qt.labs.folderlistmodel
+import "../../components/common"
 import "../../components/state"
 import "../../components/theme"
 import "../../services"
@@ -56,7 +57,7 @@ Item {
     opacity: shown ? 1 : 0
 
     Behavior on opacity {
-        NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+        MotionAnimation { type: MotionAnimation.DefaultEffects }
     }
 
     FolderListModel {

@@ -1,4 +1,5 @@
 import QtQuick
+import "../common"
 import "../theme"
 
 Item {
@@ -8,8 +9,7 @@ Item {
         Top,
         Right,
         Bottom,
-        Left,
-        Floating
+        Left
     }
 
     enum EdgeAlignment {
@@ -22,9 +22,7 @@ Item {
 
     default property alias content: contentLayer.data
 
-    readonly property bool isEdgePanel: true
     property bool shown: false
-    property bool contributesToShape: true
     property bool wantsKeyboardFocus: false
     property Item focusTarget: null
 
@@ -32,25 +30,18 @@ Item {
     property int edgeAlignment: EdgePanel.Center
     property real alongEdgeOffset: 0
     property real edgeOffset: ShellMetrics.panelScreenEdgeOverlap
-    property real floatingX: 0
-    property real floatingY: 0
 
     property real targetWidth: 320
     property real targetHeight: 180
     property real radius: ShellMetrics.panelRadius
     property real hiddenMargin: 32
     property real closedWidthScale: 0.96
-
-    property int slideDurationMs: ShellMetrics.panelSlideDurationMs
-    property int slideEasing: Easing.OutBack
-    property real slideOvershoot: ShellMetrics.panelSlideOvershoot
-    property int widthAnimationDurationMs: ShellMetrics.panelResizeDurationMs
-    property int widthEasing: Easing.OutBack
-    property real widthOvershoot: ShellMetrics.panelResizeOvershoot
-    property int heightAnimationDurationMs: 340
-    property int resizeEasing: Easing.OutCubic
+    property real motionStiffness: 250
+    property real motionDamping: 31.62
+    property real closeMotionDamping: motionDamping
 
     readonly property bool animationsReady: host && host.animationsReady
+    readonly property real motionProgress: revealMotion.value
     readonly property real restingX: {
         if (!host)
             return 0;
@@ -58,8 +49,6 @@ Item {
             return -edgeOffset;
         if (edge === EdgePanel.Right)
             return host.width - width + edgeOffset;
-        if (edge === EdgePanel.Floating)
-            return floatingX;
 
         if (edgeAlignment === EdgePanel.Start)
             return alongEdgeOffset;
@@ -74,8 +63,6 @@ Item {
             return -edgeOffset;
         if (edge === EdgePanel.Bottom)
             return host.height - height + edgeOffset;
-        if (edge === EdgePanel.Floating)
-            return floatingY;
 
         if (edgeAlignment === EdgePanel.Start)
             return alongEdgeOffset;
@@ -83,55 +70,46 @@ Item {
             return host.height - height - alongEdgeOffset;
         return (host.height - height) / 2 + alongEdgeOffset;
     }
-    property real slideOffset: {
-        if (shown)
-            return 0;
+    readonly property real hiddenSlideOffset: {
         if (edge === EdgePanel.Top || edge === EdgePanel.Left)
-            return -(edge === EdgePanel.Top ? height : width) - hiddenMargin;
+            return -(edge === EdgePanel.Top ? targetHeight : targetWidth)
+                - hiddenMargin;
         if (edge === EdgePanel.Right)
-            return width + hiddenMargin;
-        return height + hiddenMargin;
+            return targetWidth + hiddenMargin;
+        return targetHeight + hiddenMargin;
     }
+    readonly property real slideOffset: hiddenSlideOffset * (1 - motionProgress)
 
     x: restingX + ((edge === EdgePanel.Left || edge === EdgePanel.Right)
         ? slideOffset
         : 0)
     y: restingY + ((edge === EdgePanel.Top
-        || edge === EdgePanel.Bottom
-        || edge === EdgePanel.Floating)
+        || edge === EdgePanel.Bottom)
         ? slideOffset
         : 0)
-    width: shown ? targetWidth : targetWidth * closedWidthScale
-    height: targetHeight
+    width: targetWidth * (closedWidthScale
+        + (1 - closedWidthScale) * motionProgress)
+    height: heightMotion.value
     clip: true
 
-    Behavior on width {
-        enabled: root.animationsReady
+    SpringMotion {
+        id: revealMotion
 
-        NumberAnimation {
-            duration: root.widthAnimationDurationMs
-            easing.type: root.widthEasing
-            easing.overshoot: root.widthOvershoot
-        }
+        enabled: root.animationsReady
+        target: root.shown ? 1 : 0
+        stiffness: root.motionStiffness
+        damping: root.shown ? root.motionDamping : root.closeMotionDamping
+        positionEpsilon: 0.0005
+        velocityEpsilon: 0.001
     }
 
-    Behavior on height {
+    SpringMotion {
+        id: heightMotion
+
         enabled: root.animationsReady
-
-        NumberAnimation {
-            duration: root.heightAnimationDurationMs
-            easing.type: root.resizeEasing
-        }
-    }
-
-    Behavior on slideOffset {
-        enabled: root.animationsReady
-
-        NumberAnimation {
-            duration: root.slideDurationMs
-            easing.type: root.slideEasing
-            easing.overshoot: root.slideOvershoot
-        }
+        target: root.targetHeight
+        positionEpsilon: 0.1
+        velocityEpsilon: 0.1
     }
 
     Item {

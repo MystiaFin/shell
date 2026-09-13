@@ -29,6 +29,7 @@ Singleton {
     property var analysisCacheKeys: []
 
     signal overviewPlacementReady(string key, string source, var placement)
+    signal overviewPlacementFailed(string key, string source)
 
     function requestOverviewPlacement(options: var): void {
         const source = options.source.toString();
@@ -131,15 +132,20 @@ Singleton {
         const placement = OverviewPlacement.calculate(request, analysis, cardGap);
         if (placement)
             overviewPlacementReady(request.key, request.source, placement);
+        else
+            overviewPlacementFailed(request.key, request.source);
     }
 
     function retryIfCurrent(request: var): void {
         console.warn("Could not analyze wallpaper for Desktop Overview:",
             request.source, analyzerError.text.trim());
 
-        if (request.retryCount >= maximumRetries
-                || latestGenerations[request.key] !== request.generation)
+        if (latestGenerations[request.key] !== request.generation)
             return;
+        if (request.retryCount >= maximumRetries) {
+            overviewPlacementFailed(request.key, request.source);
+            return;
+        }
 
         request.retryCount++;
         retryRequests = retryRequests.concat(request);

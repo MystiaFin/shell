@@ -1,6 +1,7 @@
 import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
+import "../../components/common"
 import "../../components/theme"
 
 Rectangle {
@@ -30,13 +31,12 @@ Rectangle {
             enterAnimation.start();
     }
 
-    NumberAnimation {
+    MotionAnimation {
         id: enterAnimation
+        type: MotionAnimation.DefaultSpatial
         target: root
         property: "slideOffset"
         to: 0
-        duration: 240
-        easing.type: Easing.OutCubic
     }
 
     RowLayout {

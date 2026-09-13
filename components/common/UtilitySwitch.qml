@@ -21,10 +21,7 @@ Rectangle {
         color: Theme.primaryTextColor
 
         Behavior on x {
-            NumberAnimation {
-                duration: ShellMetrics.fastAnimationMs
-                easing.type: Easing.OutCubic
-            }
+            MotionAnimation { type: MotionAnimation.FastSpatial }
         }
     }
 

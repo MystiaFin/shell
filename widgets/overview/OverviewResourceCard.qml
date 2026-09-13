@@ -1,4 +1,5 @@
 import QtQuick
+import "../../components/common"
 import "../../components/theme"
 
 Item {
@@ -44,8 +45,6 @@ Item {
         }
 
         Text {
-            id: detailText
-
             anchors {
                 top: labelText.bottom
                 topMargin: 2
@@ -78,10 +77,7 @@ Item {
                 color: root.accentColor
 
                 Behavior on width {
-                    NumberAnimation {
-                        duration: ShellMetrics.pageTransitionDurationMs
-                        easing.type: Easing.OutCubic
-                    }
+                    MotionAnimation { type: MotionAnimation.FastSpatial }
                 }
             }
         }

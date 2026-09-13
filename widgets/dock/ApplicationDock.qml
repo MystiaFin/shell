@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Widgets
 import QtQuick
+import "../../components/common"
 import "../../components/theme"
 import "../../services"
 import "../overview"
@@ -48,17 +49,11 @@ Item {
     }
 
     Behavior on opacity {
-        NumberAnimation {
-            duration: ShellMetrics.fastAnimationMs
-            easing.type: Easing.InOutCubic
-        }
+        MotionAnimation { type: MotionAnimation.DefaultEffects }
     }
 
     Behavior on scale {
-        NumberAnimation {
-            duration: ShellMetrics.fastAnimationMs
-            easing.type: Easing.OutCubic
-        }
+        MotionAnimation { type: MotionAnimation.FastSpatial }
     }
 
     ScriptModel {
@@ -120,7 +115,7 @@ Item {
                     ? Theme.hoverSurfaceColor : "transparent"
 
                 Behavior on color {
-                    ColorAnimation { duration: ShellMetrics.fastAnimationMs }
+                    MotionColorAnimation { type: MotionAnimation.FastEffects }
                 }
             }
 
@@ -133,10 +128,7 @@ Item {
 
                 scale: itemHover.hovered ? 1.1 : 1
                 Behavior on scale {
-                    NumberAnimation {
-                        duration: ShellMetrics.fastAnimationMs
-                        easing.type: Easing.OutCubic
-                    }
+                    MotionAnimation { type: MotionAnimation.FastSpatial }
                 }
             }
 

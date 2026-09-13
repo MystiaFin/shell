@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "../../components/common"
 import "../../components/theme"
 import "../../services"
 
@@ -51,19 +52,16 @@ Item {
             boundsBehavior: Flickable.StopAtBounds
 
             remove: Transition {
-                NumberAnimation {
+                MotionAnimation {
+                    type: MotionAnimation.FastEffects
                     property: "opacity"
                     to: 0
-                    duration: ShellMetrics.fastAnimationMs
-                    easing.type: Easing.OutCubic
                 }
             }
 
             removeDisplaced: Transition {
-                NumberAnimation {
+                MotionAnimation {
                     property: "y"
-                    duration: 220
-                    easing.type: Easing.OutCubic
                 }
             }
 

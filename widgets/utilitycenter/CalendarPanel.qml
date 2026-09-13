@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "../../components/common"
 import "../../components/theme"
 import "../../services"
 
@@ -240,19 +241,15 @@ Rectangle {
 
         property int direction: 1
 
-        NumberAnimation {
+        MotionAnimation {
             target: outgoingPage
             property: "x"
             to: -monthSlide.direction * pageViewport.width
-            duration: ShellMetrics.pageTransitionDurationMs
-            easing.type: Easing.OutCubic
         }
-        NumberAnimation {
+        MotionAnimation {
             target: livePage
             property: "x"
             to: 0
-            duration: ShellMetrics.pageTransitionDurationMs
-            easing.type: Easing.OutCubic
         }
 
         onFinished: {

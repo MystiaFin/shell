@@ -15,10 +15,9 @@ PanelWindow {
     property real connectionRadius: ShellMetrics.liquidConnectionRadius
     readonly property int maximumShapeCount: 8
 
-    readonly property var edgePanels: panelLayer.children.filter(panel =>
-        panel.isEdgePanel === true)
+    readonly property var edgePanels: panelLayer.children
     readonly property var shapeContributors: edgePanels.filter(panel =>
-        panel.contributesToShape)
+        panel.motionProgress > 0.001)
     readonly property bool keyboardRequested: edgePanels.some(panel =>
         panel.shown && panel.wantsKeyboardFocus)
 

@@ -1,4 +1,5 @@
 import QtQuick
+import "../../components/common"
 import "../../components/theme"
 
 Rectangle {
@@ -19,7 +20,7 @@ Rectangle {
     opacity: enabled ? 1 : 0.35
 
     Behavior on opacity {
-        NumberAnimation { duration: ShellMetrics.fastAnimationMs }
+        MotionAnimation { type: MotionAnimation.DefaultEffects }
     }
 
     Text {

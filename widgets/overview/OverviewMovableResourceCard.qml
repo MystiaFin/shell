@@ -1,4 +1,6 @@
 import QtQuick
+import "../../components/common"
+import "../../components/theme"
 
 OverviewResourceCard {
     id: root
@@ -16,16 +18,18 @@ OverviewResourceCard {
     wallpaperRect: Qt.rect(x, y, width, height)
 
     Behavior on targetX {
-        NumberAnimation {
-            duration: 700
-            easing.type: Easing.InOutCubic
+        enabled: root.overview.placementReady
+        MotionAnimation {
+            type: MotionAnimation.SlowSpatial
+            duration: ShellMetrics.floatingWidgetTransitionDurationMs
         }
     }
 
     Behavior on targetY {
-        NumberAnimation {
-            duration: 700
-            easing.type: Easing.InOutCubic
+        enabled: root.overview.placementReady
+        MotionAnimation {
+            type: MotionAnimation.SlowSpatial
+            duration: ShellMetrics.floatingWidgetTransitionDurationMs
         }
     }
 }

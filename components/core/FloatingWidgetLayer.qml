@@ -12,8 +12,11 @@ PanelWindow {
 
     required property var modelData
     readonly property var targetScreen: modelData
-    readonly property url displayedWallpaper:
+    readonly property url publishedWallpaper:
         DisplayedWallpaperState.sourceForScreen(targetScreen.name)
+    readonly property url displayedWallpaper:
+        publishedWallpaper.toString() !== ""
+            ? publishedWallpaper : WallpaperService.source
     readonly property real dockReservation: applicationDock.hasApplications
         ? applicationDock.height + 16 : 0
     readonly property rect usableArea: Qt.rect(

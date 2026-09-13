@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Wayland
 import QtQuick
+import "../../components/common"
 import "../../components/state"
 import "../../components/theme"
 
@@ -106,25 +107,24 @@ PanelWindow {
         }
     }
 
-    NumberAnimation {
+    MotionAnimation {
         id: backgroundFade
+        type: MotionAnimation.DefaultEffects
 
         target: root
         property: "backgroundOpacity"
         from: 0
         to: 1
         duration: ShellMetrics.startupBlockFadeDurationMs
-        easing.type: Easing.OutCubic
     }
 
-    NumberAnimation {
+    MotionAnimation {
         id: statusIntro
 
         target: statusContent
         property: "y"
         to: 0
         duration: ShellMetrics.startupStatusBarDurationMs
-        easing.type: Easing.OutCubic
     }
 
     Timer {

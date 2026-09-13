@@ -16,9 +16,8 @@ Item {
     implicitHeight: 24
 
     Behavior on displayValue {
-        NumberAnimation {
-            duration: 300
-            easing.type: Easing.OutCubic
+        SmoothedAnimation {
+            velocity: ShellMetrics.continuousMotionVelocity
         }
     }
 
@@ -52,7 +51,6 @@ Item {
             target: root
             function onDisplayValueChanged() { canvas.requestPaint(); }
             function onRingColorChanged() { canvas.requestPaint(); }
-            function onBackgroundColorChanged() { canvas.requestPaint(); }
         }
     }
 

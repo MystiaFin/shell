@@ -49,10 +49,7 @@ Item {
                 border.color: Theme.accentColor
 
                 Behavior on color {
-                    ColorAnimation {
-                        duration: 300
-                        easing.type: Easing.InOutCubic
-                    }
+                    MotionColorAnimation { type: MotionAnimation.FastEffects }
                 }
 
                 Item {
@@ -72,25 +69,16 @@ Item {
                         rotation: Theme.lightMode ? 0 : -90
 
                         Behavior on color {
-                            ColorAnimation { duration: 300 }
+                            MotionColorAnimation { type: MotionAnimation.FastEffects }
                         }
                         Behavior on opacity {
-                            NumberAnimation {
-                                duration: 300
-                                easing.type: Easing.InOutCubic
-                            }
+                            MotionAnimation { type: MotionAnimation.DefaultEffects }
                         }
                         Behavior on scale {
-                            NumberAnimation {
-                                duration: 300
-                                easing.type: Easing.InOutCubic
-                            }
+                            MotionAnimation {}
                         }
                         Behavior on rotation {
-                            NumberAnimation {
-                                duration: 300
-                                easing.type: Easing.InOutCubic
-                            }
+                            MotionAnimation {}
                         }
                     }
 
@@ -107,25 +95,16 @@ Item {
                         rotation: Theme.lightMode ? 90 : 0
 
                         Behavior on color {
-                            ColorAnimation { duration: 300 }
+                            MotionColorAnimation { type: MotionAnimation.FastEffects }
                         }
                         Behavior on opacity {
-                            NumberAnimation {
-                                duration: 300
-                                easing.type: Easing.InOutCubic
-                            }
+                            MotionAnimation { type: MotionAnimation.DefaultEffects }
                         }
                         Behavior on scale {
-                            NumberAnimation {
-                                duration: 300
-                                easing.type: Easing.OutBack
-                            }
+                            MotionAnimation {}
                         }
                         Behavior on rotation {
-                            NumberAnimation {
-                                duration: 300
-                                easing.type: Easing.InOutCubic
-                            }
+                            MotionAnimation {}
                         }
                     }
                 }
@@ -159,7 +138,7 @@ Item {
                 x: (0 - root.pageIndex) * pageViewport.width
 
                 Behavior on x {
-                    NumberAnimation { duration: ShellMetrics.pageTransitionDurationMs; easing.type: Easing.OutCubic }
+                    MotionAnimation {}
                 }
             }
 
@@ -169,7 +148,7 @@ Item {
                 x: (1 - root.pageIndex) * pageViewport.width
 
                 Behavior on x {
-                    NumberAnimation { duration: ShellMetrics.pageTransitionDurationMs; easing.type: Easing.OutCubic }
+                    MotionAnimation {}
                 }
             }
 
@@ -179,7 +158,7 @@ Item {
                 x: (2 - root.pageIndex) * pageViewport.width
 
                 Behavior on x {
-                    NumberAnimation { duration: ShellMetrics.pageTransitionDurationMs; easing.type: Easing.OutCubic }
+                    MotionAnimation {}
                 }
             }
         }
