@@ -7,7 +7,7 @@ Rectangle {
     property alias text: searchInput.text
     property alias focusTarget: searchInput
 
-    property string placeholder: "Search applications..."
+    property string placeholder: "Type > for command pallete..."
 
     signal moveSelectionRequested(bool down)
     signal accepted
