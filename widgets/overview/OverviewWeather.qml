@@ -57,8 +57,6 @@ Item {
         }
 
         Column {
-            id: weatherDetails
-
             x: root.iconOnLeft && conditionIcon.visible
                 ? conditionIcon.width + 12 : 0
             width: parent.width - (conditionIcon.visible

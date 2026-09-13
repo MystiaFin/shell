@@ -36,7 +36,6 @@ Item {
         }
 
         HoverHandler {
-            id: cardHover
             cursorShape: Qt.PointingHandCursor
         }
         TapHandler { onTapped: root.selectionRequested() }

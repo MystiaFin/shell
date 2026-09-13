@@ -27,7 +27,6 @@ Singleton {
     property real airQualityIndex: 0
     property bool airQualityAvailable: false
     property int weatherCode: -1
-    property date lastUpdated: new Date(0)
     property string responseData: ""
     property string airQualityResponseData: ""
     property string loadedConfig: ""
@@ -104,7 +103,6 @@ Singleton {
             uvIndex = Number(uvValue);
             environmentalAvailable = humidityValue !== null && uvValue !== null
                 && Number.isFinite(humidity) && Number.isFinite(uvIndex);
-            lastUpdated = new Date();
             available = true;
             errorMessage = "";
         } catch (error) {

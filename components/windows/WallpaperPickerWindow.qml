@@ -3,7 +3,6 @@ import Quickshell.Wayland
 import QtQuick
 import "../../widgets/wallpaper" as WallpaperWidgets
 import "../state"
-import "../../services"
 
 PanelWindow {
     id: root

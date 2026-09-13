@@ -43,15 +43,11 @@ Item {
         }
 
         Item {
-            id: faderInteractionArea
-
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumHeight: 120
 
             Rectangle {
-                id: faderTrack
-
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -92,8 +88,6 @@ Item {
             }
 
             MouseArea {
-                id: faderPointerArea
-
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: mouseY >= faderHandle.y

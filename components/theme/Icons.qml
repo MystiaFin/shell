@@ -23,7 +23,6 @@ Singleton {
     readonly property string wifiNone: "󰤟"
     readonly property string previousMonth: "󰁍"
     readonly property string nextMonth: "󰁔"
-    readonly property string emptyFolder: "󰉏"
     readonly property string volume: "󰕾"
     readonly property string microphone: "󰍬"
     readonly property string media: "󰎈"

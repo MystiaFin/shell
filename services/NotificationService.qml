@@ -82,8 +82,6 @@ Singleton {
     ListModel { id: popupListModel }
 
     NotificationServer {
-        id: server
-
         bodySupported: true
         bodyMarkupSupported: false
         imageSupported: true

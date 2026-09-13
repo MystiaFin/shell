@@ -74,7 +74,6 @@ Singleton {
     ListModel { id: currentCalendarDaysModel }
 
     Timer {
-        id: dayChangeTimer
         interval: 60000
         running: true
         repeat: true

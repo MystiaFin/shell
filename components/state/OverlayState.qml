@@ -56,11 +56,6 @@ Singleton {
         hide(utilityCenter);
     }
 
-    function showUtilityPage(page: string): void {
-        utilityPage = page;
-        show(utilityCenter);
-    }
-
     function toggleLauncher(): void {
         if (launcherVisible) {
             hideLauncher();

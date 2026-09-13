@@ -32,7 +32,6 @@ Singleton {
     readonly property string artist: currentPlayer ? currentPlayer.trackArtist : ""
     readonly property string album: currentPlayer ? currentPlayer.trackAlbum : ""
     readonly property string artUrl: currentPlayer ? currentPlayer.trackArtUrl : ""
-    readonly property string playerName: currentPlayer ? currentPlayer.identity : ""
     readonly property bool playing: currentPlayer ? currentPlayer.isPlaying : false
     readonly property real positionSeconds: currentPlayer ? currentPlayer.position : 0
     readonly property real durationSeconds: currentPlayer ? currentPlayer.length : 0
